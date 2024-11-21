@@ -1,2 +1,2 @@
-export { atom, ripple, drip, createStore } from './rippling'
-export type { Atom, Ripple, Drip, Store } from './typing'
+export { atom, compute, effect, createStore } from './rippling'
+export type { Atom, Compute, Effect, Store } from './typing'

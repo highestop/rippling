@@ -3,20 +3,20 @@ export interface Atom<Value> {
     _initialValue: Value;
 }
 
-export interface Ripple<Value> {
+export interface Compute<Value> {
     _read: Read<Value>;
 }
 
-export type Readable<Value> = Atom<Value> | Ripple<Value> | Drip<Value, unknown[], unknown>
+export type Readable<Value> = Atom<Value> | Compute<Value> | Effect<Value, unknown[], unknown>
 
 export type Getter = <Value>(readable: Readable<Value>) => Value;
 
 export interface Setter {
     <Value>(atom: Atom<Value>, value: Value): void;
-    <Args extends unknown[], ReturnValue>(drip: Drip<unknown, Args, ReturnValue>, ...args: Args): ReturnValue;
+    <Args extends unknown[], ReturnValue>(drip: Effect<unknown, Args, ReturnValue>, ...args: Args): ReturnValue;
 }
 
-export interface Drip<Value, Args extends unknown[], Return> {
+export interface Effect<Value, Args extends unknown[], Return> {
     _read?: Read<Value>;
     _write: Write<Args, Return>;
 }
