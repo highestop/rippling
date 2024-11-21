@@ -14,13 +14,46 @@
 
 Atom are the basic stateful units in Rippling. The can be thought of as a simple key-value store.
 
+For Example:
+
+```typescript
+const store = createStore();
+const count = atom(0);
+store.set(count, 1);
+console.log(store.get(count)); // 1
+```
+
 ### Ripple
 
 Ripple are the basic compute units in Rippling. The can read other Atom / Ripple / Drip.
 
+For Example:
+
+```typescript
+const store = createStore();
+const count = atom(0);
+const doubleCount = ripple((get) => get(count) * 2);
+console.log(store.get(doubleCount)); // 0
+```
+
 ### Drip
 
 Drip are the basic action units in Rippling. The can read other Atom / Ripple / Drip and write to Atom / Drip.
+
+For Example:
+
+```typescript
+const store = createStore();
+const count = atom(0);
+const doubleCount = atom(0);
+const updateCount = drip((get, set, value) => {
+  set(count, value);
+  set(doubleCount, get(count) * 2);
+});
+store.set(updateCount, 1);
+console.log(store.get(count)); // 1
+console.log(store.get(doubleCount)); // 2
+```
 
 ## License
 
