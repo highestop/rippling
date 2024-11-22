@@ -200,3 +200,41 @@ test('get should return value directly', () => {
     expect(store.get(cmpt)).property('a', 2)
     expect(store.get(cmpt)).property('b', 1)
 })
+
+test('derived atom should trigger when deps changed', () => {
+    const store = createStore();
+    const stateA = state(0);
+    const stateB = state(0);
+    const stateC = state(0);
+    const traceB = vi.fn()
+    const traceC = vi.fn();
+    const derivedAtom = computed((get) => {
+        if (get(stateA) == 0) {
+            traceB()
+            return get(stateB);
+        } else {
+            traceC();
+            return get(stateC);
+        }
+    });
+    expect(store.get(derivedAtom)).toBe(0);
+
+    store.set(stateC, 1);
+    expect(traceC).not.toBeCalled();
+
+    store.get(derivedAtom);
+    expect(traceC).not.toBeCalled();
+
+    store.set(stateB, 100);
+    store.get(derivedAtom);
+    expect(traceC).not.toBeCalled();
+
+    traceB.mockClear()
+    store.set(stateA, 1);
+    expect(traceB).not.toBeCalled();
+    expect(traceC).not.toBeCalled();
+
+    store.get(derivedAtom);
+    expect(traceB).not.toBeCalled();
+    expect(traceC).toBeCalled();
+})
