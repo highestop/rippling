@@ -7,24 +7,27 @@ export interface Computed<Value> {
     _read: Read<Value>;
 }
 
-export type Readable<Value> = State<Value> | Computed<Value> | Effect<Value, unknown[], unknown>
+export type Readable<Value> = State<Value> | Computed<Value> | Effect<Value, unknown[]>
 
 export type Getter = <Value>(readable: Readable<Value>) => Value;
 
 export interface Setter {
     <Value>(state: State<Value>, value: Value): void;
-    <Args extends unknown[], ReturnValue>(drip: Effect<unknown, Args, ReturnValue>, ...args: Args): ReturnValue;
+    <Value, Args extends unknown[]>(effect: Effect<Value, Args>, ...args: Args): Value;
 }
 
-export interface Effect<Value, Args extends unknown[], Return> {
+export interface Effect<Value, Args extends unknown[]> {
     _read: Read<Value>;
-    _write: Write<Args, Return>;
+    _write: Write<Value, Args>;
 }
 
 export type Read<Value> = (get: Getter) => Value;
-export type Write<Args extends unknown[], Return> = (get: Getter, set: Setter, ...args: Args) => Return;
+export type Write<Value, Args extends unknown[]> = (get: Getter, set: Setter, ...args: Args) => Value;
+export type Subscribe = (readables: Readable<unknown>[], cbEffect: Effect<unknown, unknown[]>) => () => void;
 
 export interface Store {
     get: Getter;
     set: Setter;
+    sub: Subscribe;
+    flush: () => void;
 }
