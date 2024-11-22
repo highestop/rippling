@@ -47,6 +47,24 @@ test('async state should works like sync state', async () => {
     expect(await store.get(asyncCmpt)).toBe(2)
 })
 
+test('async computed should not follow old value', async () => {
+    const store = createStore()
+    const base = state('foo')
+    const cmpt = computed((get) => {
+        return Promise.resolve(get(base) + get(base))
+    })
+    const derivedCmpt = computed(async (get) => {
+        return get(base) + await get(cmpt)
+    })
+
+    const ret1 = store.get(derivedCmpt)
+    store.set(base, 'bar')
+    const ret2 = store.get(derivedCmpt)
+
+    expect(await ret1).toBe('foofoofoo')
+    expect(await ret2).toBe('barbarbar')
+})
+
 test('effect can set other state', () => {
     const store = createStore()
     const anAtom = state(1)
@@ -79,12 +97,16 @@ test('read & write effect as an effect', async () => {
 
 test('set an atom should trigger subscribe', () => {
     const store = createStore()
-    const anAtom = state(1)
+    const base = state(1, {
+        debugLabel: 'base'
+    })
     const trace = vi.fn()
-    store.sub([anAtom], effect(() => {
+    store.sub([base], effect(() => {
         trace()
+    }, {
+        debugLabel: 'effect'
     }))
-    store.set(anAtom, 2)
+    store.set(base, 2)
     expect(trace).not.toBeCalled()
     store.flush()
     expect(trace).toBeCalledTimes(1)
@@ -133,11 +155,15 @@ test('sub multiple atoms', () => {
     expect(trace).toBeCalledTimes(1)
 })
 
-test.skip('sub computed atom', () => {
+test('sub computed atom', () => {
     const store = createStore()
-    const anState = state(1)
+    const base = state(1, {
+        debugLabel: 'base'
+    })
     const cmpt = computed((get) => {
-        return get(anState) * 2
+        return get(base) * 2
+    }, {
+        debugLabel: 'cmpt'
     })
 
     const trace = vi.fn()
@@ -145,7 +171,32 @@ test.skip('sub computed atom', () => {
         trace()
     }))
     expect(trace).not.toBeCalled()
-    store.set(anState, 2)
+    store.set(base, 2)
     store.flush()
     expect(trace).toBeCalledTimes(1)
+})
+
+test('get read deps', () => {
+    const store = createStore()
+    const base = state({ a: 1 })
+    const cmpt = computed((get) => {
+        return Object.assign(get(base), { b: 1 })
+    })
+    expect(store.printReadDeps(cmpt)).toEqual(['anonymous'])
+})
+
+test('get should return value directly', () => {
+    const store = createStore()
+    const base = state({ a: 1 })
+    const cmpt = computed((get) => {
+        return Object.assign(get(base), { b: 1 })
+    })
+
+    const b = store.get(cmpt)
+    store.set(base, { a: 2 })
+    expect(b).toEqual({ a: 1, b: 1 })
+
+    b.b = 2
+    expect(store.get(cmpt)).property('a', 2)
+    expect(store.get(cmpt)).property('b', 1)
 })

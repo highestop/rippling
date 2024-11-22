@@ -1,10 +1,12 @@
 
 export interface State<Value> {
     _initialValue: Value;
+    _debugLabel?: string;
 }
 
 export interface Computed<Value> {
     _read: Read<Value>;
+    _debugLabel?: string;
 }
 
 export type Readable<Value> = State<Value> | Computed<Value> | Effect<Value, unknown[]>
@@ -19,6 +21,7 @@ export interface Setter {
 export interface Effect<Value, Args extends unknown[]> {
     _read: Read<Value>;
     _write: Write<Value, Args>;
+    _debugLabel?: string;
 }
 
 export type Read<Value> = (get: Getter) => Value;
@@ -30,4 +33,5 @@ export interface Store {
     set: Setter;
     sub: Subscribe;
     flush: () => void;
+    printReadDeps: (readable: Readable<unknown>) => string[];
 }
