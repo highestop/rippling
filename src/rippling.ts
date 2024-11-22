@@ -1,4 +1,4 @@
-import { Atom, Effect, Getter, Read, Readable, Compute, Setter, Store, Write } from "./typing";
+import { Atom, Action, Getter, Read, Readable, Compute, Setter, Store, Write } from "./typing";
 
 export function atom<Value>(initialValue: Value): Atom<Value> {
     return { _initialValue: initialValue }
@@ -8,27 +8,45 @@ export function compute<Value>(read: Read<Value>): Compute<Value> {
     return { _read: read }
 }
 
-export function effect<Args extends unknown[], Return>(write: Write<Args, Return>): Effect<null, Args, Return>;
-export function effect<Value, Args extends unknown[], Return>(read: Read<Value>, write: Write<Args, Return>): Effect<Value, Args, Return>;
-export function effect<Value, Args extends unknown[], Return>(prop1: Read<Value> | Write<Args, Return>, prop2?: Write<Args, Return>) {
-    if (prop2 === undefined) {
-        return {
-            _write: prop1 as Write<Args, Return>
+export function action<Value, Args extends unknown[]>(write: Write<Args, Value>): Action<Value, Args, Value> {
+    const internalValue = atom<{
+        value: Value,
+        inited: true,
+    } | {
+        inited: false
+    }>({
+        inited: false
+    });
+
+    return {
+        _write: (get, set, ...args) => {
+            const ret = write(get, set, ...args);
+            set(internalValue, {
+                value: ret,
+                inited: true,
+            });
+            return ret;
+        },
+        _read: (get) => {
+            const value = get(internalValue);
+            if (!value.inited) {
+                throw new Error('Action is not inited');
+            }
+            return value.value;
         }
     }
-    return { _read: prop1 as Read<Value>, _write: prop2 }
 }
 
-function isEffect<Value>(readable: Readable<Value>): readable is Compute<Value> {
-    return '_read' in readable && readable._read !== undefined
+function canReadAsCompute<Value>(readable: Readable<Value>): readable is Compute<Value> {
+    return '_read' in readable
 }
 
-type StoreKey = Atom<unknown> | Compute<unknown> | Effect<unknown, unknown[], unknown>
+type StoreKey = Atom<unknown> | Compute<unknown> | Action<unknown, unknown[], unknown>
 export function createStore(): Store {
     const data = new WeakMap<StoreKey, unknown>();
 
     const set: Setter = function set<Value, Args extends unknown[], ReturnValue>(
-        atom: Atom<Value> | Effect<unknown, Args, ReturnValue>,
+        atom: Atom<Value> | Action<unknown, Args, ReturnValue>,
         ...args: [Value] | Args
     ): undefined | ReturnValue {
         if ('_write' in atom) {
@@ -40,12 +58,8 @@ export function createStore(): Store {
     }
 
     const get: Getter = function get<Value>(readable: Readable<Value>): Value {
-        if (isEffect(readable)) {
+        if (canReadAsCompute(readable)) {
             return readable._read(get);
-        }
-
-        if ('_write' in readable) {
-            throw new Error('Cannot get value of an effect without read function')
         }
 
         if (data.has(readable)) {

@@ -1,5 +1,5 @@
-import { expect, test } from 'vitest';
-import { atom, createStore, Atom, compute, Compute, effect } from '../';
+import { expect, test, vi } from 'vitest';
+import { atom, createStore, Atom, compute, Compute, action } from '../';
 
 test('should work', () => {
     const store = createStore();
@@ -47,32 +47,32 @@ test('async atom should works like sync atom', async () => {
     expect(await store.get(asyncCmpt)).toBe(2)
 })
 
-test('effect can set other atom', () => {
+test('action can set other atom', () => {
     const store = createStore()
     const anAtom = atom(1)
     const doubleAtom = atom(0)
-    const doubleEffect = effect((get, set, num) => {
+    const doubleAction = action((get, set, num) => {
         set(anAtom, num)
         set(doubleAtom, get(anAtom) * 2)
     })
-    store.set(doubleEffect, 2)
+    store.set(doubleAction, 2)
     expect(store.get(anAtom)).toBe(2)
     expect(store.get(doubleAtom)).toBe(4)
 })
 
-test('read & write effect as an action', async () => {
+test('read & write action as an action', async () => {
     const store = createStore()
-    const promiseAtom = atom(Promise.resolve(1))
-
-    const actionEffect = effect(get => {
-        return get(promiseAtom)
-    }, (_, set) => {
-        const promise = Promise.resolve(2)
-        set(promiseAtom, promise)
-        return promise
+    const trace = vi.fn()
+    const actionAction = action(async () => {
+        await Promise.resolve()
+        trace()
+        return 2;
     })
 
-    expect(await store.get(actionEffect)).toBe(1)
-    void store.set(actionEffect)
-    expect(await store.get(actionEffect)).toBe(2)
+    expect(() => store.get(actionAction)).toThrow('Action is not inited')
+
+    void store.set(actionAction)
+    expect(trace).not.toHaveBeenCalled()
+    expect(await store.get(actionAction)).toBe(2)
+    expect(trace).toHaveBeenCalledOnce()
 })

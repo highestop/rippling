@@ -25,7 +25,7 @@ console.log(store.get(count)); // 1
 
 ### Compute
 
-Compute are the basic compute units in Rippling. The can read other Atom / Compute / Effect.
+Compute are the basic compute units in Rippling. The can read other Atom / Compute / Action.
 
 For Example:
 
@@ -36,9 +36,9 @@ const doubleCount = compute((get) => get(count) * 2);
 console.log(store.get(doubleCount)); // 0
 ```
 
-### Effect
+### Action
 
-Effect are the basic action units in Rippling. The can read other Atom / Compute / Effect and write to Atom / Effect.
+Action are the basic command units in Rippling. The can read other Atom / Compute / Action and write to Atom / Action.
 
 For Example:
 
@@ -46,7 +46,7 @@ For Example:
 const store = createStore();
 const count = atom(0);
 const doubleCount = atom(0);
-const updateCount = effect((get, set, value) => {
+const updateCount = action((get, set, value) => {
   set(count, value);
   set(doubleCount, get(count) * 2);
 });
