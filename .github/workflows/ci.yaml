@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/effect-setup@v4
         with:
           version: 9
           run_install: |
@@ -28,10 +28,10 @@ jobs:
         run: pnpm coverage
 
       - name: "Report Coverage"
-        uses: davelosert/vitest-coverage-report-action@v2
+        uses: davelosert/vitest-coverage-report-effect@v2
 
       - name: Coveralls
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-effect@v2
         with:
           file: coverage/cobertura-coverage.xml
           format: cobertura

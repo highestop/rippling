@@ -1,15 +1,15 @@
-import { Atom, Action, Getter, Read, Readable, Compute, Setter, Store, Write } from "./typing";
+import { State, Effect, Getter, Read, Readable, Computed, Setter, Store, Write } from "./typing";
 
-export function atom<Value>(initialValue: Value): Atom<Value> {
+export function state<Value>(initialValue: Value): State<Value> {
     return { _initialValue: initialValue }
 }
 
-export function compute<Value>(read: Read<Value>): Compute<Value> {
+export function computed<Value>(read: Read<Value>): Computed<Value> {
     return { _read: read }
 }
 
-export function action<Value, Args extends unknown[]>(write: Write<Args, Value>): Action<Value, Args, Value> {
-    const internalValue = atom<{
+export function effect<Value, Args extends unknown[]>(write: Write<Args, Value>): Effect<Value, Args, Value> {
+    const internalValue = state<{
         value: Value,
         inited: true,
     } | {
@@ -30,31 +30,31 @@ export function action<Value, Args extends unknown[]>(write: Write<Args, Value>)
         _read: (get) => {
             const value = get(internalValue);
             if (!value.inited) {
-                throw new Error('Action is not inited');
+                throw new Error('Effect is not inited');
             }
             return value.value;
         }
     }
 }
 
-function canReadAsCompute<Value>(readable: Readable<Value>): readable is Compute<Value> {
+function canReadAsCompute<Value>(readable: Readable<Value>): readable is Computed<Value> {
     return '_read' in readable
 }
 
-type StoreKey = Atom<unknown> | Compute<unknown> | Action<unknown, unknown[], unknown>
+type StoreKey = State<unknown> | Computed<unknown> | Effect<unknown, unknown[], unknown>
 export function createStore(): Store {
     const data = new WeakMap<StoreKey, unknown>();
 
     const set: Setter = function set<Value, Args extends unknown[], ReturnValue>(
-        atom: Atom<Value> | Action<unknown, Args, ReturnValue>,
+        state: State<Value> | Effect<unknown, Args, ReturnValue>,
         ...args: [Value] | Args
     ): undefined | ReturnValue {
-        if ('_write' in atom) {
-            return atom._write(get, set, ...args as Args);
+        if ('_write' in state) {
+            return state._write(get, set, ...args as Args);
         }
 
         const value = args[0] as Value;
-        data.set(atom, value);
+        data.set(state, value);
     }
 
     const get: Getter = function get<Value>(readable: Readable<Value>): Value {
