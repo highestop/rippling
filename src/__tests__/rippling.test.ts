@@ -238,3 +238,34 @@ test('derived atom should trigger when deps changed', () => {
     expect(traceB).not.toBeCalled();
     expect(traceC).toBeCalled();
 })
+
+test('outdated deps should not trigger sub', async () => {
+    const store = createStore();
+    const branch = state("A");
+    const refresh = state(0);
+    const derived = computed((get) => {
+        if (get(branch) == "A") {
+            return Promise.resolve().then(() => {
+                get(refresh);
+                return "A";
+            });
+        }
+        return "B";
+    });
+
+    const traceSub = vi.fn();
+    store.sub([derived], effect(() => {
+        traceSub()
+    }));
+
+    store.set(branch, "B");
+    const derivedRet = store.get(derived);
+    store.flush()
+    expect(traceSub).toBeCalled();
+    expect(await derivedRet).toBe("B");
+
+    traceSub.mockClear();
+    store.set(refresh, 1);
+    store.flush()
+    expect(traceSub).not.toBeCalled();
+})
