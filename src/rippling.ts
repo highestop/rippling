@@ -1,6 +1,6 @@
-import { State, Effect, Getter, Read, Readable, Computed, Setter, Store, Write, Subscribe } from "./typing";
+import { State, Effect, Getter, Read, Atom, Computed, Setter, Store, Write, Subscribe, NestedString } from "./typing";
 
-const EMPTY_SET = new Set<AnyAtom>();
+const EMPTY_MAP = new Map<AnyAtom, number>();
 
 interface Options {
     debugLabel?: string;
@@ -44,40 +44,42 @@ export function effect<Value, Args extends unknown[]>(write: Write<Value, Args>,
     }
 }
 
-function canReadAsCompute<Value>(readable: Readable<Value>): readable is Computed<Value> {
-    return '_read' in readable
+function canReadAsCompute<Value>(atom: Atom<Value>): atom is Computed<Value> {
+    return '_read' in atom
 }
 
 type AnyAtom = State<unknown> | Computed<unknown> | Effect<unknown, unknown[]>
 
 interface Mounted {
     listeners: Set<Effect<unknown, unknown[]>>,
-    readDepcs: Set<AnyAtom>,
+    readDepcs?: Map<AnyAtom, number>, // only valid for computed
     readDepts: Set<AnyAtom>,
 }
 
-interface AtomState {
-    readDeps: Set<AnyAtom>,
+interface AtomState<T> {
     mounted?: Mounted,
+    value?: T,
+    dependencies?: Map<AnyAtom, number>,
+    epoch?: number,
 }
 
 export function createStore(): Store {
-    const atomValue = new WeakMap<AnyAtom, unknown>();
-    const atomState = new WeakMap<AnyAtom, AtomState>();
+    const atomStateMap = new WeakMap<AnyAtom, AtomState<unknown>>();
 
     const pendingListeners = new Set<Effect<unknown, unknown[]>>();
 
-    function markDirty(key: AnyAtom) {
-        const mounted = atomState.get(key)?.mounted
+    function markPendingListeners(key: AnyAtom) {
+        const mounted = atomStateMap.get(key)?.mounted
         if (!mounted) {
             return;
         }
+
         for (const listener of mounted.listeners) {
             pendingListeners.add(listener)
         }
 
         for (const dep of mounted.readDepts) {
-            markDirty(dep)
+            markPendingListeners(dep)
         }
     }
 
@@ -89,91 +91,128 @@ export function createStore(): Store {
             return state._write(get, set, ...args as Args);
         }
 
-        markDirty(state)
+        if ('_read' in state) {
+            return;
+        }
 
-        const value = args[0] as Value;
-        atomValue.set(state, value);
-    }
+        const self = state;
+        markPendingListeners(self)
 
-    const get: Getter = function get<Value>(readable: Readable<Value>): Value {
-        if (canReadAsCompute(readable)) {
-            const readDeps = new Set<AnyAtom>();
-            if (!atomState.has(readable)) {
-                atomState.set(readable, {
-                    readDeps
-                })
-            }
-            const internalState = atomState.get(readable);
-            if (!internalState) {
+        if (!atomStateMap.has(self)) {
+            atomStateMap.set(self, {
+                epoch: 0,
+                value: args[0] as Value,
+            })
+        } else {
+            const atomState = atomStateMap.get(self);
+            if (!atomState) {
                 throw new Error('Internal state not found');
             }
-            internalState.readDeps = readDeps;
-
-            const wrappedGet: Getter = (other) => {
-                readDeps.add(other);
-                return get(other)
-            }
-            const ret = readable._read(wrappedGet);
-            return ret;
+            atomState.value = args[0] as Value;
+            atomState.epoch = (atomState.epoch ?? 0) + 1;
         }
-
-        const internalState = atomState.get(readable);
-        if (!internalState) {
-            atomState.set(readable, {
-                readDeps: EMPTY_SET,
-            })
-        }
-
-        if (atomValue.has(readable)) {
-            return atomValue.get(readable) as Value;
-        }
-
-        return readable._initialValue;
     }
 
-    function mount(readable: AnyAtom): Mounted {
-        get(readable);
-        const internalState = atomState.get(readable);
-        if (!internalState) {
+    function readAtomState<Value>(atom: Atom<Value>): AtomState<Value> {
+        if (canReadAsCompute(atom)) {
+            const self = atom;
+
+            if (!atomStateMap.has(self)) {
+                atomStateMap.set(self, {
+                    dependencies: new Map<AnyAtom, number>(),
+                    epoch: 0,
+                })
+            }
+
+            const atomState = atomStateMap.get(self) as AtomState<Value> | undefined;
+            if (!atomState) {
+                throw new Error('Internal state not found');
+            }
+
+            if (
+                'value' in atomState &&
+                Array.from(atomState.dependencies ?? new Map<AnyAtom, number>()).every(
+                    ([a, n]) =>
+                        readAtomState(a).epoch === n
+                )
+            ) {
+                return atomState;
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const readDeps = atomState.dependencies!;
+            const wrappedGet: Getter = (other) => {
+                const otherState = readAtomState(other);
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                readDeps.set(other, otherState.epoch!);
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                return otherState.value!;
+            }
+
+            const ret = atom._read(wrappedGet);
+            atomState.value = ret;
+            atomState.epoch = (atomState.epoch ?? 0) + 1;
+
+            return atomState;
+        }
+
+        // return value for simple state
+        const atomState = atomStateMap.get(atom);
+        if (!atomState) {
+            atomStateMap.set(atom, {
+                value: atom._initialValue,
+                epoch: 0,
+            })
+        }
+        return atomStateMap.get(atom) as AtomState<Value>;
+    }
+
+    const get: Getter = function get<Value>(atom: Atom<Value>): Value {
+        return readAtomState(atom).value as Value;
+    }
+
+    function mount(atom: AnyAtom): Mounted {
+        get(atom);
+        const atomState = atomStateMap.get(atom);
+        if (!atomState) {
             throw new Error('Internal state not found');
         }
 
-        internalState.mounted = internalState.mounted ?? {
+        atomState.mounted = atomState.mounted ?? {
             listeners: new Set(),
-            readDepcs: internalState.readDeps,
+            readDepcs: atomState.dependencies,
             readDepts: new Set(),
         }
 
-        for (const dep of internalState.mounted.readDepcs) {
+        for (const [dep] of Array.from(atomState.mounted.readDepcs ?? EMPTY_MAP)) {
             const mounted = mount(dep)
-            mounted.readDepts.add(readable)
+            mounted.readDepts.add(atom)
         }
 
-        return internalState.mounted
+        return atomState.mounted
     }
 
-    function unmount(readable: AnyAtom) {
-        const internalState = atomState.get(readable);
+    function unmount(atom: AnyAtom) {
+        const internalState = atomStateMap.get(atom);
         if (internalState) {
             internalState.mounted = undefined;
         }
     }
 
-    const sub: Subscribe = function sub(readables: Readable<unknown>[], cbEffect: Effect<unknown, unknown[]>) {
+    const sub: Subscribe = function sub(atoms: Atom<unknown>[], cbEffect: Effect<unknown, unknown[]>) {
         const unsubscribes = new Set<() => void>();
-        for (const readable of readables) {
-            const mounted = mount(readable);
+        for (const atom of atoms) {
+            const mounted = mount(atom);
             mounted.listeners.add(cbEffect);
-            mounted.readDepts.add(cbEffect);
+
             unsubscribes.add(() => {
                 mounted.listeners.delete(cbEffect);
-                mounted.readDepts.delete(cbEffect);
 
-                if (mounted.readDepcs.size === 0) {
+                if (mounted.readDepcs?.size === 0) {
                     if (mounted.listeners.size !== 0) {
                         throw new Error('Mounted state has no deps but listeners');
                     }
-                    unmount(readable);
+                    unmount(atom);
                 }
             })
         }
@@ -192,19 +231,20 @@ export function createStore(): Store {
         }
     }
 
+    function printReadDependencies(key: Atom<unknown>): NestedString {
+        const label = key._debugLabel ?? 'anonymous';
+        const atomState = readAtomState(key);
+
+        return [label, ...Array.from(atomState.dependencies ?? EMPTY_MAP).map(([key]) => {
+            return printReadDependencies(key);
+        })] as NestedString[];
+    }
+
     return {
         set,
         get,
         sub,
         flush,
-        printReadDeps: (readable: Readable<unknown>) => {
-            get(readable)
-            const internalState = atomState.get(readable);
-            if (!internalState) {
-                throw new Error('Internal state not found');
-            }
-
-            return Array.from(internalState.readDeps).map(key => key._debugLabel ?? 'anonymous');
-        }
+        printReadDependencies,
     }
 }

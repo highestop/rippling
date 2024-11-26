@@ -9,9 +9,9 @@ export interface Computed<Value> {
     _debugLabel?: string;
 }
 
-export type Readable<Value> = State<Value> | Computed<Value> | Effect<Value, unknown[]>
+export type Atom<Value> = State<Value> | Computed<Value> | Effect<Value, unknown[]>
 
-export type Getter = <Value>(readable: Readable<Value>) => Value;
+export type Getter = <Value>(readable: Atom<Value>) => Value;
 
 export interface Setter {
     <Value>(state: State<Value>, value: Value): void;
@@ -26,12 +26,14 @@ export interface Effect<Value, Args extends unknown[]> {
 
 export type Read<Value> = (get: Getter) => Value;
 export type Write<Value, Args extends unknown[]> = (get: Getter, set: Setter, ...args: Args) => Value;
-export type Subscribe = (readables: Readable<unknown>[], cbEffect: Effect<unknown, unknown[]>) => () => void;
+export type Subscribe = (readables: Atom<unknown>[], cbEffect: Effect<unknown, unknown[]>) => () => void;
+
+export type NestedString = (string | NestedString)[];
 
 export interface Store {
     get: Getter;
     set: Setter;
     sub: Subscribe;
     flush: () => void;
-    printReadDeps: (readable: Readable<unknown>) => string[];
+    printReadDependencies: (atom: Atom<unknown>) => NestedString;
 }

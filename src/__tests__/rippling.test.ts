@@ -16,16 +16,18 @@ test('should work', () => {
 
 test('computed state should work', () => {
     const store = createStore();
-    const anAtom = state(1);
-    const computedAtom = computed((get) => {
-        const num = get(anAtom);
+    const base = state(1);
+    const derived = computed((get) => {
+        const num = get(base);
         return num * 2
+    }, {
+        debugLabel: 'derived'
     });
 
-    expect(store.get(computedAtom)).toBe(2);
+    expect(store.get(derived)).toBe(2);
 })
 
-test('computed state should net set', () => {
+test('computed state should not writable', () => {
     const store = createStore()
     const anAtom = state(1)
     const doubleCmpt = computed((get) => {
@@ -49,12 +51,18 @@ test('async state should works like sync state', async () => {
 
 test('async computed should not follow old value', async () => {
     const store = createStore()
-    const base = state('foo')
+    const base = state('foo', {
+        debugLabel: 'base'
+    })
     const cmpt = computed((get) => {
         return Promise.resolve(get(base) + get(base))
+    }, {
+        debugLabel: 'cmpt'
     })
     const derivedCmpt = computed(async (get) => {
         return get(base) + await get(cmpt)
+    }, {
+        debugLabel: 'derivedCmpt'
     })
 
     const ret1 = store.get(derivedCmpt)
@@ -182,7 +190,7 @@ test('get read deps', () => {
     const cmpt = computed((get) => {
         return Object.assign(get(base), { b: 1 })
     })
-    expect(store.printReadDeps(cmpt)).toEqual(['anonymous'])
+    expect(store.printReadDependencies(cmpt)).toEqual(['anonymous', ['anonymous']])
 })
 
 test('get should return value directly', () => {
@@ -241,8 +249,12 @@ test('derived atom should trigger when deps changed', () => {
 
 test('outdated deps should not trigger sub', async () => {
     const store = createStore();
-    const branch = state("A");
-    const refresh = state(0);
+    const branch = state("A", {
+        debugLabel: 'branch'
+    });
+    const refresh = state(0, {
+        debugLabel: 'refresh'
+    });
     const derived = computed((get) => {
         if (get(branch) == "A") {
             return Promise.resolve().then(() => {
@@ -251,11 +263,15 @@ test('outdated deps should not trigger sub', async () => {
             });
         }
         return "B";
+    }, {
+        debugLabel: 'derived'
     });
 
     const traceSub = vi.fn();
     store.sub([derived], effect(() => {
         traceSub()
+    }, {
+        debugLabel: 'effect'
     }));
 
     store.set(branch, "B");
@@ -268,4 +284,17 @@ test('outdated deps should not trigger sub', async () => {
     store.set(refresh, 1);
     store.flush()
     expect(traceSub).not.toBeCalled();
+})
+
+test('computed should only compute once if no deps changed', () => {
+    const store = createStore();
+    const base = state(1);
+    const trace = vi.fn();
+    const cmpt = computed((get) => {
+        trace();
+        return get(base) * 2;
+    });
+    store.get(cmpt);
+    store.get(cmpt);
+    expect(trace).toBeCalledTimes(1);
 })
