@@ -21,6 +21,10 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
             this.getMountGraph(key)
         )] as NestedString[];
     }
+
+    getPendingListeners = (): string[] => {
+        return this.listenerManager._debugGetPendingListeners().map((listener) => listener.debugLabel ?? 'anonymous')
+    }
 }
 
 export function createDebugStore(): DebugStore {
