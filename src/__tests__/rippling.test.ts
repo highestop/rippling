@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest';
-import { state, createStore, State, computed, Computed, effect } from '../';
+import { state, createStore, State, computed, Computed, effect, createDebugStore } from '../';
 
 test('should work', () => {
     const store = createStore();
@@ -197,12 +197,12 @@ test('sub computed atom', () => {
 })
 
 test('get read deps', () => {
-    const store = createStore()
+    const store = createDebugStore()
     const base = state({ a: 1 })
     const cmpt = computed((get) => {
         return Object.assign(get(base), { b: 1 })
     })
-    expect(store.printReadDependencies(cmpt)).toEqual(['anonymous', ['anonymous']])
+    expect(store.getReadDependencies(cmpt)).toEqual(['anonymous', ['anonymous']])
 })
 
 test('get should return value directly', () => {

@@ -1,7 +1,8 @@
 import { expect, it, vi } from 'vitest'
-import { computed, createStore, effect, state } from '..'
+import { computed, createStore, effect, state, createDebugStore } from '..'
 import { suspense } from './utils'
 import { delay } from 'signal-timers'
+
 it('can propagate updates with async atom chains', async () => {
     const { pause, restore } = suspense()
     const store = createStore()
@@ -116,16 +117,16 @@ it('do not keep atoms mounted between async recalculations', async () => {
         debugLabel: 'derived',
     })
 
-    const store = createStore()
+    const store = createDebugStore()
     store.sub(derived, effect(() => void (0)))
     restore()
     await Promise.resolve()
 
-    expect(store.printMountGraph(base)).toEqual(['base', ['derived']])
+    expect(store.getMountGraph(base)).toEqual(['base', ['derived']])
     store.set(base, (c) => c + 1)
     store.flush()
     restore()
-    expect(store.printMountGraph(base)).toEqual(['base'])
+    expect(store.getMountGraph(base)).toEqual(['base'])
 })
 
 it('should not provide stale values to conditional dependents', () => {

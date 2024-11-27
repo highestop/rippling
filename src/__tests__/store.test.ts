@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
-import { computed, createStore, effect, state } from '../rippling'
+import { computed, createStore, effect, state } from '..'
 import { suspense } from './utils'
-import { Getter } from '../typing'
+import { Getter } from '../typing/atom'
 
 it.skip('should not fire on subscribe', () => {
     const store = createStore()
