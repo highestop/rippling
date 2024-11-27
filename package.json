@@ -7,6 +7,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "type-check": "tsc --noEmit",
     "prepack": "pnpm run build",
     "lint": "eslint .",
     "test": "pnpm vitest",
@@ -16,6 +17,7 @@
   "engines": {
     "node": ">=10"
   },
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.4",
