@@ -7,11 +7,19 @@ interface Options {
 }
 
 export function state<Value>(initialValue: Value, options?: Options): State<Value> {
-    return { _initialValue: initialValue, _debugLabel: options?.debugLabel }
+    const ret: State<Value> = { init: initialValue };
+    if (options?.debugLabel) {
+        ret._debugLabel = options.debugLabel;
+    }
+    return ret;
 }
 
 export function computed<Value>(read: Read<Value>, options?: Options): Computed<Value> {
-    return { _read: read, _debugLabel: options?.debugLabel }
+    const ret: Computed<Value> = { read: read };
+    if (options?.debugLabel) {
+        ret._debugLabel = options.debugLabel;
+    }
+    return ret;
 }
 
 export function effect<Value, Args extends unknown[]>(write: Write<Value, Args>, options?: Options): Effect<Value, Args> {
@@ -24,8 +32,8 @@ export function effect<Value, Args extends unknown[]>(write: Write<Value, Args>,
         inited: false
     });
 
-    return {
-        _write: (get, set, ...args) => {
+    const ret: Effect<Value, Args> = {
+        write: (get, set, ...args) => {
             const ret = write(get, set, ...args);
             set(internalValue, {
                 value: ret,
@@ -33,19 +41,24 @@ export function effect<Value, Args extends unknown[]>(write: Write<Value, Args>,
             });
             return ret;
         },
-        _read: (get) => {
+        read: (get) => {
             const value = get(internalValue);
             if (!value.inited) {
                 throw new Error('Effect is not inited');
             }
             return value.value;
-        },
-        _debugLabel: options?.debugLabel,
+        }
     }
+
+    if (options?.debugLabel) {
+        ret._debugLabel = options.debugLabel;
+    }
+
+    return ret;
 }
 
 function canReadAsCompute<Value>(atom: Atom<Value>): atom is Computed<Value> {
-    return '_read' in atom
+    return 'read' in atom
 }
 
 type AnyAtom = State<unknown> | Computed<unknown> | Effect<unknown, unknown[]>
@@ -87,11 +100,11 @@ export function createStore(): Store {
         state: State<Value> | Effect<Value, Args>,
         ...args: [Value] | Args
     ): undefined | Value {
-        if ('_write' in state) {
-            return state._write(get, set, ...args as Args);
+        if ('write' in state) {
+            return state.write(get, set, ...args as Args);
         }
 
-        if ('_read' in state) {
+        if ('read' in state) {
             return;
         }
 
@@ -149,7 +162,7 @@ export function createStore(): Store {
                 return otherState.value!;
             }
 
-            const ret = atom._read(wrappedGet);
+            const ret = atom.read(wrappedGet);
             atomState.value = ret;
             atomState.epoch = (atomState.epoch ?? 0) + 1;
 
@@ -160,7 +173,7 @@ export function createStore(): Store {
         const atomState = atomStateMap.get(atom);
         if (!atomState) {
             atomStateMap.set(atom, {
-                value: atom._initialValue,
+                value: atom.init,
                 epoch: 0,
             })
         }
@@ -226,7 +239,7 @@ export function createStore(): Store {
 
     function flush() {
         for (const listener of pendingListeners) {
-            listener._write(get, set)
+            listener.write(get, set)
             pendingListeners.delete(listener)
         }
     }

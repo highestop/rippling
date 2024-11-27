@@ -1,11 +1,11 @@
 
 export interface State<Value> {
-    _initialValue: Value;
+    init: Value;
     _debugLabel?: string;
 }
 
 export interface Computed<Value> {
-    _read: Read<Value>;
+    read: Read<Value>;
     _debugLabel?: string;
 }
 
@@ -19,8 +19,8 @@ export interface Setter {
 }
 
 export interface Effect<Value, Args extends unknown[]> {
-    _read: Read<Value>;
-    _write: Write<Value, Args>;
+    read: Read<Value>;
+    write: Write<Value, Args>;
     _debugLabel?: string;
 }
 
