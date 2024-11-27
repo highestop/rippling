@@ -56,7 +56,7 @@ it('unsubscribe on atom should release memory', async () => {
     const store = createStore()
     let objAtom: State<object> | undefined = state({})
     const detector = new LeakDetector(store.get(objAtom))
-    let unsub: (() => void) | undefined = store.sub([objAtom], effect(() => {
+    let unsub: (() => void) | undefined = store.sub(objAtom, effect(() => {
         return;
     }))
 
@@ -74,7 +74,7 @@ it('unsubscribe on computed should release memory', async () => {
         obj: objAtom && get(objAtom),
     }))
     const detector2 = new LeakDetector(store.get(derivedAtom))
-    let unsub: (() => void) | undefined = store.sub([objAtom], effect(() => {
+    let unsub: (() => void) | undefined = store.sub(objAtom, effect(() => {
         return;
     }))
     unsub()
@@ -92,7 +92,7 @@ it('unsubscribe a long-lived base atom', async () => {
         obj: get(base),
     }))
     const detector = new LeakDetector(store.get(cmpt))
-    let unsub: (() => void) | undefined = store.sub([base], effect(() => {
+    let unsub: (() => void) | undefined = store.sub(base, effect(() => {
         return;
     }))
     unsub()

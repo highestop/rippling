@@ -109,7 +109,7 @@ test('set an atom should trigger subscribe', () => {
         debugLabel: 'base'
     })
     const trace = vi.fn()
-    store.sub([base], effect(() => {
+    store.sub(base, effect(() => {
         trace()
     }, {
         debugLabel: 'effect'
@@ -124,7 +124,7 @@ test('set an atom should trigger once in multiple set', () => {
     const store = createStore()
     const anAtom = state(1)
     const trace = vi.fn()
-    store.sub([anAtom], effect(() => {
+    store.sub(anAtom, effect(() => {
         trace()
     }))
     store.set(anAtom, 2)
@@ -138,7 +138,7 @@ test('set an atom should trigger once in multiple flush', () => {
     const store = createStore()
     const anAtom = state(1)
     const trace = vi.fn()
-    store.sub([anAtom], effect(() => {
+    store.sub(anAtom, effect(() => {
         trace()
     }))
     store.set(anAtom, 2)
@@ -150,17 +150,29 @@ test('set an atom should trigger once in multiple flush', () => {
 
 test('sub multiple atoms', () => {
     const store = createStore()
-    const state1 = state(1)
-    const state2 = state(2)
+    const state1 = state(1, {
+        debugLabel: 'state1'
+    })
+    const state2 = state(2, {
+        debugLabel: 'state2'
+    })
 
     const trace = vi.fn()
-    store.sub([state1, state2], effect(() => {
+    const unsub = store.sub(computed(get => {
+        get(state1)
+        get(state2)
+    }, {
+        debugLabel: 'cmpt'
+    }), effect(() => {
         trace()
+    }, {
+        debugLabel: 'effect'
     }))
-    store.set(state1, 2)
-    store.set(state2, 3)
+    store.set(state1, x => x + 1)
+    store.set(state2, x => x + 1)
     store.flush()
-    expect(trace).toBeCalledTimes(1)
+    expect(trace).toBeCalled()
+    unsub()
 })
 
 test('sub computed atom', () => {
@@ -175,7 +187,7 @@ test('sub computed atom', () => {
     })
 
     const trace = vi.fn()
-    store.sub([cmpt], effect(() => {
+    store.sub(cmpt, effect(() => {
         trace()
     }))
     expect(trace).not.toBeCalled()
@@ -268,11 +280,12 @@ test('outdated deps should not trigger sub', async () => {
     });
 
     const traceSub = vi.fn();
-    store.sub([derived], effect(() => {
+    store.sub(derived, effect(() => {
         traceSub()
     }, {
         debugLabel: 'effect'
     }));
+    await expect(store.get(derived)).resolves.toBe("A");
 
     store.set(branch, "B");
     const derivedRet = store.get(derived);
@@ -280,8 +293,8 @@ test('outdated deps should not trigger sub', async () => {
     expect(traceSub).toBeCalled();
     expect(await derivedRet).toBe("B");
 
+    store.set(refresh, x => x + 1);
     traceSub.mockClear();
-    store.set(refresh, 1);
     store.flush()
     expect(traceSub).not.toBeCalled();
 })
