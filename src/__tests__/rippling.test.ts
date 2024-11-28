@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest';
-import { state, createStore, State, computed, Computed, effect, createDebugStore } from '../';
+import { state, createStore, State, computed, Computed, effect, createDebugStore } from '..';
 
 test('should work', () => {
     const store = createStore();

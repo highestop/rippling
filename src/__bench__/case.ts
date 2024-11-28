@@ -1,5 +1,5 @@
 import { computed, createStore, effect, state, State, Computed } from ".."
-import { Atom } from "../typing/atom"
+import { Atom } from "../vanilla/typing/atom"
 import { atom, createStore as createJotaiStore, Atom as JotaiAtom, PrimitiveAtom } from 'jotai/vanilla'
 
 function mergeRipplingStates(atoms: Atom<number>[], childCount: number): Computed<number> {
