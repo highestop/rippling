@@ -72,8 +72,8 @@ export class StoreImpl implements Store {
         }
     }
 
-    flush: () => void = () => {
-        for (const listener of this.listenerManager.flush()) {
+    notify: () => void = () => {
+        for (const listener of this.listenerManager.notify()) {
             listener.write(this.get, this.set)
         }
     }

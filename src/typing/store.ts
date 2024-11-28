@@ -5,7 +5,7 @@ export interface Store {
     get: Getter;
     set: Setter;
     sub: Subscribe;
-    flush: () => void;
+    notify: () => void;
 }
 
 export interface DebugStore extends Store {

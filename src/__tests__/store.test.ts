@@ -10,7 +10,7 @@ it.skip('should not fire on subscribe', () => {
     const callback2 = vi.fn()
     store.sub(countAtom, effect(callback1))
     store.sub(countAtom, effect(callback2))
-    store.flush()
+    store.notify()
     expect(callback1).not.toHaveBeenCalled()
     expect(callback2).not.toHaveBeenCalled()
 })
@@ -22,7 +22,7 @@ it('should fire subscription even if primitive atom value is the same', () => {
     store.sub(countAtom, effect(callback))
     store.set(countAtom, 0)
     callback.mockClear()
-    store.flush()
+    store.notify()
     expect(callback).toBeCalled()
 })
 
@@ -34,7 +34,7 @@ it('should fire subscription even if derived atom value is the same', () => {
     store.sub(derivedAtom, effect(callback))
     store.set(countAtom, 1)
     callback.mockClear()
-    store.flush()
+    store.notify()
     expect(callback).toBeCalled()
 })
 
@@ -45,7 +45,7 @@ it('should unmount with store.get', () => {
     const unsub = store.sub(countAtom, effect(callback))
     unsub()
     store.set(countAtom, 1)
-    store.flush()
+    store.notify()
     expect(callback).not.toHaveBeenCalled()
 })
 
@@ -58,7 +58,7 @@ it('should unmount dependencies with store.get', () => {
     unsub()
 
     store.set(countAtom, 1)
-    store.flush()
+    store.notify()
     expect(callback).not.toHaveBeenCalled()
 })
 
@@ -131,16 +131,16 @@ it('should update async atom with deps after await', async () => {
 
     store.set(countAtom, 1)
     restore()
-    store.flush()
+    store.notify()
     expect(await lastValue).toBe(1)
 
     store.set(countAtom, 2)
-    store.flush()
+    store.notify()
     restore()
     expect(await lastValue).toBe(2)
 
     store.set(countAtom, 3)
-    store.flush()
+    store.notify()
     restore()
 
     expect(await lastValue).toBe(3)
@@ -178,14 +178,14 @@ it('should fire subscription when async atom promise is the same', () => {
     expect(derivedListener).not.toHaveBeenCalled()
 
     store.set(promiseAtom, promise)
-    store.flush()
+    store.notify()
 
     expect(derivedGetter).toHaveBeenCalledTimes(2)
     expect(promiseListener).toBeCalled()
     expect(derivedListener).toBeCalled()
 
     store.set(promiseAtom, promise)
-    store.flush()
+    store.notify()
     expect(derivedGetter).toHaveBeenCalledTimes(3)
     expect(promiseListener).toBeCalled()
     expect(derivedListener).toBeCalled()
@@ -220,7 +220,7 @@ it('should notify subscription with tree dependencies', () => {
     expect(store.get(dep3_mirrorDoubleAtom)).toBe(2)
     store.set(valueAtom, (c) => c + 1)
     expect(traceDep3).not.toBeCalled()
-    store.flush()
+    store.notify()
     expect(traceDep3).toBeCalledTimes(1)
     expect(store.get(dep3_mirrorDoubleAtom)).toBe(4)
 })
@@ -239,7 +239,7 @@ it('should notify subscription with tree dependencies with bail-out', () => {
     expect(cb).toBeCalledTimes(0)
     expect(store.get(dep3Atom)).toBe(2)
     store.set(valueAtom, (c) => c + 1)
-    store.flush()
+    store.notify()
     expect(cb).toBeCalledTimes(1)
     expect(store.get(dep3Atom)).toBe(4)
 })
@@ -275,7 +275,7 @@ it('should trigger subscriber even if the same value with chained dependency', (
     expect(deriveFurtherFn).toHaveBeenCalledTimes(1)
 
     store.set(objAtom, (obj) => ({ ...obj }))
-    store.flush()
+    store.notify()
     expect(traceFurther).toHaveBeenCalledTimes(1)
 })
 
@@ -293,7 +293,7 @@ it('read function should called during subscription', () => {
 
     store.sub(derived2Atom, effect(() => void (0)))
     store.set(countAtom, (c) => c + 1)
-    store.flush()
+    store.notify()
     expect(derive1Fn).toHaveBeenCalledTimes(1)
     expect(derive2Fn).toHaveBeenCalledTimes(2)
 })
@@ -398,7 +398,7 @@ it('should not recompute a derived atom value if unchanged (#2168)', () => {
     expect(deriveFn).toHaveBeenCalledTimes(1)
 })
 
-it('should flush pending write triggered asynchronously and indirectly (#2451)', async () => {
+it('should notify pending write triggered asynchronously and indirectly (#2451)', async () => {
     const store = createStore()
     const anAtom = state('initial')
 
@@ -418,7 +418,7 @@ it('should flush pending write triggered asynchronously and indirectly (#2451)',
 
     // executing the chain reaction
     await store.set(actionAtom)
-    store.flush()
+    store.notify()
 
     expect(callbackFn).toHaveBeenCalledOnce()
     expect(callbackFn).toHaveBeenCalledWith('next')
@@ -483,11 +483,11 @@ it('Unmount an atom that is no longer dependent within a derived atom', () => {
     store.sub(derivedAtom, effect(trace))
 
     store.set(condAtom, false)
-    store.flush()
+    store.notify()
     expect(trace).toHaveBeenCalledTimes(1)
 
     store.set(baseAtom, 2)
-    store.flush()
+    store.notify()
     expect(trace).toHaveBeenCalledTimes(1)
 })
 
@@ -508,7 +508,7 @@ it('should update derived atom even if dependances changed (#2697)', () => {
 
     expect(onChangeDerived).toHaveBeenCalledTimes(0)
     store.set(primitiveAtom, 1)
-    store.flush()
+    store.notify()
     expect(onChangeDerived).toHaveBeenCalledTimes(1)
 })
 

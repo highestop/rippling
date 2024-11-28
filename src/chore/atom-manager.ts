@@ -182,7 +182,7 @@ export class ListenerManager {
         return Array.from(this.pendingListeners)
     }
 
-    *flush(): Generator<Effect<unknown, []>, void, unknown> {
+    *notify(): Generator<Effect<unknown, []>, void, unknown> {
         const pendingListeners = this.pendingListeners
         this.pendingListeners = new Set()
 

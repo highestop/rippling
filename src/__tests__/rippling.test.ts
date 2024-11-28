@@ -116,7 +116,7 @@ test('set an atom should trigger subscribe', () => {
     }))
     store.set(base, 2)
     expect(trace).not.toBeCalled()
-    store.flush()
+    store.notify()
     expect(trace).toBeCalledTimes(1)
 })
 
@@ -130,11 +130,11 @@ test('set an atom should trigger once in multiple set', () => {
     store.set(anAtom, 2)
     store.set(anAtom, 3)
     store.set(anAtom, 4)
-    store.flush()
+    store.notify()
     expect(trace).toBeCalledTimes(1)
 })
 
-test('set an atom should trigger once in multiple flush', () => {
+test('set an atom should trigger once in multiple notify', () => {
     const store = createStore()
     const anAtom = state(1)
     const trace = vi.fn()
@@ -142,9 +142,9 @@ test('set an atom should trigger once in multiple flush', () => {
         trace()
     }))
     store.set(anAtom, 2)
-    store.flush()
-    store.flush()
-    store.flush()
+    store.notify()
+    store.notify()
+    store.notify()
     expect(trace).toBeCalledTimes(1)
 })
 
@@ -170,7 +170,7 @@ test('sub multiple atoms', () => {
     }))
     store.set(state1, x => x + 1)
     store.set(state2, x => x + 1)
-    store.flush()
+    store.notify()
     expect(trace).toBeCalled()
     unsub()
 })
@@ -192,7 +192,7 @@ test('sub computed atom', () => {
     }))
     expect(trace).not.toBeCalled()
     store.set(base, 2)
-    store.flush()
+    store.notify()
     expect(trace).toBeCalledTimes(1)
 })
 
@@ -289,13 +289,13 @@ test('outdated deps should not trigger sub', async () => {
 
     store.set(branch, "B");
     const derivedRet = store.get(derived);
-    store.flush()
+    store.notify()
     expect(traceSub).toBeCalled();
     expect(await derivedRet).toBe("B");
 
     store.set(refresh, x => x + 1);
     traceSub.mockClear();
-    store.flush()
+    store.notify()
     expect(traceSub).not.toBeCalled();
 })
 
