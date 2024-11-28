@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { computed, createDebugStore, createStore, effect, nestedAtomToString, state } from '..'
+import { computed, createDebugStore, createStore, effect, state } from '..'
 import { suspense } from './utils'
 import { Getter } from '../typing/atom'
 

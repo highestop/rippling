@@ -1,6 +1,6 @@
 import LeakDetector from 'jest-leak-detector'
 import { expect, it } from 'vitest'
-import { state, State, Computed, computed, createStore, effect, createDebugStore, nestedAtomToString } from '..'
+import { state, State, Computed, computed, createStore, effect, createDebugStore } from '..'
 
 
 it('should release memory after delete state', async () => {
