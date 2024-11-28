@@ -71,7 +71,7 @@ export function setupRipplingSetCase(scale = 5) {
     const update = () => {
         const idx = Math.floor(Math.random() * atoms.length)
         store.set(atoms[idx] as State<number>, (x) => x + 1)
-        store.flush()
+        store.notify()
     }
 
     return {
