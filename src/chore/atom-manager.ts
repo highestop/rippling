@@ -21,7 +21,7 @@ function canReadAsCompute<Value>(atom: Atom<Value>): atom is Computed<Value> {
 export class AtomManager {
     private atomStateMap = new WeakMap<Atom<unknown>, AtomState<unknown>>()
 
-    public readAtomState<Value>(atom: Atom<Value>): AtomState<Value> {
+    public readAtomState<Value>(atom: Atom<Value>, ignoreMounted = false): AtomState<Value> {
         if (canReadAsCompute(atom)) {
             const self: Computed<Value> = atom;
 
@@ -35,6 +35,10 @@ export class AtomManager {
             const atomState = this.atomStateMap.get(self) as AtomState<Value> | undefined;
             if (!atomState) {
                 throw new Error('Internal state not found');
+            }
+
+            if (atomState.mounted && !ignoreMounted) {
+                return atomState;
             }
 
             if (
@@ -134,7 +138,7 @@ export class ListenerManager {
     private pendingListeners = new Set<Effect<unknown, []>>();
 
     markPendingListeners(atomManager: AtomManager, atom: Atom<unknown>) {
-        const atomState = atomManager.readAtomState(atom)
+        const atomState = atomManager.readAtomState(atom, true)
 
         for (const listener of atomState.mounted?.listeners ?? []) {
             this.pendingListeners.add(listener)
