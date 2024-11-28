@@ -19,12 +19,12 @@ function useAtomSet<Value, ARGS extends unknown[]>(store: Store, atom: Effect<Va
 
         if (isPromise(ret)) {
             return ret.then(v => {
-                store.flush()
+                store.notify()
                 return v
             }) as Value
         }
 
-        store.flush()
+        store.notify()
         return ret
     }
 }
@@ -52,7 +52,7 @@ describe('react', () => {
 
         expect(screen.getByText('0')).toBeTruthy()
         store.set(base, 1)
-        store.flush()
+        store.notify()
         expect(screen.getByText('0')).toBeTruthy()
         await Promise.resolve()
         expect(trace).toHaveBeenCalledTimes(2)
@@ -79,7 +79,7 @@ describe('react', () => {
         trace.mockClear()
         expect(screen.getByText('0')).toBeTruthy()
         store.set(base, 1)
-        store.flush()
+        store.notify()
         expect(trace).not.toBeCalled()
 
         await Promise.resolve()
@@ -88,7 +88,7 @@ describe('react', () => {
 
         trace.mockClear()
         store.set(base, 1)
-        store.flush()
+        store.notify()
         await Promise.resolve()
         expect(trace).not.toBeCalled()
     })
@@ -141,7 +141,7 @@ describe('react', () => {
 
         store.set(state1, 1)
         store.set(state2, 2)
-        store.flush()
+        store.notify()
         await Promise.resolve()
         expect(trace).toHaveBeenCalledTimes(2)
         expect(screen.getByText('3')).toBeTruthy()
@@ -198,7 +198,7 @@ describe('react', () => {
         await user.click(button)
         expect(screen.getByText('0')).toBeTruthy()
 
-        store.flush()
+        store.notify()
         await Promise.resolve()
         expect(screen.getByText('1')).toBeTruthy()
     })

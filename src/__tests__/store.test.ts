@@ -3,7 +3,7 @@ import { computed, createDebugStore, createStore, effect, state } from '..'
 import { suspense } from './utils'
 import { Getter } from '../typing/atom'
 
-it.skip('should not fire on subscribe', () => {
+it('should not fire on subscribe', () => {
     const store = createStore()
     const countAtom = state(0)
     const callback1 = vi.fn()
