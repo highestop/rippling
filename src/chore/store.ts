@@ -43,7 +43,7 @@ export class StoreImpl implements Store {
         return () => {
             mounted.listeners.delete(cbEffect);
 
-            if (mounted.readDepcs?.size === 0) {
+            if (mounted.readDepts.size === 0) {
                 if (mounted.listeners.size !== 0) {
                     throw new Error('Mounted state has no deps but listeners');
                 }

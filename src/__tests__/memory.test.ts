@@ -1,6 +1,6 @@
 import LeakDetector from 'jest-leak-detector'
 import { expect, it } from 'vitest'
-import { state, State, Computed, computed, createStore, effect } from '..'
+import { state, State, Computed, computed, createStore, effect, createDebugStore, nestedAtomToString } from '..'
 
 
 it('should release memory after delete state', async () => {
@@ -96,6 +96,24 @@ it('unsubscribe a long-lived base atom', async () => {
         return;
     }))
     unsub()
+    unsub = undefined
+    cmpt = undefined
+    expect(await detector.isLeaking()).toBe(false)
+})
+
+it('unsubscribe a computed atom', async () => {
+    const store = createDebugStore()
+    const base = state({}, { debugLabel: 'base' })
+    let cmpt: Computed<object> | undefined = computed((get) => ({
+        obj: get(base),
+    }), { debugLabel: 'cmpt' })
+    const detector = new LeakDetector(store.get(cmpt))
+    let unsub: (() => void) | undefined = store.sub(cmpt, effect(() => {
+        return;
+    }))
+
+    unsub()
+    console.log(nestedAtomToString(store.getMountGraph(base)))
     unsub = undefined
     cmpt = undefined
     expect(await detector.isLeaking()).toBe(false)

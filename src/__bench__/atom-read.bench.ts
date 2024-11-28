@@ -1,7 +1,7 @@
 import { bench, describe } from 'vitest'
 import { setupJotaiSetCase, setupJotaiSetCaseWithOutMount, setupRipplingSetCase, setupRipplingSetCaseWithOutMount } from './case'
 
-const PROP_GRAPH_DEPTH = 4
+const PROP_GRAPH_DEPTH = 5
 const { update: updateRippling } = setupRipplingSetCase(PROP_GRAPH_DEPTH)
 const { update: updateJotai } = setupJotaiSetCase(PROP_GRAPH_DEPTH)
 const { update: updateRipplingWithOutMount } = setupRipplingSetCaseWithOutMount(PROP_GRAPH_DEPTH)
