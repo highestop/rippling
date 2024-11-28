@@ -146,11 +146,7 @@ export class AtomManager {
 
     public unmount<Value>(atom: Atom<Value>): void {
         const atomState = this.atomStateMap.get(atom);
-        if (!atomState?.mounted) {
-            return
-        }
-
-        if (atomState.mounted.listeners.size !== 0) {
+        if (!atomState?.mounted || atomState.mounted.listeners.size) {
             return
         }
 

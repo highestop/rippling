@@ -113,7 +113,6 @@ it('unsubscribe a computed atom', async () => {
     }))
 
     unsub()
-    console.log(nestedAtomToString(store.getMountGraph(base)))
     unsub = undefined
     cmpt = undefined
     expect(await detector.isLeaking()).toBe(false)

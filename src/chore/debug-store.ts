@@ -18,6 +18,10 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
         return () => {
             unsub();
             atomList.forEach((atom) => {
+                if (!this.subscribedAtoms.has(atom)) {
+                    return;
+                }
+
                 this.subscribedAtoms.set(atom, (this.subscribedAtoms.get(atom) ?? 0) - 1)
                 if (this.subscribedAtoms.get(atom) === 0) {
                     this.subscribedAtoms.delete(atom)
@@ -34,10 +38,10 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
         })] as NestedAtom;
     }
 
-    getMountGraph = (atom: Atom<unknown>): NestedAtom => {
+    getReadDependents = (atom: Atom<unknown>): NestedAtom => {
         const atomState = this.atomManager.readAtomState(atom);
         return [atom, ...Array.from(atomState.mounted?.readDepts ?? []).map((key) =>
-            this.getMountGraph(key)
+            this.getReadDependents(key)
         )] as NestedAtom;
     }
 

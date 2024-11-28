@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { computed, createStore, effect, state } from '..'
+import { computed, createDebugStore, createStore, effect, nestedAtomToString, state } from '..'
 import { suspense } from './utils'
 import { Getter } from '../typing/atom'
 
@@ -510,4 +510,37 @@ it('should update derived atom even if dependances changed (#2697)', () => {
     store.set(primitiveAtom, 1)
     store.flush()
     expect(onChangeDerived).toHaveBeenCalledTimes(1)
+})
+
+it('double unmount should not cause new mount', () => {
+    const base = state(0, {
+        debugLabel: 'base'
+    })
+    const store = createDebugStore()
+    const unmount = store.sub(base, effect(() => void (0), {
+        debugLabel: 'subBase'
+    }))
+
+    unmount()
+    unmount()
+
+    expect(store.getSubscribeGraph()).toEqual([])
+})
+
+it('mount multiple times on same atom', () => {
+    const base = state(0, {
+        debugLabel: 'base'
+    })
+    const store = createDebugStore()
+    const unmount1 = store.sub(base, effect(() => void (0), {
+        debugLabel: 'subBase1'
+    }))
+    const unmount2 = store.sub(base, effect(() => void (0), {
+        debugLabel: 'subBase2'
+    }))
+
+    unmount1()
+    unmount2()
+
+    expect(store.getSubscribeGraph()).toEqual([])
 })

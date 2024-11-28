@@ -118,11 +118,11 @@ it('do not keep atoms mounted between async recalculations', async () => {
     restore()
     await Promise.resolve()
 
-    expect(store.getMountGraph(base)).toEqual([base, [derived]])
+    expect(store.getReadDependents(base)).toEqual([base, [derived]])
     store.set(base, (c) => c + 1)
     store.flush()
     restore()
-    expect(store.getMountGraph(base)).toEqual([base])
+    expect(store.getReadDependents(base)).toEqual([base])
 })
 
 it('should not provide stale values to conditional dependents', () => {

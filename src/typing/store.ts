@@ -10,7 +10,7 @@ export interface Store {
 
 export interface DebugStore extends Store {
     getReadDependencies: (atom: Atom<unknown>) => NestedAtom;
-    getMountGraph: (atom: Atom<unknown>) => NestedAtom;
+    getReadDependents: (atom: Atom<unknown>) => NestedAtom;
     getPendingListeners: () => NestedAtom;
     getSubscribeGraph: () => NestedAtom;
 }
