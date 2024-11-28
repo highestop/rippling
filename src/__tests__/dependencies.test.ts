@@ -106,15 +106,11 @@ it('correctly handles the same promise being returned twice from an atom getter 
 // we do not do this, just clean all deps when new calculation starts
 it('do not keep atoms mounted between async recalculations', async () => {
     const { pause, restore } = suspense()
-    const base = state(0, {
-        debugLabel: 'base',
-    })
+    const base = state(0)
 
     const derived = computed(async (get) => {
         await pause()
         get(base)
-    }, {
-        debugLabel: 'derived',
     })
 
     const store = createDebugStore()
@@ -122,11 +118,11 @@ it('do not keep atoms mounted between async recalculations', async () => {
     restore()
     await Promise.resolve()
 
-    expect(store.getMountGraph(base)).toEqual(['base', ['derived']])
+    expect(store.getMountGraph(base)).toEqual([base, [derived]])
     store.set(base, (c) => c + 1)
     store.flush()
     restore()
-    expect(store.getMountGraph(base)).toEqual(['base'])
+    expect(store.getMountGraph(base)).toEqual([base])
 })
 
 it('should not provide stale values to conditional dependents', () => {

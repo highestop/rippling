@@ -1,4 +1,5 @@
 import { Atom, Effect, Getter, Setter } from "./atom";
+import { NestedAtom } from "./util";
 
 export interface Store {
     get: Getter;
@@ -8,11 +9,10 @@ export interface Store {
 }
 
 export interface DebugStore extends Store {
-    getReadDependencies: (atom: Atom<unknown>) => NestedString;
-    getMountGraph: (atom: Atom<unknown>) => NestedString;
-    getPendingListeners: () => string[];
+    getReadDependencies: (atom: Atom<unknown>) => NestedAtom;
+    getMountGraph: (atom: Atom<unknown>) => NestedAtom;
+    getPendingListeners: () => NestedAtom;
+    getSubscribeGraph: () => NestedAtom;
 }
 
 export type Subscribe = (atoms: Atom<unknown>[] | Atom<unknown>, callback: Effect<unknown, unknown[]>) => () => void;
-
-export type NestedString = (string | NestedString)[];

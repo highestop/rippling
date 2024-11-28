@@ -1,5 +1,5 @@
 import { Atom, Effect, Getter, State, Updater, Setter } from "../typing/atom";
-import { Store, Subscribe } from "../typing/store";
+import { Store } from "../typing/store";
 import { computed } from "./atom";
 import { AtomManager, ListenerManager } from "./atom-manager";
 
@@ -37,30 +37,11 @@ export class StoreImpl implements Store {
         this.listenerManager.markPendingListeners(this.atomManager, atom)
     }
 
-    sub: Subscribe = (atoms: Atom<unknown>[] | Atom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void => {
-        const unsubscribes = new Set<() => void>();
-
-        if (Array.isArray(atoms) && atoms.length === 0) {
-            return () => void (0);
-        }
-
-        let atom: Atom<unknown>;
-        if (Array.isArray(atoms) && atoms.length === 1) {
-            atom = atoms[0];
-        } else if (Array.isArray(atoms)) {
-            atom = computed((get) => {
-                for (const atom of atoms) {
-                    get(atom);
-                }
-            })
-        } else {
-            atom = atoms;
-        }
-
+    private _subSingleAtom(atom: Atom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
         const mounted = this.atomManager.mount(atom);
         mounted.listeners.add(cbEffect);
 
-        unsubscribes.add(() => {
+        return () => {
             mounted.listeners.delete(cbEffect);
 
             if (mounted.readDepcs?.size === 0) {
@@ -69,6 +50,24 @@ export class StoreImpl implements Store {
                 }
                 this.atomManager.unmount(atom);
             }
+        }
+    }
+
+    sub(atoms: Atom<unknown>[] | Atom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
+        if (Array.isArray(atoms) && atoms.length === 0) {
+            return () => void (0);
+        }
+
+        let atom: Atom<unknown>;
+        if (Array.isArray(atoms) && atoms.length === 1) {
+            return this._subSingleAtom(atoms[0], cbEffect)
+        } else if (!Array.isArray(atoms)) {
+            return this._subSingleAtom(atoms, cbEffect)
+        }
+
+        const unsubscribes = new Set<() => void>();
+        atoms.forEach((atom) => {
+            unsubscribes.add(this._subSingleAtom(atom, cbEffect))
         })
 
         return () => {

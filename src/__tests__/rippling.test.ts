@@ -202,7 +202,7 @@ test('get read deps', () => {
     const cmpt = computed((get) => {
         return Object.assign(get(base), { b: 1 })
     })
-    expect(store.getReadDependencies(cmpt)).toEqual(['anonymous', ['anonymous']])
+    expect(store.getReadDependencies(cmpt)).toEqual([cmpt, [base]])
 })
 
 test('get should return value directly', () => {
