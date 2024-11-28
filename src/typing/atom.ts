@@ -4,8 +4,8 @@ export interface Setter {
     <Value, Args extends unknown[]>(effect: Effect<Value, Args>, ...args: Args): Value;
 }
 export type Getter = <Value>(readable: Atom<Value>) => Value;
-
-export type Read<Value> = (get: Getter) => Value;
+export interface GetterOptions { signal: AbortSignal }
+export type Read<Value> = (get: Getter, options: GetterOptions) => Value;
 export type Write<Value, Args extends unknown[]> = (get: Getter, set: Setter, ...args: Args) => Value;
 
 export interface State<Value> {

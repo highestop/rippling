@@ -1,5 +1,5 @@
 import { Atom, Effect } from "../typing/atom";
-import { DebugStore, NestedString, Subscribe } from "../typing/store";
+import { DebugStore, Subscribe } from "../typing/store";
 import { NestedAtom } from "../typing/util";
 import { AtomManager, ListenerManager } from "./atom-manager";
 import { StoreImpl } from "./store";

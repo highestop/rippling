@@ -1,12 +1,13 @@
 import { bench, describe } from 'vitest'
 import { setupJotaiSetCase, setupJotaiSetCaseWithOutMount, setupRipplingSetCase, setupRipplingSetCaseWithOutMount } from './case'
 
-const { update: updateRippling } = setupRipplingSetCase(6)
-const { update: updateJotai } = setupJotaiSetCase(6)
-const { update: updateRipplingWithOutMount } = setupRipplingSetCaseWithOutMount(5)
-const { update: updateJotaiWithOutMount } = setupJotaiSetCaseWithOutMount(5)
+const PROP_GRAPH_DEPTH = 4
+const { update: updateRippling } = setupRipplingSetCase(PROP_GRAPH_DEPTH)
+const { update: updateJotai } = setupJotaiSetCase(PROP_GRAPH_DEPTH)
+const { update: updateRipplingWithOutMount } = setupRipplingSetCaseWithOutMount(PROP_GRAPH_DEPTH)
+const { update: updateJotaiWithOutMount } = setupJotaiSetCaseWithOutMount(PROP_GRAPH_DEPTH)
 
-describe('set with mount, 6 layer states, each computed has 10 children', () => {
+describe(`set with mount, ${String(PROP_GRAPH_DEPTH)} layer states, each computed has 10 children`, () => {
     bench('rippling', () => {
         updateRippling()
     })
@@ -16,7 +17,7 @@ describe('set with mount, 6 layer states, each computed has 10 children', () => 
     })
 })
 
-describe('set without mount, 5 layer states, each computed has 10 children', () => {
+describe(`set without mount, ${String(PROP_GRAPH_DEPTH)} layer states, each computed has 10 children`, () => {
     bench('rippling', () => {
         updateRipplingWithOutMount()
     })

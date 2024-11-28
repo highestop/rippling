@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "test": "pnpm vitest",
     "build": "rollup -c",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "bench": "vitest bench"
   },
   "engines": {
     "node": ">=10"

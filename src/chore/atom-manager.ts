@@ -6,6 +6,7 @@ interface AtomState<T> {
     value?: T,
     dependencies?: Map<Atom<unknown>, number>,
     epoch?: number,
+    abortController?: AbortController
 }
 
 interface Mounted {
@@ -21,34 +22,47 @@ function canReadAsCompute<Value>(atom: Atom<Value>): atom is Computed<Value> {
 export class AtomManager {
     private atomStateMap = new WeakMap<Atom<unknown>, AtomState<unknown>>()
 
+    private shouldReculate = <Value>(atom: Atom<Value>, ignoreMounted: boolean): boolean => {
+        const atomState = this.atomStateMap.get(atom) as AtomState<Value> | undefined
+        if (!atomState) {
+            return true;
+        }
+
+        if (atomState.mounted && !ignoreMounted) {
+            return false;
+        }
+
+        if (
+            'value' in atomState &&
+            Array.from(atomState.dependencies ?? new Map<Atom<unknown>, number>()).every(
+                ([a, n]) =>
+                    this.readAtomState(a).epoch === n
+            )
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
     public readAtomState<Value>(atom: Atom<Value>, ignoreMounted = false): AtomState<Value> {
         if (canReadAsCompute(atom)) {
+            if (!this.shouldReculate(atom, ignoreMounted)) {
+                return this.atomStateMap.get(atom) as AtomState<Value>;
+            }
+
             const self: Computed<Value> = atom;
-
-            if (!this.atomStateMap.has(self)) {
-                this.atomStateMap.set(self, {
-                    dependencies: new Map<Atom<unknown>, number>(),
-                    epoch: 0,
-                })
-            }
-
-            const atomState = this.atomStateMap.get(self) as AtomState<Value> | undefined;
+            let atomState: AtomState<Value> | undefined = this.atomStateMap.get(self) as AtomState<Value> | undefined
             if (!atomState) {
-                throw new Error('Internal state not found');
-            }
-
-            if (atomState.mounted && !ignoreMounted) {
-                return atomState;
-            }
-
-            if (
-                'value' in atomState &&
-                Array.from(atomState.dependencies ?? new Map<Atom<unknown>, number>()).every(
-                    ([a, n]) =>
-                        this.readAtomState(a).epoch === n
-                )
-            ) {
-                return atomState;
+                atomState = {
+                    dependencies: new Map<Atom<unknown>, number>(),
+                    epoch: -1,
+                    abortController: new AbortController(),
+                }
+                this.atomStateMap.set(self, atomState)
+            } else {
+                atomState.abortController?.abort(`abort ${self.debugLabel ?? 'anonymous'} atom`)
+                atomState.abortController = new AbortController()
             }
 
             const lastDeps = atomState.dependencies ?? EMPTY_MAP;
@@ -84,7 +98,10 @@ export class AtomManager {
                 }
             }
 
-            const ret = self.read(wrappedGet);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const signal: AbortSignal = atomState.abortController!.signal
+
+            const ret = self.read(wrappedGet, { signal });
             if (atomState.value !== ret) {
                 atomState.value = ret;
                 atomState.epoch = (atomState.epoch ?? 0) + 1;

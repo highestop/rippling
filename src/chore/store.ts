@@ -1,6 +1,5 @@
 import { Atom, Effect, Getter, State, Updater, Setter } from "../typing/atom";
 import { Store } from "../typing/store";
-import { computed } from "./atom";
 import { AtomManager, ListenerManager } from "./atom-manager";
 
 export class StoreImpl implements Store {
@@ -58,7 +57,6 @@ export class StoreImpl implements Store {
             return () => void (0);
         }
 
-        let atom: Atom<unknown>;
         if (Array.isArray(atoms) && atoms.length === 1) {
             return this._subSingleAtom(atoms[0], cbEffect)
         } else if (!Array.isArray(atoms)) {
