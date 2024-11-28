@@ -3,6 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { babel } from "@rollup/plugin-babel";
 import { dts } from "rollup-plugin-dts";
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const projectRootDir = path.resolve(__dirname);
@@ -21,9 +22,6 @@ const commonConfig = {
     onwarn: (warning) => {
         throw new Error(warning?.message);
     },
-    external: [
-        ...Object.keys(pkg.dependencies ?? {}),
-    ],
 };
 
 /** @type { import('rollup').RollupOptions } */
@@ -47,6 +45,9 @@ const dtsConfig = {
 /** @type { import('rollup').RollupOptions } */
 const sourceConfig = {
     plugins: [
+        nodeResolve({
+            extensions: ['.ts']
+        }),
         babel({
             exclude: "node_modules/**",
             extensions: [".ts"],
