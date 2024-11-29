@@ -45,9 +45,7 @@ export class AtomManager {
         }
 
         if (
-            'value' in atomState
-            && 'dependencies' in atomState
-            && Array.from(atomState.dependencies).every(([dep, epoch]) => {
+            'dependencies' in atomState && Array.from(atomState.dependencies).every(([dep, epoch]) => {
                 return this.readAtomState(dep).epoch === epoch
             })
         ) {
@@ -79,26 +77,26 @@ export class AtomManager {
         const lastDeps = atomState.dependencies;
         const readDeps = new Map<ReadableAtom<unknown>, number>();
         atomState.dependencies = readDeps;
-        const wrappedGet: Getter = (other) => {
-            const otherState = this.readAtomState(other)
+        const wrappedGet: Getter = (depAtom) => {
+            const depState = this.readAtomState(depAtom)
 
             // get 可能发生在异步过程中，当重复调用时，只有最新的 get 过程会修改 deps
             if (atomState.dependencies === readDeps) {
-                readDeps.set(other, otherState.epoch);
+                readDeps.set(depAtom, depState.epoch);
 
-                if (atomState.mounted && !otherState.mounted) {
-                    this.mount(other).readDepts.add(self)
-                } else if (otherState.mounted) {
-                    otherState.mounted.readDepts.add(self)
+                if (atomState.mounted && !depState.mounted) {
+                    this.mount(depAtom).readDepts.add(self)
+                } else if (depState.mounted) {
+                    depState.mounted.readDepts.add(self)
                 }
             }
 
-            return otherState.value;
+            return depState.value;
         }
 
-        const newKeys = new Set(readDeps.keys())
+
         for (const key of lastDeps.keys()) {
-            if (!newKeys.has(key)) {
+            if (!readDeps.has(key)) {
                 const otherState = this.atomStateMap.get(key)
                 if (otherState?.mounted) {
                     otherState.mounted.readDepts.delete(self)
@@ -186,14 +184,23 @@ export class ListenerManager {
     private pendingListeners = new Set<Effect<unknown, []>>();
 
     markPendingListeners(atomManager: AtomManager, atom: ReadableAtom<unknown>) {
-        const atomState = atomManager.readAtomState(atom, true)
 
-        for (const listener of atomState.mounted?.listeners ?? []) {
-            this.pendingListeners.add(listener)
-        }
+        let queue = new Set([atom])
+        while (queue.size > 0) {
+            const nextQueue = new Set<ReadableAtom<unknown>>([])
+            for (const atom of queue) {
+                const atomState = atomManager.readAtomState(atom, true)
 
-        for (const dep of Array.from(atomState.mounted?.readDepts ?? [])) {
-            this.markPendingListeners(atomManager, dep)
+                for (const listener of atomState.mounted?.listeners ?? []) {
+                    this.pendingListeners.add(listener)
+                }
+
+                for (const dep of Array.from(atomState.mounted?.readDepts ?? [])) {
+                    nextQueue.add(dep)
+                }
+            }
+
+            queue = nextQueue
         }
     }
 

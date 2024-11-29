@@ -11,11 +11,11 @@ const { update: updateRipplingWithoutNotify } = setupRipplingSetCaseWithoutNotif
 describe(`set with mount, ${String(PROP_GRAPH_DEPTH)} layer states, each computed has 10 children`, () => {
     bench('rippling', () => {
         updateRippling()
-    })
+    }, { time: 1000 })
 
     bench('jotai', () => {
         updateJotai()
-    })
+    }, { time: 1000 })
 })
 
 describe(`set without notify, ${String(PROP_GRAPH_DEPTH)} layer states, each computed has 10 children`, () => {
