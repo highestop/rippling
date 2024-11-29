@@ -66,12 +66,8 @@ export class AtomManager {
             atomState = {
                 dependencies: new Map<ReadableAtom<unknown>, number>(),
                 epoch: -1,
-                abortController: new AbortController(),
             } as ComputedState<Value>
             this.atomStateMap.set(self, atomState)
-        } else {
-            atomState.abortController?.abort(`abort ${self.debugLabel ?? 'anonymous'} atom`)
-            atomState.abortController = new AbortController()
         }
 
         const lastDeps = atomState.dependencies;
@@ -95,6 +91,19 @@ export class AtomManager {
         }
 
 
+        const ret = self.read(wrappedGet, {
+            get signal() {
+                atomState.abortController?.abort(`abort ${self.debugLabel ?? 'anonymous'} atom`)
+                atomState.abortController = new AbortController()
+                return atomState.abortController.signal
+            }
+        });
+
+        if (atomState.value !== ret) {
+            atomState.value = ret;
+            atomState.epoch += 1;
+        }
+
         for (const key of lastDeps.keys()) {
             if (!readDeps.has(key)) {
                 const otherState = this.atomStateMap.get(key)
@@ -102,15 +111,6 @@ export class AtomManager {
                     otherState.mounted.readDepts.delete(self)
                 }
             }
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const signal: AbortSignal = atomState.abortController!.signal
-
-        const ret = self.read(wrappedGet, { signal });
-        if (atomState.value !== ret) {
-            atomState.value = ret;
-            atomState.epoch += 1;
         }
 
         return atomState;
