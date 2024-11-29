@@ -5,7 +5,7 @@ import { computed, Computed, createStore, effect, Effect, State, state, Store } 
 import React, { useSyncExternalStore } from 'react'
 import { isPromise } from 'util/types'
 
-function useAtomValue<T>(store: Store, atom: State<T> | Computed<T> | Effect<T, unknown[]>) {
+function useAtomValue<T>(store: Store, atom: State<T> | Computed<T>) {
     return useSyncExternalStore(fn => {
         return store.sub(atom, effect(fn))
     }, () => {

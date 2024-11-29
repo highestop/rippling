@@ -2,9 +2,9 @@
 
 Rippling is a state management library inspired by Jotai. While Jotai is a great state management solution that has benefited the Motiff project significantly, as our project grew larger, especially with the increasing number of states (1k~10k atoms), we felt that some of Jotai's design choices needed adjustments, mainly in these aspects:
 
-* Too many combinations of atom init/setter/getter methods, need simplification to reduce team's mental overhead
-* The timing of store notifying all subscribers should be manually controlled by developers, rather than automatic notification
-* Should reduce reactive capabilities, especially the `onMount` capability - the framework shouldn't provide this ability
+- Too many combinations of atom init/setter/getter methods, need simplification to reduce team's mental overhead
+- The timing of store notifying all subscribers should be manually controlled by developers, rather than automatic notification
+- Should reduce reactive capabilities, especially the `onMount` capability - the framework shouldn't provide this ability
 
 To address these issues, I created Rippling to express my thoughts on state management. Before detailing the differences from Jotai, we need to understand Rippling's Atom types and subscription system.
 
@@ -17,13 +17,13 @@ Like Jotai, Rippling is also an Atom State solution. However, unlike Jotai, Ripp
 `state` is a readable and writable "variable", similar to a Primitive Atom in Jotai. Reading a `state` involves no computation process, and writing to a `state` won't trigger any Listener execution - it's simply a variable.
 
 ```typescript
-const i = state(0)
-const store = createStore()
-console.log(store.get(i)) // 0
-store.set(i, 1)
-console.log(store.get(i)) // 1
-store.set(i, x => x * 10)
-console.log(store.get(i)) // 10
+const i = state(0);
+const store = createStore();
+console.log(store.get(i)); // 0
+store.set(i, 1);
+console.log(store.get(i)); // 1
+store.set(i, (x) => x * 10);
+console.log(store.get(i)); // 10
 ```
 
 ### `computed` (equivalent to "Read-only Atom" in Jotai)
@@ -31,41 +31,28 @@ console.log(store.get(i)) // 10
 `computed` is a readable computed variable whose calculation process should be side-effect free. As long as its dependent Atoms don't change, repeatedly reading the value of a `computed` should yield identical results. `computed` is similar to a Read-only Atom in Jotai.
 
 ```typescript
-const i = state(0)
-const j = computed(() => store.get(i) * 10)
-console.log(store.get(j)) // 0
-store.set(i, 1)
-console.log(store.get(j)) // 10
+const i = state(0);
+const j = computed(() => store.get(i) * 10);
+console.log(store.get(j)); // 0
+store.set(i, 1);
+console.log(store.get(j)); // 10
 ```
 
-### `effect` (like "Read&Write Atom" in Jotai, but different)
+### `effect` (equivalent to "Write-only Atom" in Jotai)
 
 `effect` is used to encapsulate a process code block. The code inside an Effect only executes when an external `set` call is made on it. `effect` is also the only type in rippling that can modify state without relying on a `store`.
 
 ```typescript
-const num = state(1)
+const num = state(1);
 const doubleEffect = effect((get, set) => {
-    const double = get(num) * 2
-    set(num, double)
-})
-console.log(store.get(num)) // 1
-store.set(doubleEffect)
-console.log(store.get(num)) // 2
-store.set(doubleEffect)
-console.log(store.get(num)) // 4
-```
-
-`effect` has another characteristic - it is observable. In Rippling, getting an effect returns the result from its last execution. This is particularly convenient for loading scenarios.
-
-```typescript
-const setupEditorEffect = effect(async (get, set) => {
-    const wasm = await set(setupWasmEffect)
-    const websocketBridge = await set(setupWebsocketBridgeEffect)
-    const jsPluginBridge = await set(setupJsPluginBridgeEffect)
-    return setupEditor(wasm, websocketBridge, jsPluginBridge)
-})
-
-
+  const double = get(num) * 2;
+  set(num, double);
+});
+console.log(store.get(num)); // 1
+store.set(doubleEffect);
+console.log(store.get(num)); // 2
+store.set(doubleEffect);
+console.log(store.get(num)); // 4
 ```
 
 ## Subscription System
@@ -73,21 +60,21 @@ const setupEditorEffect = effect(async (get, set) => {
 Rippling's subscription system is very different from Jotai's. First, Rippling's subscription callback must be an effect.
 
 ```typescript
-export const userId = state(1)
+export const userId = state(1);
 
 export const userIdChangeEffect = effect((get, set) => {
-    const userId = get(userId)  
-    // ...
-})
+  const userId = get(userId);
+  // ...
+});
 
 // ...
-import { userId, userIdChangeEffect } from './atoms'
+import { userId, userIdChangeEffect } from "./atoms";
 
 function setupPage() {
-    const store = createStore()
-    // ...
-    store.sub(userId, userIdChangeEffect)
-    // ...
+  const store = createStore();
+  // ...
+  store.sub(userId, userIdChangeEffect);
+  // ...
 }
 ```
 
@@ -102,32 +89,35 @@ As an alternative solution, operators like `loadable` should be implemented as H
 In Jotai, `sub` notifications are automatic - whenever the subscribed Atom or its upstream atoms change, all subscribed callbacks are automatically notified. This can create performance overhead, as shown in this common editor scenario.
 
 ```typescript
-const width = atom(100)
-const height = atom(100)
-const area = computed(() => store.get(width) * store.get(height))
+const width = atom(100);
+const height = atom(100);
+const area = computed(() => store.get(width) * store.get(height));
 store.sub(area, () => {
-    // ...
-})
+  // ...
+});
 
 // this will trigger the callback twice
-store.set(width, 200)
-store.set(height, 200)
+store.set(width, 200);
+store.set(height, 200);
 ```
 
 In this scenario, the area value is computed twice. For an editor like Motiff, frequent CPU usage can significantly slow down the editor's response time. Instead, we prefer to notify all subscribed callbacks once after the user interaction is complete.
 
 ```typescript
-const width = state(100)
-const height = state(100)
-const computedArea = computed(() => store.get(width) * store.get(height))
-store.sub(computedArea, effect(() => {
+const width = state(100);
+const height = state(100);
+const computedArea = computed(() => store.get(width) * store.get(height));
+store.sub(
+  computedArea,
+  effect(() => {
     // ...
-}))
+  })
+);
 
-store.set(width, 200)
-store.set(height, 200)
+store.set(width, 200);
+store.set(height, 200);
 // ...
-store.notify()
+store.notify();
 ```
 
 ## Reactive is not first-class citizen

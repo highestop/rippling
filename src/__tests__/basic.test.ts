@@ -40,14 +40,12 @@ it('creates atoms', () => {
 
   expect(setSumAtom).toMatchInlineSnapshot(`
     {
-      "read": [Function],
       "write": [Function],
     }
     `)
 
   expect(decrementCountAtom).toMatchInlineSnapshot(`
     {
-      "read": [Function],
       "write": [Function],
     }
     `)

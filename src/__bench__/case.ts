@@ -1,13 +1,13 @@
 import { computed, createStore, effect, state, State, Computed } from ".."
-import { Atom } from "../typing/atom"
+import { ReadableAtom } from "../typing/atom"
 import { atom, createStore as createJotaiStore, Atom as JotaiAtom, PrimitiveAtom } from 'jotai/vanilla'
 
-function mergeRipplingStates(atoms: Atom<number>[], childCount: number): Computed<number> {
-    let pendingAtoms: Atom<number>[] = [...atoms]
+function mergeRipplingStates(atoms: ReadableAtom<number>[], childCount: number): Computed<number> {
+    let pendingAtoms: ReadableAtom<number>[] = [...atoms]
     while (pendingAtoms.length > 1) {
-        const derivedAtoms: Atom<number>[] = []
+        const derivedAtoms: ReadableAtom<number>[] = []
         for (let i = 0; i < pendingAtoms.length / childCount; i++) {
-            const innerAtoms: Atom<number>[] = []
+            const innerAtoms: ReadableAtom<number>[] = []
             for (let j = 0; j < childCount && i * childCount + j < pendingAtoms.length; j++) {
                 innerAtoms.push(pendingAtoms[i * childCount + j])
             }
@@ -51,7 +51,7 @@ function mergeJotaiAtoms(atoms: JotaiAtom<number>[], childCount: number): JotaiA
 
 function setupRipplingStore(scale = 5) {
     const store = createStore()
-    const atoms: Atom<number>[] = []
+    const atoms: ReadableAtom<number>[] = []
     for (let i = 0; i < Math.pow(10, scale); i++) {
         atoms.push(state(i))
     }

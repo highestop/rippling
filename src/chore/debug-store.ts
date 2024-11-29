@@ -1,13 +1,13 @@
-import { Atom, Effect } from "../typing/atom";
+import { ReadableAtom, Effect } from "../typing/atom";
 import { DebugStore, Subscribe } from "../typing/store";
 import { NestedAtom } from "../typing/util";
-import { AtomManager, ListenerManager } from "./atom-manager";
+import { AtomManager, ComputedState, ListenerManager } from "./atom-manager";
 import { StoreImpl } from "./store";
 
 class DebugStoreImpl extends StoreImpl implements DebugStore {
-    private readonly subscribedAtoms = new Map<Atom<unknown>, number>()
+    private readonly subscribedAtoms = new Map<ReadableAtom<unknown>, number>()
 
-    sub: Subscribe = (atoms: Atom<unknown>[] | Atom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void => {
+    sub: Subscribe = (atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void => {
         const atomList = Array.isArray(atoms) ? atoms : [atoms]
 
         atomList.forEach((atom) => {
@@ -30,15 +30,19 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
         }
     }
 
-    getReadDependencies = (atom: Atom<unknown>): NestedAtom => {
+    getReadDependencies = (atom: ReadableAtom<unknown>): NestedAtom => {
         const atomState = this.atomManager.readAtomState(atom);
 
-        return [atom, ...Array.from(atomState.dependencies ?? new Map<Atom<unknown>, number>()).map(([key]) => {
+        if (!('dependencies' in atomState)) {
+            return [atom]
+        }
+
+        return [atom, ...Array.from((atomState as ComputedState<unknown>).dependencies).map(([key]) => {
             return this.getReadDependencies(key);
         })] as NestedAtom;
     }
 
-    getReadDependents = (atom: Atom<unknown>): NestedAtom => {
+    getReadDependents = (atom: ReadableAtom<unknown>): NestedAtom => {
         const atomState = this.atomManager.readAtomState(atom);
         return [atom, ...Array.from(atomState.mounted?.readDepts ?? []).map((key) =>
             this.getReadDependents(key)

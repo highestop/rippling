@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest';
-import { state, createStore, State, computed, Computed, effect, createDebugStore } from '..';
+import { state, createStore, State, computed, Computed, effect, createDebugStore, Effect } from '..';
 
 test('should work', () => {
     const store = createStore();
@@ -84,23 +84,6 @@ test('effect can set other state', () => {
     store.set(doubleEffect, 2)
     expect(store.get(anAtom)).toBe(2)
     expect(store.get(doubleAtom)).toBe(4)
-})
-
-test('read & write effect as an effect', async () => {
-    const store = createStore()
-    const trace = vi.fn()
-    const effectEffect = effect(async () => {
-        await Promise.resolve()
-        trace()
-        return 2;
-    })
-
-    expect(() => store.get(effectEffect)).toThrow('Effect is not inited')
-
-    void store.set(effectEffect)
-    expect(trace).not.toHaveBeenCalled()
-    expect(await store.get(effectEffect)).toBe(2)
-    expect(trace).toHaveBeenCalledOnce()
 })
 
 test('set an atom should trigger subscribe', () => {
@@ -310,4 +293,52 @@ test('computed should only compute once if no deps changed', () => {
     store.get(cmpt);
     store.get(cmpt);
     expect(trace).toBeCalledTimes(1);
+})
+
+test('an observable effect process', async () => {
+    function observableEffect<Value, Args extends unknown[]>(
+        effectAtom: Effect<Value, Args>
+    ): [Computed<Value | null>, Effect<Value, Args>] {
+        const lastResult = state<Value | null>(null);
+        return [
+            computed((get) => get(lastResult)),
+
+            effect((get, set, ...args: Args) => {
+                const result = set(effectAtom, ...args)
+                set(lastResult, result)
+                return result
+            })]
+    }
+
+    const [setupResult, setupEffect] = observableEffect(effect(async () => {
+        await Promise.resolve()
+        return 'ok'
+    }))
+    const store = createStore();
+    expect(store.get(setupResult)).toBeNull();
+    const ret = store.set(setupEffect)
+    expect(ret).toBeInstanceOf(Promise)
+    expect(store.get(setupResult)).toBe(ret)
+    await expect(ret).resolves.toBe('ok')
+})
+
+test('generator in effect', () => {
+    const step = state(0);
+    const generatorEffect = effect(function* (_, set) {
+        set(step, 1)
+        yield;
+        set(step, 2)
+        yield;
+        set(step, 3)
+        return 3;
+    })
+
+    const store = createStore();
+    const ret = store.set(generatorEffect)
+    ret.next()
+    expect(store.get(step)).toBe(1)
+    ret.next()
+    expect(store.get(step)).toBe(2)
+    ret.next()
+    expect(store.get(step)).toBe(3)
 })

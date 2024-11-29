@@ -1,28 +1,28 @@
-import { Atom, Effect, Getter, State, Updater, Setter } from "../typing/atom";
+import { ReadableAtom, Effect, Getter, State, Updater, Setter } from "../typing/atom";
 import { Store } from "../typing/store";
 import { AtomManager, ListenerManager } from "./atom-manager";
 
 export class StoreImpl implements Store {
     constructor(protected readonly atomManager: AtomManager, protected readonly listenerManager: ListenerManager) { }
 
-    get: Getter = <Value>(atom: Atom<Value>): Value => {
-        return this.atomManager.readAtomState(atom).value as Value
+    get: Getter = <Value>(atom: ReadableAtom<Value>): Value => {
+        return this.atomManager.readAtomState(atom).value
     }
 
     set: Setter = <Value, Args extends unknown[]>(
         atom: State<Value> | Effect<Value, Args>,
         ...args: [Value | Updater<Value>] | Args
     ): undefined | Value => {
-        if ('write' in atom) {
-            return atom.write(this.get, this.set, ...args as Args);
-        }
-
         if ('read' in atom) {
             return;
         }
 
+        if ('write' in atom) {
+            return atom.write(this.get, this.set, ...args as Args);
+        }
+
         const newValue = typeof args[0] === 'function' ? (args[0] as Updater<Value>)(
-            this.atomManager.readAtomState(atom).value as Value
+            this.atomManager.readAtomState(atom).value
         ) : args[0] as Value;
 
         if (!this.atomManager.inited(atom)) {
@@ -32,11 +32,11 @@ export class StoreImpl implements Store {
         }
         const atomState = this.atomManager.readAtomState(atom)
         atomState.value = newValue;
-        atomState.epoch = (atomState.epoch ?? 0) + 1;
+        atomState.epoch += 1;
         this.listenerManager.markPendingListeners(this.atomManager, atom)
     }
 
-    private _subSingleAtom(atom: Atom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
+    private _subSingleAtom(atom: ReadableAtom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
         const mounted = this.atomManager.mount(atom);
         mounted.listeners.add(cbEffect);
 
@@ -49,7 +49,7 @@ export class StoreImpl implements Store {
         }
     }
 
-    sub(atoms: Atom<unknown>[] | Atom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
+    sub(atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
         if (Array.isArray(atoms) && atoms.length === 0) {
             return () => void (0);
         }

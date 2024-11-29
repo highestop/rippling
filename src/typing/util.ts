@@ -1,4 +1,4 @@
-import { Atom } from "./atom";
+import { ReadableAtom, WritableAtom } from "./atom";
 
-export type NestedAtom = (Atom<unknown> | NestedAtom)[];
+export type NestedAtom = (ReadableAtom<unknown> | WritableAtom<unknown> | NestedAtom)[];
 export type NestedString = (string | NestedString)[];
