@@ -69,9 +69,25 @@ export function setupRipplingSetCase(scale = 5) {
     }))
 
     const update = () => {
-        const idx = Math.floor(Math.random() * atoms.length)
-        store.set(atoms[idx] as State<number>, (x) => x + 1)
+        store.set(atoms[0] as State<number>, (x) => x + 1)
         store.notify()
+    }
+
+    return {
+        cleanup,
+        update,
+    }
+}
+
+export function setupRipplingSetCaseWithoutNotify(scale = 5) {
+    const { store, atoms, topAtom } = setupRipplingStore(scale)
+
+    const cleanup = store.sub(topAtom, effect((get) => {
+        get(topAtom)
+    }))
+
+    const update = () => {
+        store.set(atoms[0] as State<number>, (x) => x + 1)
     }
 
     return {
@@ -99,8 +115,7 @@ export function setupJotaiSetCase(scale = 5) {
     })
 
     const update = () => {
-        const idx = Math.floor(Math.random() * atoms.length)
-        store.set(atoms[idx], (x: number) => x + 1)
+        store.set(atoms[0], (x: number) => x + 1)
     }
 
     return {
@@ -109,13 +124,12 @@ export function setupJotaiSetCase(scale = 5) {
     }
 }
 
-export function setupRipplingSetCaseWithOutMount(scale = 5) {
+export function setupRipplingSetCaseWithoutMount(scale = 5) {
     const { store, atoms, topAtom } = setupRipplingStore(scale)
 
     const cleanup = () => void (0)
     const update = () => {
-        const idx = Math.floor(Math.random() * atoms.length)
-        store.set(atoms[idx] as State<number>, (x) => x + 1)
+        store.set(atoms[0] as State<number>, (x) => x + 1)
         store.get(topAtom)
     }
 
@@ -124,13 +138,12 @@ export function setupRipplingSetCaseWithOutMount(scale = 5) {
         update,
     }
 }
-export function setupJotaiSetCaseWithOutMount(scale = 5) {
+export function setupJotaiSetCaseWithoutMount(scale = 5) {
     const { store, atoms, topAtom } = setupJotaiStore(scale)
 
     const cleanup = () => void (0)
     const update = () => {
-        const idx = Math.floor(Math.random() * atoms.length)
-        store.set(atoms[idx], (x: number) => x + 1)
+        store.set(atoms[0], (x: number) => x + 1)
         store.get(topAtom)
     }
 
