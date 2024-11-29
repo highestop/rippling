@@ -39,3 +39,9 @@ jobs:
           file: coverage/cobertura-coverage.xml
           format: cobertura
           fail-on-error: true
+
+      - name: Run benchmarks
+        uses: CodSpeedHQ/action@v3
+        with:
+          run: pnpm vitest bench
+          token: ${{ secrets.CODSPEED_TOKEN }}
