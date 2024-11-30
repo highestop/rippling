@@ -1,18 +1,18 @@
-import { ReadableAtom, Effect, Getter, State, Updater, Setter } from "../typing/atom";
+import { ReadableAtom, Effect, Getter, Value, Updater, Setter } from "../typing/atom";
 import { Store } from "../typing/store";
 import { AtomManager, ListenerManager } from "./atom-manager";
 
 export class StoreImpl implements Store {
     constructor(protected readonly atomManager: AtomManager, protected readonly listenerManager: ListenerManager) { }
 
-    get: Getter = <Value>(atom: ReadableAtom<Value>): Value => {
-        return this.atomManager.readAtomState(atom).value
+    get: Getter = <T>(atom: ReadableAtom<T>): T => {
+        return this.atomManager.readAtomState(atom).val
     }
 
-    set: Setter = <Value, Args extends unknown[]>(
-        atom: State<Value> | Effect<Value, Args>,
-        ...args: [Value | Updater<Value>] | Args
-    ): undefined | Value => {
+    set: Setter = <T, Args extends unknown[]>(
+        atom: Value<T> | Effect<T, Args>,
+        ...args: [T | Updater<T>] | Args
+    ): undefined | T => {
         if ('read' in atom) {
             return;
         }
@@ -21,17 +21,17 @@ export class StoreImpl implements Store {
             return atom.write(this.get, this.set, ...args as Args);
         }
 
-        const newValue = typeof args[0] === 'function' ? (args[0] as Updater<Value>)(
-            this.atomManager.readAtomState(atom).value
-        ) : args[0] as Value;
+        const newValue = typeof args[0] === 'function' ? (args[0] as Updater<T>)(
+            this.atomManager.readAtomState(atom).val
+        ) : args[0] as T;
 
         if (!this.atomManager.inited(atom)) {
-            this.atomManager.readAtomState(atom).value = newValue;
+            this.atomManager.readAtomState(atom).val = newValue;
             this.listenerManager.markPendingListeners(this.atomManager, atom)
             return
         }
         const atomState = this.atomManager.readAtomState(atom)
-        atomState.value = newValue;
+        atomState.val = newValue;
         atomState.epoch += 1;
         this.listenerManager.markPendingListeners(this.atomManager, atom)
     }

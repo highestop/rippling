@@ -1,25 +1,25 @@
-export type Updater<Value> = (current: Value) => Value;
+export type Updater<T> = (current: T) => T;
 export interface Setter {
-    <Value>(state: State<Value>, value: Value | Updater<Value>): void;
-    <Value, Args extends unknown[]>(effect: Effect<Value, Args>, ...args: Args): Value;
+    <T>(value: Value<T>, val: T | Updater<T>): void;
+    <T, Args extends unknown[]>(effect: Effect<T, Args>, ...args: Args): T;
 }
-export type Getter = <Value>(readable: ReadableAtom<Value>) => Value;
+export type Getter = <T>(readable: ReadableAtom<T>) => T;
 export interface GetterOptions { signal: AbortSignal }
-export type Read<Value> = (get: Getter, options: GetterOptions) => Value;
-export type Write<Value, Args extends unknown[]> = (get: Getter, set: Setter, ...args: Args) => Value;
+export type Read<T> = (get: Getter, options: GetterOptions) => T;
+export type Write<T, Args extends unknown[]> = (get: Getter, set: Setter, ...args: Args) => T;
 
-export interface State<Value> {
-    init: Value;
+export interface Value<T> {
+    init: T;
     debugLabel?: string;
 }
-export interface Computed<Value> {
-    read: Read<Value>;
+export interface Computed<T> {
+    read: Read<T>;
     debugLabel?: string;
 }
-export interface Effect<Value, Args extends unknown[]> {
-    write: Write<Value, Args>;
+export interface Effect<T, Args extends unknown[]> {
+    write: Write<T, Args>;
     debugLabel?: string;
 }
 
-export type ReadableAtom<Value> = State<Value> | Computed<Value>
-export type WritableAtom<Value> = State<Value> | Effect<Value, unknown[]>
+export type ReadableAtom<T> = Value<T> | Computed<T>
+export type WritableAtom<T> = Value<T> | Effect<T, unknown[]>

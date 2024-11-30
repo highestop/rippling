@@ -1,4 +1,4 @@
-import { computed, createStore, effect, state, State, Computed } from ".."
+import { computed, createStore, effect, value, Value, Computed } from ".."
 import { ReadableAtom } from "../typing/atom"
 import { atom, createStore as createJotaiStore, Atom as JotaiAtom, PrimitiveAtom } from 'jotai/vanilla'
 
@@ -53,7 +53,7 @@ function setupRipplingStore(scale = 5) {
     const store = createStore()
     const atoms: ReadableAtom<number>[] = []
     for (let i = 0; i < Math.pow(10, scale); i++) {
-        atoms.push(state(i))
+        atoms.push(value(i))
     }
 
     const topAtom = mergeRipplingStates(atoms, 10)
@@ -69,7 +69,7 @@ export function setupRipplingSetCase(scale = 5) {
     }))
 
     const update = () => {
-        store.set(atoms[0] as State<number>, (x) => x + 1)
+        store.set(atoms[0] as Value<number>, (x) => x + 1)
         store.notify()
     }
 
@@ -87,7 +87,7 @@ export function setupRipplingSetCaseWithoutNotify(scale = 5) {
     }))
 
     const update = () => {
-        store.set(atoms[0] as State<number>, (x) => x + 1)
+        store.set(atoms[0] as Value<number>, (x) => x + 1)
     }
 
     return {
@@ -129,7 +129,7 @@ export function setupRipplingSetCaseWithoutMount(scale = 5) {
 
     const cleanup = () => void (0)
     const update = () => {
-        store.set(atoms[0] as State<number>, (x) => x + 1)
+        store.set(atoms[0] as Value<number>, (x) => x + 1)
         store.get(topAtom)
     }
 

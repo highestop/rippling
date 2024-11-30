@@ -1,11 +1,11 @@
 import LeakDetector from 'jest-leak-detector'
 import { expect, it } from 'vitest'
-import { state, State, Computed, computed, createStore, effect, createDebugStore } from '..'
+import { value, Value, Computed, computed, createStore, effect, createDebugStore } from '..'
 
 
-it('should release memory after delete state', async () => {
+it('should release memory after delete value', async () => {
     const store = createStore()
-    let base: State<object> | undefined = state({})
+    let base: Value<object> | undefined = value({})
 
     const detector = new LeakDetector(store.get(base))
     base = undefined
@@ -13,9 +13,9 @@ it('should release memory after delete state', async () => {
     expect(await detector.isLeaking()).toBe(false)
 })
 
-it('should release memory after base state & derived computed is deleted', async () => {
+it('should release memory after base value & derived computed is deleted', async () => {
     const store = createStore()
-    let base: State<object> | undefined = state({})
+    let base: Value<object> | undefined = value({})
     let derived: Computed<object> | undefined = computed((get) => ({
         obj: base && get(base),
     }))
@@ -29,9 +29,9 @@ it('should release memory after base state & derived computed is deleted', async
     expect(await detector2.isLeaking()).toBe(false)
 })
 
-it('with a long-lived base state', async () => {
+it('with a long-lived base value', async () => {
     const store = createStore()
-    const base = state({})
+    const base = value({})
 
     let cmpt: Computed<object> | undefined = computed((get) => ({
         obj: get(base),
@@ -44,7 +44,7 @@ it('with a long-lived base state', async () => {
 
 it('should not hold onto dependent atoms that are not mounted', async () => {
     const store = createStore()
-    const base = state({})
+    const base = value({})
     let cmpt: Computed<unknown> | undefined = computed((get) => get(base))
     const detector = new LeakDetector(cmpt)
     store.get(cmpt)
@@ -54,7 +54,7 @@ it('should not hold onto dependent atoms that are not mounted', async () => {
 
 it('unsubscribe on atom should release memory', async () => {
     const store = createStore()
-    let objAtom: State<object> | undefined = state({})
+    let objAtom: Value<object> | undefined = value({})
     const detector = new LeakDetector(store.get(objAtom))
     let unsub: (() => void) | undefined = store.sub(objAtom, effect(() => {
         return;
@@ -68,7 +68,7 @@ it('unsubscribe on atom should release memory', async () => {
 
 it('unsubscribe on computed should release memory', async () => {
     const store = createStore()
-    let objAtom: State<object> | undefined = state({})
+    let objAtom: Value<object> | undefined = value({})
     const detector1 = new LeakDetector(store.get(objAtom))
     let derivedAtom: Computed<object> | undefined = computed((get) => ({
         obj: objAtom && get(objAtom),
@@ -87,7 +87,7 @@ it('unsubscribe on computed should release memory', async () => {
 
 it('unsubscribe a long-lived base atom', async () => {
     const store = createStore()
-    const base = state({})
+    const base = value({})
     let cmpt: Computed<object> | undefined = computed((get) => ({
         obj: get(base),
     }))
@@ -103,7 +103,7 @@ it('unsubscribe a long-lived base atom', async () => {
 
 it('unsubscribe a computed atom', async () => {
     const store = createDebugStore()
-    const base = state({}, { debugLabel: 'base' })
+    const base = value({}, { debugLabel: 'base' })
     let cmpt: Computed<object> | undefined = computed((get) => ({
         obj: get(base),
     }), { debugLabel: 'cmpt' })

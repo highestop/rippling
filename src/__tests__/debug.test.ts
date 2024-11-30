@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
-import { computed, createDebugStore, effect, nestedAtomToString, state } from "..";
+import { computed, createDebugStore, effect, nestedAtomToString, value } from "..";
 
 it('can get pending listeners', () => {
     const store = createDebugStore()
-    const base = state(1)
+    const base = value(1)
     store.sub(base, effect(() => { void (0) }, { debugLabel: 'sub' }))
 
     expect(store.getPendingListeners()).toEqual([])
@@ -13,7 +13,7 @@ it('can get pending listeners', () => {
 
 it('get all subscribed atoms', () => {
     const store = createDebugStore()
-    const base = state(1, { debugLabel: 'base' })
+    const base = value(1, { debugLabel: 'base' })
     const derived = computed((get) => get(base) + 1, { debugLabel: 'derived' })
     store.sub([base, derived], effect(() => { void (0) }, { debugLabel: 'sub' }))
     expect(nestedAtomToString(store.getSubscribeGraph())).toEqual([['base', 'sub'], ['derived', 'sub']])

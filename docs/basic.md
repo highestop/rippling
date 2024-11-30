@@ -2,7 +2,7 @@
 
 ## Atom
 
-### `state`
+### `value`
 
 ### `derived`
 

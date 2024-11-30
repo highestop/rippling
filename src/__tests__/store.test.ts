@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
-import { computed, createDebugStore, createStore, effect, state } from '..'
+import { computed, createDebugStore, createStore, effect, value } from '..'
 import { suspense } from './utils'
 import { Getter } from '../typing/atom'
 
 it('should not fire on subscribe', () => {
     const store = createStore()
-    const countAtom = state(0)
+    const countAtom = value(0)
     const callback1 = vi.fn()
     const callback2 = vi.fn()
     store.sub(countAtom, effect(callback1))
@@ -17,7 +17,7 @@ it('should not fire on subscribe', () => {
 
 it('should fire subscription even if primitive atom value is the same', () => {
     const store = createStore()
-    const countAtom = state(0)
+    const countAtom = value(0)
     const callback = vi.fn()
     store.sub(countAtom, effect(callback))
     store.set(countAtom, 0)
@@ -28,7 +28,7 @@ it('should fire subscription even if primitive atom value is the same', () => {
 
 it('should fire subscription even if derived atom value is the same', () => {
     const store = createStore()
-    const countAtom = state(0)
+    const countAtom = value(0)
     const derivedAtom = computed((get) => get(countAtom) * 0)
     const callback = vi.fn()
     store.sub(derivedAtom, effect(callback))
@@ -40,7 +40,7 @@ it('should fire subscription even if derived atom value is the same', () => {
 
 it('should unmount with store.get', () => {
     const store = createStore()
-    const countAtom = state(0)
+    const countAtom = value(0)
     const callback = vi.fn()
     const unsub = store.sub(countAtom, effect(callback))
     unsub()
@@ -51,7 +51,7 @@ it('should unmount with store.get', () => {
 
 it('should unmount dependencies with store.get', () => {
     const store = createStore()
-    const countAtom = state(0)
+    const countAtom = value(0)
     const derivedAtom = computed((get) => get(countAtom) * 2)
     const callback = vi.fn()
     const unsub = store.sub(derivedAtom, effect(callback))
@@ -63,7 +63,7 @@ it('should unmount dependencies with store.get', () => {
 })
 
 it('should update async atom with delay (#1813)', async () => {
-    const countAtom = state(0)
+    const countAtom = value(0)
 
     const suspensedResolve: (() => void)[] = []
     function restoreAll() {
@@ -92,7 +92,7 @@ it('should update async atom with delay (#1813)', async () => {
 
 it('should override a promise by setting', async () => {
     const store = createStore()
-    const countAtom = state(Promise.resolve(0))
+    const countAtom = value(Promise.resolve(0))
     const infinitePending = new Promise<never>(() => void (0))
     store.set(countAtom, infinitePending)
     const promise1 = store.get(countAtom)
@@ -104,7 +104,7 @@ it('should override a promise by setting', async () => {
 
 it('should update async atom with deps after await', async () => {
     const { pause, restore } = suspense()
-    const countAtom = state(0, {
+    const countAtom = value(0, {
         debugLabel: 'countAtom'
     })
 
@@ -149,7 +149,7 @@ it('should update async atom with deps after await', async () => {
 
 it('should fire subscription when async atom promise is the same', () => {
     const promise = Promise.resolve()
-    const promiseAtom = state(promise, {
+    const promiseAtom = value(promise, {
         debugLabel: 'promiseAtom'
     })
     const derivedGetter = vi.fn((get: Getter) => get(promiseAtom))
@@ -195,7 +195,7 @@ it('should fire subscription when async atom promise is the same', () => {
 })
 
 it('should notify subscription with tree dependencies', () => {
-    const valueAtom = state(1, {
+    const valueAtom = value(1, {
         debugLabel: 'valueAtom'
     })
     const dep1_doubleAtom = computed((get) => get(valueAtom) * 2, {
@@ -226,7 +226,7 @@ it('should notify subscription with tree dependencies', () => {
 })
 
 it('should notify subscription with tree dependencies with bail-out', () => {
-    const valueAtom = state(1)
+    const valueAtom = value(1)
     const dep1Atom = computed((get) => get(valueAtom) * 2)
     const dep2Atom = computed((get) => get(valueAtom) * 0)
     const dep3Atom = computed((get) => get(dep1Atom) + get(dep2Atom))
@@ -246,7 +246,7 @@ it('should notify subscription with tree dependencies with bail-out', () => {
 
 it('should trigger subscriber even if the same value with chained dependency', () => {
     const store = createStore()
-    const objAtom = state({ count: 1 }, {
+    const objAtom = value({ count: 1 }, {
         debugLabel: 'objAtom'
     })
     const countAtom = computed((get) => get(objAtom).count, {
@@ -281,7 +281,7 @@ it('should trigger subscriber even if the same value with chained dependency', (
 
 it('read function should called during subscription', () => {
     const store = createStore()
-    const countAtom = state(1)
+    const countAtom = value(1)
     const derive1Fn = vi.fn((get: Getter) => get(countAtom))
     const derived1Atom = computed(derive1Fn)
     const derive2Fn = vi.fn((get: Getter) => get(countAtom))
@@ -300,8 +300,8 @@ it('read function should called during subscription', () => {
 
 it('should update with conditional dependencies', () => {
     const store = createStore()
-    const f1 = state(false)
-    const f2 = state(false)
+    const f1 = value(false)
+    const f2 = value(false)
     const f3 = computed(
         (get) => get(f1) && get(f2)
     )
@@ -319,7 +319,7 @@ it('should update with conditional dependencies', () => {
 it('should update derived atoms during write', () => {
     const store = createStore()
 
-    const baseCountAtom = state(1)
+    const baseCountAtom = value(1)
     const countAtom = computed((get) => get(baseCountAtom))
 
     const updateCountAtom = effect((get, set, newValue: number) => {
@@ -337,7 +337,7 @@ it('should update derived atoms during write', () => {
 
 it.skip('resolves dependencies reliably after a delay', async () => {
     expect.assertions(1)
-    const countAtom = state(0)
+    const countAtom = value(0)
     let result: number | null = null
 
     const { pause, restore, waitQueueCount } = suspense()
@@ -388,7 +388,7 @@ it.skip('resolves dependencies reliably after a delay', async () => {
 
 it('should not recompute a derived atom value if unchanged (#2168)', () => {
     const store = createStore()
-    const countAtom = state(1)
+    const countAtom = value(1)
     const zeroAtom = computed((get) => get(countAtom) * 0)
     const deriveFn = vi.fn((get: Getter) => get(zeroAtom))
     const derivedAtom = computed(deriveFn)
@@ -400,7 +400,7 @@ it('should not recompute a derived atom value if unchanged (#2168)', () => {
 
 it('should notify pending write triggered asynchronously and indirectly (#2451)', async () => {
     const store = createStore()
-    const anAtom = state('initial')
+    const anAtom = value('initial')
 
     const callbackFn = vi.fn()
     const unsub = store.sub(anAtom, effect((get) => {
@@ -430,7 +430,7 @@ describe('async atom with subtle timing', () => {
         const { pause, restore } = suspense()
         const store = createStore()
 
-        const a = state(1)
+        const a = value(1)
         const b = computed(async (get) => {
             await pause()
             return get(a)
@@ -447,7 +447,7 @@ describe('async atom with subtle timing', () => {
     it('case 2', async () => {
         const { pause, restore } = suspense()
         const store = createStore()
-        const a = state(1)
+        const a = value(1)
         const b = computed(async (get) => {
             const aValue = get(a)
             await pause()
@@ -464,11 +464,11 @@ describe('async atom with subtle timing', () => {
 })
 
 it('Unmount an atom that is no longer dependent within a derived atom', () => {
-    const condAtom = state(true, {
+    const condAtom = value(true, {
         debugLabel: 'condAtom'
     })
 
-    const baseAtom = state(0, {
+    const baseAtom = value(0, {
         debugLabel: 'baseAtom'
     })
 
@@ -492,7 +492,7 @@ it('Unmount an atom that is no longer dependent within a derived atom', () => {
 })
 
 it('should update derived atom even if dependances changed (#2697)', () => {
-    const primitiveAtom = state<number | undefined>(undefined)
+    const primitiveAtom = value<number | undefined>(undefined)
     const derivedAtom = computed((get) => get(primitiveAtom))
     const conditionalAtom = computed((get) => {
         const base = get(primitiveAtom)
@@ -513,7 +513,7 @@ it('should update derived atom even if dependances changed (#2697)', () => {
 })
 
 it('double unmount should not cause new mount', () => {
-    const base = state(0, {
+    const base = value(0, {
         debugLabel: 'base'
     })
     const store = createDebugStore()
@@ -528,7 +528,7 @@ it('double unmount should not cause new mount', () => {
 })
 
 it('mount multiple times on same atom', () => {
-    const base = state(0, {
+    const base = value(0, {
         debugLabel: 'base'
     })
     const store = createDebugStore()

@@ -1,9 +1,9 @@
 import { expect, test, vi } from 'vitest';
-import { state, createStore, State, computed, Computed, effect, createDebugStore, Effect } from '..';
+    import { value, createStore, Value, computed, Computed, effect, createDebugStore, Effect } from '..';
 
 test('should work', () => {
     const store = createStore();
-    const anAtom = state(1);
+    const anAtom = value(1);
 
     expect(store.get(anAtom)).toBe(1);
 
@@ -14,9 +14,9 @@ test('should work', () => {
     expect(store2.get(anAtom)).toBe(1);
 });
 
-test('computed state should work', () => {
+test('computed value should work', () => {
     const store = createStore();
-    const base = state(1);
+    const base = value(1);
     const derived = computed((get) => {
         const num = get(base);
         return num * 2
@@ -27,20 +27,20 @@ test('computed state should work', () => {
     expect(store.get(derived)).toBe(2);
 })
 
-test('computed state should not writable', () => {
+test('computed value should not writable', () => {
     const store = createStore()
-    const anAtom = state(1)
+    const anAtom = value(1)
     const doubleCmpt = computed((get) => {
         return get(anAtom) * 2
     })
 
-    store.set(doubleCmpt as unknown as State<number>, 3)
+    store.set(doubleCmpt as unknown as Value<number>, 3)
     expect(store.get(doubleCmpt)).toBe(2)
 })
 
-test('async state should works like sync state', async () => {
+test('async value should works like sync value', async () => {
     const store = createStore()
-    const anAtom = state(1)
+    const anAtom = value(1)
     const asyncCmpt: Computed<Promise<number>> = computed(async (get) => {
         await Promise.resolve()
         return get(anAtom) * 2
@@ -51,7 +51,7 @@ test('async state should works like sync state', async () => {
 
 test('async computed should not follow old value', async () => {
     const store = createStore()
-    const base = state('foo', {
+    const base = value('foo', {
         debugLabel: 'base'
     })
     const cmpt = computed((get) => {
@@ -73,10 +73,10 @@ test('async computed should not follow old value', async () => {
     expect(await ret2).toBe('barbarbar')
 })
 
-test('effect can set other state', () => {
+test('effect can set other value', () => {
     const store = createStore()
-    const anAtom = state(1)
-    const doubleAtom = state(0)
+    const anAtom = value(1)
+    const doubleAtom = value(0)
     const doubleEffect = effect((get, set, num) => {
         set(anAtom, num)
         set(doubleAtom, get(anAtom) * 2)
@@ -88,7 +88,7 @@ test('effect can set other state', () => {
 
 test('set an atom should trigger subscribe', () => {
     const store = createStore()
-    const base = state(1, {
+    const base = value(1, {
         debugLabel: 'base'
     })
     const trace = vi.fn()
@@ -105,7 +105,7 @@ test('set an atom should trigger subscribe', () => {
 
 test('set an atom should trigger once in multiple set', () => {
     const store = createStore()
-    const anAtom = state(1)
+    const anAtom = value(1)
     const trace = vi.fn()
     store.sub(anAtom, effect(() => {
         trace()
@@ -119,7 +119,7 @@ test('set an atom should trigger once in multiple set', () => {
 
 test('set an atom should trigger once in multiple notify', () => {
     const store = createStore()
-    const anAtom = state(1)
+    const anAtom = value(1)
     const trace = vi.fn()
     store.sub(anAtom, effect(() => {
         trace()
@@ -133,10 +133,10 @@ test('set an atom should trigger once in multiple notify', () => {
 
 test('sub multiple atoms', () => {
     const store = createStore()
-    const state1 = state(1, {
+    const state1 = value(1, {
         debugLabel: 'state1'
     })
-    const state2 = state(2, {
+    const state2 = value(2, {
         debugLabel: 'state2'
     })
 
@@ -160,7 +160,7 @@ test('sub multiple atoms', () => {
 
 test('sub computed atom', () => {
     const store = createStore()
-    const base = state(1, {
+    const base = value(1, {
         debugLabel: 'base'
     })
     const cmpt = computed((get) => {
@@ -181,7 +181,7 @@ test('sub computed atom', () => {
 
 test('get read deps', () => {
     const store = createDebugStore()
-    const base = state({ a: 1 })
+    const base = value({ a: 1 })
     const cmpt = computed((get) => {
         return Object.assign(get(base), { b: 1 })
     })
@@ -190,7 +190,7 @@ test('get read deps', () => {
 
 test('get should return value directly', () => {
     const store = createStore()
-    const base = state({ a: 1 })
+    const base = value({ a: 1 })
     const cmpt = computed((get) => {
         return Object.assign(get(base), { b: 1 })
     })
@@ -206,9 +206,9 @@ test('get should return value directly', () => {
 
 test('derived atom should trigger when deps changed', () => {
     const store = createStore();
-    const stateA = state(0);
-    const stateB = state(0);
-    const stateC = state(0);
+    const stateA = value(0);
+    const stateB = value(0);
+    const stateC = value(0);
     const traceB = vi.fn()
     const traceC = vi.fn();
     const derivedAtom = computed((get) => {
@@ -244,10 +244,10 @@ test('derived atom should trigger when deps changed', () => {
 
 test('outdated deps should not trigger sub', async () => {
     const store = createStore();
-    const branch = state("A", {
+    const branch = value("A", {
         debugLabel: 'branch'
     });
-    const refresh = state(0, {
+    const refresh = value(0, {
         debugLabel: 'refresh'
     });
     const derived = computed((get) => {
@@ -284,7 +284,7 @@ test('outdated deps should not trigger sub', async () => {
 
 test('computed should only compute once if no deps changed', () => {
     const store = createStore();
-    const base = state(1);
+    const base = value(1);
     const trace = vi.fn();
     const cmpt = computed((get) => {
         trace();
@@ -296,10 +296,10 @@ test('computed should only compute once if no deps changed', () => {
 })
 
 test('an observable effect process', async () => {
-    function observableEffect<Value, Args extends unknown[]>(
-        effectAtom: Effect<Value, Args>
-    ): [Computed<Value | null>, Effect<Value, Args>] {
-        const lastResult = state<Value | null>(null);
+    function observableEffect<T, Args extends unknown[]>(
+        effectAtom: Effect<T, Args>
+    ): [Computed<T | null>, Effect<T, Args>] {
+        const lastResult = value<T | null>(null);
         return [
             computed((get) => get(lastResult)),
 
@@ -323,7 +323,7 @@ test('an observable effect process', async () => {
 })
 
 test('generator in effect', () => {
-    const step = state(0);
+    const step = value(0);
     const generatorEffect = effect(function* (_, set) {
         set(step, 1)
         yield;

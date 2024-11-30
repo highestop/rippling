@@ -12,12 +12,12 @@ To address these issues, I created Rippling to express my thoughts on state mana
 
 Like Jotai, Rippling is also an Atom State solution. However, unlike Jotai, Rippling doesn't expose Raw Atom, instead dividing Atoms into three types:
 
-### `state` (equivalent to "Primitive Atom" in Jotai)
+### `value` (equivalent to "Primitive Atom" in Jotai)
 
-`state` is a readable and writable "variable", similar to a Primitive Atom in Jotai. Reading a `state` involves no computation process, and writing to a `state` won't trigger any Listener execution - it's simply a variable.
+`value` is a readable and writable "variable", similar to a Primitive Atom in Jotai. Reading a `value` involves no computation process, and writing to a `value` won't trigger any Listener execution - it's simply a variable.
 
 ```typescript
-const i = state(0);
+const i = value(0);
 const store = createStore();
 console.log(store.get(i)); // 0
 store.set(i, 1);
@@ -31,8 +31,8 @@ console.log(store.get(i)); // 10
 `computed` is a readable computed variable whose calculation process should be side-effect free. As long as its dependent Atoms don't change, repeatedly reading the value of a `computed` should yield identical results. `computed` is similar to a Read-only Atom in Jotai.
 
 ```typescript
-const i = state(0);
-const j = computed(() => store.get(i) * 10);
+const i = value(0);
+const j = computed((get) => get(i) * 10);
 console.log(store.get(j)); // 0
 store.set(i, 1);
 console.log(store.get(j)); // 10
@@ -40,10 +40,10 @@ console.log(store.get(j)); // 10
 
 ### `effect` (equivalent to "Write-only Atom" in Jotai)
 
-`effect` is used to encapsulate a process code block. The code inside an Effect only executes when an external `set` call is made on it. `effect` is also the only type in rippling that can modify state without relying on a `store`.
+`effect` is used to encapsulate a process code block. The code inside an Effect only executes when an external `set` call is made on it. `effect` is also the only type in rippling that can modify value without relying on a `store`.
 
 ```typescript
-const num = state(1);
+const num = value(1);
 const doubleEffect = effect((get, set) => {
   const double = get(num) * 2;
   set(num, double);
@@ -60,7 +60,7 @@ console.log(store.get(num)); // 4
 Rippling's subscription system is very different from Jotai's. First, Rippling's subscription callback must be an effect.
 
 ```typescript
-export const userId = state(1);
+export const userId = value(1);
 
 export const userIdChangeEffect = effect((get, set) => {
   const userId = get(userId);
@@ -104,8 +104,8 @@ store.set(height, 200);
 In this scenario, the area value is computed twice. For an editor like Motiff, frequent CPU usage can significantly slow down the editor's response time. Instead, we prefer to notify all subscribed callbacks once after the user interaction is complete.
 
 ```typescript
-const width = state(100);
-const height = state(100);
+const width = value(100);
+const height = value(100);
 const computedArea = computed(() => store.get(width) * store.get(height));
 store.sub(
   computedArea,
@@ -126,4 +126,4 @@ While Reactive Programming has natural advantages in decoupling View Components,
 
 Regardless of the original design semantics of `useEffect`, in the current environment, `useEffect`'s semantics are deeply bound to React's rendering behavior. When engineers use `useEffect`, they subconsciously think "callback me when these things change", especially "callback me when some async process is done". While it's easy to write such waiting code using `async/await`, it feels unnatural in React.
 
-When designing Rippling, we wanted the trigger points for state changes to be completely detached from React's Mount/Unmount lifecycle and completely decoupled from React's rendering behavior. Rippling does not consider using React's `use` hook, nor does it consider using APIs like `suspense` and `ErrorBoundary`.
+When designing Rippling, we wanted the trigger points for value changes to be completely detached from React's Mount/Unmount lifecycle and completely decoupled from React's rendering behavior. Rippling does not consider using React's `use` hook, nor does it consider using APIs like `suspense` and `ErrorBoundary`.

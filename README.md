@@ -11,42 +11,42 @@
 
 ## Core Concepts
 
-### State
+### Value
 
-State are the basic stateful units in Rippling. The can be thought of as a simple key-value store.
+Value are the basic stateful units in Rippling. The can be thought of as a simple key-value store.
 
 For Example:
 
 ```typescript
 const store = createStore();
-const count = state(0);
+const count = value(0);
 store.set(count, 1);
 console.log(store.get(count)); // 1
 ```
 
 ### Computed
 
-Computed are the basic compute units in Rippling. The can read other State / Computed / Effect.
+Computed are the basic compute units in Rippling. The can read other Value / Computed / Effect.
 
 For Example:
 
 ```typescript
 const store = createStore();
-const count = state(0);
+const count = value(0);
 const doubleCount = computed((get) => get(count) * 2);
 console.log(store.get(doubleCount)); // 0
 ```
 
 ### Effect
 
-Effect are the basic command units in Rippling. The can read other State / Computed / Effect and write to State / Effect.
+Effect are the basic command units in Rippling. The can read other Value / Computed / Effect and write to Value / Effect.
 
 For Example:
 
 ```typescript
 const store = createStore();
-const count = state(0);
-const doubleCount = state(0);
+const count = value(0);
+const doubleCount = value(0);
 const updateCount = effect((get, set, value) => {
   set(count, value);
   set(doubleCount, get(count) * 2);
