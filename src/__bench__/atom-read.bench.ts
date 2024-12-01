@@ -1,5 +1,5 @@
 import { bench, describe } from 'vitest'
-import { setupJotaiStore, setupRipplingStore } from './case'
+import { jotaiStrategy, ripplingStrategy, setupJotaiStore, setupRipplingStore, setupStoreWithoutSub } from './case'
 import { Value } from '..'
 import { PrimitiveAtom } from 'jotai/vanilla'
 
@@ -15,7 +15,6 @@ describe(`set with mount, ${String(PROP_GRAPH_DEPTH)} layer states, each compute
             store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
             store.notify()
         }
-
     })
 
     bench('jotai', () => {
@@ -43,6 +42,27 @@ describe(`set with lazy notify, ${String(PROP_GRAPH_DEPTH)} layer states, each c
         for (let i = 0; i < atoms[0].length / 10; i++) {
             store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
             store.notify()
+        }
+    })
+})
+
+const { store: storeWithoutSubRippling, atoms: atomsWithoutSubRippling } = setupStoreWithoutSub(PROP_GRAPH_DEPTH, ripplingStrategy)
+const { store: storeWithoutSubJotai, atoms: atomsWithoutSubJotai } = setupStoreWithoutSub(PROP_GRAPH_DEPTH, jotaiStrategy)
+describe(`set without sub, ${String(PROP_GRAPH_DEPTH)} layer states, each computed has 10 children`, () => {
+    bench('rippling', () => {
+        const atoms = atomsWithoutSubRippling
+        const store = storeWithoutSubRippling
+        for (let i = 0; i < atoms[0].length / 10; i++) {
+            store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
+            store.notify()
+        }
+    })
+
+    bench('jotai', () => {
+        const atoms = atomsWithoutSubJotai
+        const store = storeWithoutSubJotai
+        for (let i = 0; i < atoms[0].length / 10; i++) {
+            store.set(atoms[0][i * 10] as PrimitiveAtom<number>, (x) => x + 1)
         }
     })
 })

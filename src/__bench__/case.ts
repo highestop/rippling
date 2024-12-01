@@ -122,6 +122,18 @@ function setupStore<T, S>(scale: number, strategy: Strategy<T, S>) {
     return { store, atoms, cleanup }
 }
 
+export function setupStoreWithoutSub<T, S>(scale: number, strategy: Strategy<T, S>) {
+    const store = strategy.createStore()
+    const values: T[] = []
+    for (let i = 0; i < Math.pow(10, scale); i++) {
+        values.push(strategy.createValue(i))
+    }
+
+    const atoms = deriveAtoms(values, 10, strategy)
+
+    return { store, atoms }
+}
+
 export function setupRipplingStore(scale = 5) {
     return setupStore(scale, ripplingStrategy)
 }
