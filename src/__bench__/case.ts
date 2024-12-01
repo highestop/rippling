@@ -1,154 +1,131 @@
-import { computed, createStore, effect, value, Value, Computed } from ".."
-import { ReadableAtom } from "../typing/atom"
+import { computed, createStore, effect, value } from ".."
+import { ReadableAtom, Value } from "../typing/atom"
 import { atom, createStore as createJotaiStore, Atom as JotaiAtom, PrimitiveAtom } from 'jotai/vanilla'
 
-function mergeRipplingStates(atoms: ReadableAtom<number>[], childCount: number): Computed<number> {
-    let pendingAtoms: ReadableAtom<number>[] = [...atoms]
-    while (pendingAtoms.length > 1) {
-        const derivedAtoms: ReadableAtom<number>[] = []
-        for (let i = 0; i < pendingAtoms.length / childCount; i++) {
-            const innerAtoms: ReadableAtom<number>[] = []
-            for (let j = 0; j < childCount && i * childCount + j < pendingAtoms.length; j++) {
-                innerAtoms.push(pendingAtoms[i * childCount + j])
-            }
-            const derived = computed((get) => {
-                let total = 0
-                for (const atom of innerAtoms) {
-                    total += get(atom)
-                }
-                return total
-            })
-            derivedAtoms.push(derived)
-        }
-        pendingAtoms = derivedAtoms
-    }
-    return pendingAtoms[0] as Computed<number>
+function fib(n: number): number {
+    if (n <= 1) return n
+    return fib(n - 1) + fib(n - 2)
 }
 
-function mergeJotaiAtoms(atoms: JotaiAtom<number>[], childCount: number): JotaiAtom<number> {
-    let pendingAtoms: JotaiAtom<number>[] = [...atoms]
-    while (pendingAtoms.length > 1) {
-        const derivedAtoms: JotaiAtom<number>[] = []
-        for (let i = 0; i < pendingAtoms.length / childCount; i++) {
-            const innerAtoms: JotaiAtom<number>[] = []
-            for (let j = 0; j < childCount && i * childCount + j < pendingAtoms.length; j++) {
-                innerAtoms.push(pendingAtoms[i * childCount + j])
-            }
-            const derived = atom((get) => {
-                let total = 0
-                for (const atom of innerAtoms) {
-                    total += get(atom)
-                }
-                return total
-            })
-            derivedAtoms.push(derived)
-        }
-        pendingAtoms = derivedAtoms
-    }
-
-    return pendingAtoms[0]
+interface Strategy<T, S> {
+    createStore(): S
+    createValue(value: number): T
+    createComputed(atoms: T[], compute: (get: (atom: T) => number) => number): T
+    sub(store: S, atom: T, callback: () => void): () => void
+    get(store: S, atom: T): number
+    setWithNotify(store: S, atom: T, value: number | ((prev: number) => number)): void
 }
 
-function setupRipplingStore(scale = 5) {
-    const store = createStore()
-    const atoms: ReadableAtom<number>[] = []
-    for (let i = 0; i < Math.pow(10, scale); i++) {
-        atoms.push(value(i))
-    }
-
-    const topAtom = mergeRipplingStates(atoms, 10)
-
-    return { store, atoms, topAtom }
-}
-
-export function setupRipplingSetCase(scale = 5) {
-    const { store, atoms, topAtom } = setupRipplingStore(scale)
-
-    const cleanup = store.sub(topAtom, effect((get) => {
-        get(topAtom)
-    }))
-
-    const update = () => {
-        store.set(atoms[0] as Value<number>, (x) => x + 1)
+export const ripplingStrategy: Strategy<ReadableAtom<number>, ReturnType<typeof createStore>> = {
+    createStore() {
+        return createStore()
+    },
+    createValue(val: number) {
+        return value(val)
+    },
+    createComputed(atoms, compute) {
+        return computed(get => compute(get))
+    },
+    sub(store, atom, callback) {
+        return store.sub(atom, effect(() => {
+            callback()
+        }))
+    },
+    get(store, atom) {
+        return store.get(atom)
+    },
+    setWithNotify(store, atom, value) {
+        store.set(atom as Value<number>, value)
         store.notify()
     }
+}
 
-    return {
-        cleanup,
-        update,
+export const jotaiStrategy: Strategy<JotaiAtom<number>, ReturnType<typeof createJotaiStore>> = {
+    createStore() {
+        return createJotaiStore()
+    },
+    createValue(val: number) {
+        return atom(val)
+    },
+    createComputed(atoms, compute) {
+        return atom(get => compute(get))
+    },
+    sub(store, atom, callback) {
+        return store.sub(atom, callback)
+    },
+    get(store, atom) {
+        return store.get(atom)
+    },
+    setWithNotify(store, atom, value) {
+        store.set(atom as PrimitiveAtom<number>, value)
     }
 }
 
-export function setupRipplingSetCaseWithoutNotify(scale = 5) {
-    const { store, atoms, topAtom } = setupRipplingStore(scale)
+function deriveAtoms<T, S>(atoms: T[], childCount: number, strategy: Strategy<T, S>): T[][] {
+    let pendingAtoms: T[] = [...atoms]
+    const result: T[][] = []
 
-    const cleanup = store.sub(topAtom, effect((get) => {
-        get(topAtom)
-    }))
+    while (pendingAtoms.length > 1) {
+        result.push(pendingAtoms)
+        const derivedAtoms: T[] = []
 
-    const update = () => {
-        store.set(atoms[0] as Value<number>, (x) => x + 1)
+        for (let i = 0; i < pendingAtoms.length / childCount; i++) {
+            const innerAtoms: T[] = []
+            for (let j = 0; j < childCount && i * childCount + j < pendingAtoms.length; j++) {
+                innerAtoms.push(pendingAtoms[i * childCount + j])
+            }
+
+            const derived = strategy.createComputed(innerAtoms, (get) => {
+                let total = 0
+                for (const atom of innerAtoms) {
+                    total += get(atom)
+                }
+                return total
+            })
+
+            derivedAtoms.push(derived)
+        }
+        pendingAtoms = derivedAtoms
     }
 
-    return {
-        cleanup,
-        update,
-    }
+    result.push(pendingAtoms)
+    return result
 }
 
-function setupJotaiStore(scale = 5) {
-    const store = createJotaiStore()
-    const atoms: PrimitiveAtom<number>[] = []
+function setupStore<T, S>(scale: number, strategy: Strategy<T, S>) {
+    const store = strategy.createStore()
+    const values: T[] = []
     for (let i = 0; i < Math.pow(10, scale); i++) {
-        atoms.push(atom(i))
+        values.push(strategy.createValue(i))
     }
 
-    const topAtom = mergeJotaiAtoms(atoms, 10)
-    return { store, atoms, topAtom }
+    const atoms = deriveAtoms(values, 10, strategy)
+    const cleanups: (() => void)[] = []
+
+    for (let i = 1; i < atoms.length; i++) {
+        const levelAtoms = atoms[i]
+        for (let j = 0; j < levelAtoms.length / 10; j++) {
+            const atom = levelAtoms[j * 10]
+            cleanups.push(strategy.sub(store, atom, () => {
+                strategy.get(store, atom)
+                fib(10)
+            }))
+        }
+    }
+
+    const cleanup = () => {
+        for (const cleanup of cleanups) {
+            cleanup()
+        }
+    }
+
+    return { store, atoms, cleanup }
 }
 
-export function setupJotaiSetCase(scale = 5) {
-    const { store, atoms, topAtom } = setupJotaiStore(scale)
-
-    const cleanup = store.sub(topAtom, () => {
-        store.get(topAtom)
-    })
-
-    const update = () => {
-        store.set(atoms[0], (x: number) => x + 1)
-    }
-
-    return {
-        cleanup,
-        update,
-    }
+export function setupRipplingStore(scale = 5) {
+    return setupStore(scale, ripplingStrategy)
 }
 
-export function setupRipplingSetCaseWithoutMount(scale = 5) {
-    const { store, atoms, topAtom } = setupRipplingStore(scale)
-
-    const cleanup = () => void (0)
-    const update = () => {
-        store.set(atoms[0] as Value<number>, (x) => x + 1)
-        store.get(topAtom)
-    }
-
-    return {
-        cleanup,
-        update,
-    }
-}
-export function setupJotaiSetCaseWithoutMount(scale = 5) {
-    const { store, atoms, topAtom } = setupJotaiStore(scale)
-
-    const cleanup = () => void (0)
-    const update = () => {
-        store.set(atoms[0], (x: number) => x + 1)
-        store.get(topAtom)
-    }
-
-    return {
-        cleanup,
-        update,
-    }
+export function setupJotaiStore(scale = 5) {
+    return setupStore(scale, jotaiStrategy)
 }
