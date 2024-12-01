@@ -18,7 +18,9 @@ export class StoreImpl implements Store {
         }
 
         if ('write' in atom) {
-            return atom.write(this.get, this.set, ...args as Args);
+            const ret = atom.write(this.get, this.set, ...args as Args);
+            this.notify()
+            return ret;
         }
 
         const newValue = typeof args[0] === 'function' ? (args[0] as Updater<T>)(
