@@ -12,7 +12,6 @@ test('rippling write scenario', () => {
         const atom = atoms[0][i * 10] as Value<number>
         const val = store.get(atom)
         store.set(atom, val + 1)
-        store.notify()
     }
     expect(store.get(atoms[atoms.length - 1][0])).toBe(4960)
     cleanup()

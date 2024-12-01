@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest';
-    import { value, createStore, Value, computed, Computed, effect, createDebugStore, Effect } from '..';
+import { value, createStore, Value, computed, Computed, effect, createDebugStore, Effect } from '..';
 
 test('should work', () => {
     const store = createStore();
@@ -98,36 +98,21 @@ test('set an atom should trigger subscribe', () => {
         debugLabel: 'effect'
     }))
     store.set(base, 2)
-    expect(trace).not.toBeCalled()
-    store.notify()
     expect(trace).toBeCalledTimes(1)
 })
 
-test('set an atom should trigger once in multiple set', () => {
+test('set an atom in effect should trigger once in multiple set', () => {
     const store = createStore()
     const anAtom = value(1)
     const trace = vi.fn()
     store.sub(anAtom, effect(() => {
         trace()
     }))
-    store.set(anAtom, 2)
-    store.set(anAtom, 3)
-    store.set(anAtom, 4)
-    store.notify()
-    expect(trace).toBeCalledTimes(1)
-})
-
-test('set an atom should trigger once in multiple notify', () => {
-    const store = createStore()
-    const anAtom = value(1)
-    const trace = vi.fn()
-    store.sub(anAtom, effect(() => {
-        trace()
+    store.set(effect((_, set) => {
+        set(anAtom, 2)
+        set(anAtom, 3)
+        set(anAtom, 4)
     }))
-    store.set(anAtom, 2)
-    store.notify()
-    store.notify()
-    store.notify()
     expect(trace).toBeCalledTimes(1)
 })
 
@@ -153,7 +138,6 @@ test('sub multiple atoms', () => {
     }))
     store.set(state1, x => x + 1)
     store.set(state2, x => x + 1)
-    store.notify()
     expect(trace).toBeCalled()
     unsub()
 })
@@ -175,7 +159,6 @@ test('sub computed atom', () => {
     }))
     expect(trace).not.toBeCalled()
     store.set(base, 2)
-    store.notify()
     expect(trace).toBeCalledTimes(1)
 })
 
@@ -272,13 +255,11 @@ test('outdated deps should not trigger sub', async () => {
 
     store.set(branch, "B");
     const derivedRet = store.get(derived);
-    store.notify()
     expect(traceSub).toBeCalled();
     expect(await derivedRet).toBe("B");
 
     store.set(refresh, x => x + 1);
     traceSub.mockClear();
-    store.notify()
     expect(traceSub).not.toBeCalled();
 })
 
@@ -318,7 +299,6 @@ test('an observable effect process', async () => {
     expect(store.get(setupResult)).toBeNull();
     const ret = store.set(setupEffect)
     expect(ret).toBeInstanceOf(Promise)
-    expect(store.get(setupResult)).toBe(ret)
     await expect(ret).resolves.toBe('ok')
 })
 

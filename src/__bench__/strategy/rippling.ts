@@ -21,6 +21,5 @@ export const ripplingStrategy: Strategy<Value<number> | Computed<number>, Return
     },
     setWithNotify(store, atom, value) {
         store.set(atom as Value<number>, value)
-        store.notify()
     }
 }

@@ -19,12 +19,10 @@ function useSetEffect<T, ARGS extends unknown[]>(store: Store, atom: Effect<T, A
 
         if (isPromise(ret)) {
             return ret.then(v => {
-                store.notify()
                 return v
             }) as T
         }
 
-        store.notify()
         return ret
     }
 }
@@ -52,7 +50,6 @@ describe('react', () => {
 
         expect(screen.getByText('0')).toBeTruthy()
         store.set(base, 1)
-        store.notify()
         expect(screen.getByText('0')).toBeTruthy()
         await Promise.resolve()
         expect(trace).toHaveBeenCalledTimes(2)
@@ -79,7 +76,6 @@ describe('react', () => {
         trace.mockClear()
         expect(screen.getByText('0')).toBeTruthy()
         store.set(base, 1)
-        store.notify()
         expect(trace).not.toBeCalled()
 
         await Promise.resolve()
@@ -88,7 +84,6 @@ describe('react', () => {
 
         trace.mockClear()
         store.set(base, 1)
-        store.notify()
         await Promise.resolve()
         expect(trace).not.toBeCalled()
     })
@@ -141,7 +136,6 @@ describe('react', () => {
 
         store.set(state1, 1)
         store.set(state2, 2)
-        store.notify()
         await Promise.resolve()
         expect(trace).toHaveBeenCalledTimes(2)
         expect(screen.getByText('3')).toBeTruthy()
@@ -171,7 +165,7 @@ describe('react', () => {
         expect(screen.getByText('1')).toBeTruthy()
     })
 
-    it('floating promise not trigger rerender', async () => {
+    it('floating promise trigger rerender', async () => {
         const store = createStore()
         const count = value(0)
         const onClickEffect = effect((get, set) => {
@@ -196,10 +190,6 @@ describe('react', () => {
 
         const user = userEvent.setup()
         await user.click(button)
-        expect(screen.getByText('0')).toBeTruthy()
-
-        store.notify()
-        await Promise.resolve()
-        expect(screen.getByText('1')).toBeTruthy()
+        expect(await screen.findByText('1')).toBeTruthy()
     })
 })

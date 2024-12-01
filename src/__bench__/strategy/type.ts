@@ -4,5 +4,5 @@ export interface Strategy<T, S> {
     createComputed(compute: (get: (atom: T) => number) => number): T
     sub(store: S, atom: T, callback: () => void): () => void
     get(store: S, atom: T): number
-    setWithNotify(store: S, atom: T, value: number | ((prev: number) => number)): void
+    setWithNotify(store: S, atom: T, value: number): void
 }

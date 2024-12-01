@@ -1,6 +1,6 @@
 import { bench, describe } from 'vitest'
 import { setupStore, setupStoreWithoutSub } from './case'
-import { Value } from '..'
+import { effect, Value } from '..'
 import { PrimitiveAtom } from 'jotai/vanilla'
 import { ripplingStrategy } from './strategy/rippling'
 import { jotaiStrategy } from './strategy/jotai'
@@ -15,7 +15,6 @@ describe('set with subscription', () => {
             const store = storeRippling
             for (let i = 0; i < atoms[0].length / 10; i++) {
                 store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
-                store.notify()
             }
         })
 
@@ -43,10 +42,11 @@ describe('set with subscription', () => {
         bench('batch notify', () => {
             const atoms = atomsRippling
             const store = storeRippling
-            for (let i = 0; i < atoms[0].length / 10; i++) {
-                store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
-            }
-            store.notify()
+            store.set(effect((get, set) => {
+                for (let i = 0; i < atoms[0].length / 10; i++) {
+                    set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
+                }
+            }))
         })
 
         bench('immediate notify', () => {
@@ -54,7 +54,6 @@ describe('set with subscription', () => {
             const store = storeRippling
             for (let i = 0; i < atoms[0].length / 10; i++) {
                 store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
-                store.notify()
             }
         })
     })
@@ -70,7 +69,6 @@ describe('set without sub', () => {
             const store = storeWithoutSubRippling
             for (let i = 0; i < atoms[0].length / 10; i++) {
                 store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
-                store.notify()
             }
         })
 

@@ -5,11 +5,9 @@ import { AtomManager, ListenerManager } from "./atom-manager";
 export class StoreImpl implements Store {
     constructor(protected readonly atomManager: AtomManager, protected readonly listenerManager: ListenerManager) { }
 
-    get: Getter = <T>(atom: ReadableAtom<T>): T => {
-        return this.atomManager.readAtomState(atom).val
-    }
+    private isOuterSet = false;
 
-    set: Setter = <T, Args extends unknown[]>(
+    private innerSet = <T, Args extends unknown[]>(
         atom: Value<T> | Effect<T, Args>,
         ...args: [T | Updater<T>] | Args
     ): undefined | T => {
@@ -19,7 +17,6 @@ export class StoreImpl implements Store {
 
         if ('write' in atom) {
             const ret = atom.write(this.get, this.set, ...args as Args);
-            this.notify()
             return ret;
         }
 
@@ -36,6 +33,38 @@ export class StoreImpl implements Store {
         atomState.val = newValue;
         atomState.epoch += 1;
         this.listenerManager.markPendingListeners(this.atomManager, atom)
+    }
+
+    get: Getter = <T>(atom: ReadableAtom<T>): T => {
+        return this.atomManager.readAtomState(atom).val
+    }
+
+    private notify = () => {
+        for (const listener of this.listenerManager.notify()) {
+            listener.write(this.get, this.set)
+        }
+    }
+
+    set: Setter = <T, Args extends unknown[]>(
+        atom: Value<T> | Effect<T, Args>,
+        ...args: [T | Updater<T>] | Args
+    ): undefined | T => {
+        const shouldNotify = !this.isOuterSet;
+        if (shouldNotify) {
+            this.isOuterSet = true;
+        }
+
+        let ret: T | undefined;
+        try {
+            ret = this.innerSet(atom, ...args) as T | undefined
+        } finally {
+            if (shouldNotify) {
+                this.notify()
+                this.isOuterSet = false;
+            }
+        }
+
+        return ret;
     }
 
     private _subSingleAtom(atom: ReadableAtom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
@@ -71,12 +100,6 @@ export class StoreImpl implements Store {
             for (const unsubscribe of unsubscribes) {
                 unsubscribe();
             }
-        }
-    }
-
-    notify: () => void = () => {
-        for (const listener of this.listenerManager.notify()) {
-            listener.write(this.get, this.set)
         }
     }
 }

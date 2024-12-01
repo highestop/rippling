@@ -7,8 +7,10 @@ it('can get pending listeners', () => {
     store.sub(base, effect(() => { void (0) }, { debugLabel: 'sub' }))
 
     expect(store.getPendingListeners()).toEqual([])
-    store.set(base, 2)
-    expect(nestedAtomToString(store.getPendingListeners())).toEqual(['sub'])
+    store.set(effect((_, set) => {
+        set(base, 2)
+        expect(nestedAtomToString(store.getPendingListeners())).toEqual(['sub'])
+    }))
 })
 
 it('get all subscribed atoms', () => {

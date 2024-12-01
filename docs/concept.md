@@ -101,7 +101,7 @@ store.set(width, 200);
 store.set(height, 200);
 ```
 
-In this scenario, the area value is computed twice. For an editor like Motiff, frequent CPU usage can significantly slow down the editor's response time. Instead, we prefer to notify all subscribed callbacks once after the user interaction is complete.
+In this scenario, the area value is computed twice. For an editor like Motiff, frequent CPU usage can significantly slow down the editor's response time. In Rippling, I handle this differently - all notifications are only triggered once after the outermost effect completes its execution.
 
 ```typescript
 const width = value(100);
@@ -114,10 +114,12 @@ store.sub(
   })
 );
 
-store.set(width, 200);
-store.set(height, 200);
-// ...
-store.notify();
+store.set(
+  effect((get, set) => {
+    set(width, 200);
+    set(height, 200);
+  })
+); // subscriber will be notified once
 ```
 
 ## Reactive is not first-class citizen

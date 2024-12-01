@@ -120,7 +120,6 @@ it('do not keep atoms mounted between async recalculations', async () => {
 
     expect(store.getReadDependents(base)).toEqual([base, [derived]])
     store.set(base, (c) => c + 1)
-    store.notify()
     restore()
     expect(store.getReadDependents(base)).toEqual([base])
 })
@@ -185,7 +184,6 @@ it('settles never resolving async derivations with deps picked up sync', async (
         promise: pause(),
     })
     restore()
-    store.notify()
 
     await delay(0)
     expect(trace).toHaveBeenCalledTimes(1)
@@ -218,7 +216,6 @@ it('settles never resolving async derivations with deps picked up async', async 
     store.set(syncAtom, {
         promise: Promise.resolve()
     })
-    store.notify()
 
     await delay(0)
     expect(trace).toHaveBeenCalledTimes(2)
