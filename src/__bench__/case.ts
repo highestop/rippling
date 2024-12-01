@@ -92,7 +92,7 @@ function deriveAtoms<T, S>(atoms: T[], childCount: number, strategy: Strategy<T,
     return result
 }
 
-function setupStore<T, S>(scale: number, strategy: Strategy<T, S>) {
+export function setupStore<T, S>(scale: number, strategy: Strategy<T, S>) {
     const store = strategy.createStore()
     const values: T[] = []
     for (let i = 0; i < Math.pow(10, scale); i++) {
@@ -132,12 +132,4 @@ export function setupStoreWithoutSub<T, S>(scale: number, strategy: Strategy<T, 
     const atoms = deriveAtoms(values, 10, strategy)
 
     return { store, atoms }
-}
-
-export function setupRipplingStore(scale = 5) {
-    return setupStore(scale, ripplingStrategy)
-}
-
-export function setupJotaiStore(scale = 5) {
-    return setupStore(scale, jotaiStrategy)
 }

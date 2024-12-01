@@ -1,10 +1,10 @@
 import { expect, test } from "vitest"
-import { setupJotaiStore, setupRipplingStore } from "./case"
+import { jotaiStrategy, ripplingStrategy, setupStore } from "./case"
 import { Value } from ".."
 import { PrimitiveAtom } from "jotai/vanilla"
 
 test('rippling write scenario', () => {
-    const { cleanup, atoms, store } = setupRipplingStore(2)
+    const { cleanup, atoms, store } = setupStore(2, ripplingStrategy)
     for (let i = 0; i < atoms[0].length / 10; i++) {
         store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
         store.notify()
@@ -14,7 +14,7 @@ test('rippling write scenario', () => {
 })
 
 test('jotai write scenario', () => {
-    const { cleanup, atoms, store } = setupJotaiStore(2)
+    const { cleanup, atoms, store } = setupStore(2, jotaiStrategy)
     for (let i = 0; i < atoms[0].length / 10; i++) {
         store.set(atoms[0][i * 10] as PrimitiveAtom<number>, (x: number) => x + 1)
     }
