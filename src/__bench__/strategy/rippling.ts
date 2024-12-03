@@ -1,18 +1,18 @@
 import { Strategy } from "./type"
-import { createStore, Computed, Value, computed, effect, value } from "../.."
+import { createStore, Computed, Value, $computed, $effect, $value } from "../.."
 
 export const ripplingStrategy: Strategy<Value<number> | Computed<number>, ReturnType<typeof createStore>> = {
     createStore() {
         return createStore()
     },
     createValue(val: number) {
-        return value(val)
+        return $value(val)
     },
     createComputed(compute) {
-        return computed(get => compute(get))
+        return $computed(get => compute(get))
     },
     sub(store, atom, callback) {
-        return store.sub(atom, effect(() => {
+        return store.sub(atom, $effect(() => {
             callback()
         }))
     },

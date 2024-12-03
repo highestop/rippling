@@ -1,4 +1,4 @@
-export { value, computed, effect } from './chore/atom'
+export { $value, $computed, $effect } from './chore/atom'
 export { createStore } from './chore/store'
 export { createDebugStore } from './chore/debug-store'
 export { nestedAtomToString } from './chore/util'

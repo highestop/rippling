@@ -12,12 +12,12 @@ To address these issues, I created Rippling to express my thoughts on state mana
 
 Like Jotai, Rippling is also an Atom State solution. However, unlike Jotai, Rippling doesn't expose Raw Atom, instead dividing Atoms into three types:
 
-### `value` (equivalent to "Primitive Atom" in Jotai)
+### `$value` (equivalent to "Primitive Atom" in Jotai)
 
-`value` is a readable and writable "variable", similar to a Primitive Atom in Jotai. Reading a `value` involves no computation process, and writing to a `value` won't trigger any Listener execution - it's simply a variable.
+`$value` is a readable and writable "variable", similar to a Primitive Atom in Jotai. Reading a `$value` involves no computation process, and writing to a `$value` won't trigger any Listener execution - it's simply a variable.
 
 ```typescript
-const i = value(0);
+const i = $value(0);
 const store = createStore();
 console.log(store.get(i)); // 0
 store.set(i, 1);
@@ -31,8 +31,8 @@ console.log(store.get(i)); // 10
 `computed` is a readable computed variable whose calculation process should be side-effect free. As long as its dependent Atoms don't change, repeatedly reading the value of a `computed` should yield identical results. `computed` is similar to a Read-only Atom in Jotai.
 
 ```typescript
-const i = value(0);
-const j = computed((get) => get(i) * 10);
+const i = $value(0);
+const j = $computed((get) => get(i) * 10);
 console.log(store.get(j)); // 0
 store.set(i, 1);
 console.log(store.get(j)); // 10
@@ -43,8 +43,8 @@ console.log(store.get(j)); // 10
 `effect` is used to encapsulate a process code block. The code inside an Effect only executes when an external `set` call is made on it. `effect` is also the only type in rippling that can modify value without relying on a `store`.
 
 ```typescript
-const num = value(1);
-const doubleEffect = effect((get, set) => {
+const num = $value(1);
+const doubleEffect = $effect((get, set) => {
   const double = get(num) * 2;
   set(num, double);
 });
@@ -60,9 +60,9 @@ console.log(store.get(num)); // 4
 Rippling's subscription system is very different from Jotai's. First, Rippling's subscription callback must be an effect.
 
 ```typescript
-export const userId = value(1);
+export const userId = $value(1);
 
-export const userIdChangeEffect = effect((get, set) => {
+export const userIdChangeEffect = $effect((get, set) => {
   const userId = get(userId);
   // ...
 });
@@ -89,9 +89,9 @@ As an alternative solution, operators like `loadable` should be implemented as H
 In Jotai, `sub` notifications are automatic - whenever the subscribed Atom or its upstream atoms change, all subscribed callbacks are automatically notified. This can create performance overhead, as shown in this common editor scenario.
 
 ```typescript
-const width = atom(100);
-const height = atom(100);
-const area = computed(() => store.get(width) * store.get(height));
+const width = $value(100);
+const height = $value(100);
+const area = $computed(() => store.get(width) * store.get(height));
 store.sub(area, () => {
   // ...
 });

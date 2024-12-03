@@ -1,13 +1,13 @@
 import { render, cleanup, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { computed, Computed, createStore, effect, Effect, Value, value, Store } from '..'
+import { $computed, Computed, createStore, $effect, Effect, Value, $value, Store } from '..'
 import React, { useSyncExternalStore } from 'react'
 import { isPromise } from 'util/types'
 
 function useGetAtom<T>(store: Store, atom: Value<T> | Computed<T>) {
     return useSyncExternalStore(fn => {
-        return store.sub(atom, effect(fn))
+        return store.sub(atom, $effect(fn))
     }, () => {
         return store.get(atom)
     })
@@ -36,7 +36,7 @@ describe('react', () => {
 
     it('using rippling in react', async () => {
         const store = createStore()
-        const base = value(0)
+        const base = $value(0)
 
         const trace = vi.fn()
         function App() {
@@ -60,8 +60,8 @@ describe('react', () => {
 
     it('computed should re-render', async () => {
         const store = createStore()
-        const base = value(0)
-        const derived = computed((get) => get(base) * 2)
+        const base = $value(0)
+        const derived = $computed((get) => get(base) * 2)
 
         const trace = vi.fn()
         function App() {
@@ -90,8 +90,8 @@ describe('react', () => {
 
     it('user click counter should increment', async () => {
         const store = createStore()
-        const count = value(0)
-        const onClickEffect = effect((get, set) => {
+        const count = $value(0)
+        const onClickEffect = $effect((get, set) => {
             const ret = get(count)
             set(count, ret + 1)
         })
@@ -120,8 +120,8 @@ describe('react', () => {
 
     it('two atom changes should re-render once', async () => {
         const store = createStore()
-        const state1 = value(0)
-        const state2 = value(0)
+        const state1 = $value(0)
+        const state2 = $value(0)
         const trace = vi.fn()
         function App() {
             trace()
@@ -143,8 +143,8 @@ describe('react', () => {
 
     it('async callback will trigger rerender', async () => {
         const store = createStore()
-        const count = value(0)
-        const onClickEffect = effect((get, set) => {
+        const count = $value(0)
+        const onClickEffect = $effect((get, set) => {
             return Promise.resolve().then(() => {
                 set(count, get(count) + 1)
             })
@@ -167,8 +167,8 @@ describe('react', () => {
 
     it('floating promise trigger rerender', async () => {
         const store = createStore()
-        const count = value(0)
-        const onClickEffect = effect((get, set) => {
+        const count = $value(0)
+        const onClickEffect = $effect((get, set) => {
             void Promise.resolve().then(() => {
                 set(count, get(count) + 1)
             })

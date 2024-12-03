@@ -1,6 +1,6 @@
 import { bench, describe } from 'vitest'
 import { setupStore, setupStoreWithoutSub } from './case'
-import { effect, Value } from '..'
+import { $effect, Value } from '..'
 import { PrimitiveAtom } from 'jotai/vanilla'
 import { ripplingStrategy } from './strategy/rippling'
 import { jotaiStrategy } from './strategy/jotai'
@@ -42,7 +42,7 @@ describe('set with subscription', () => {
         bench('batch notify', () => {
             const atoms = atomsRippling
             const store = storeRippling
-            store.set(effect((get, set) => {
+            store.set($effect((get, set) => {
                 for (let i = 0; i < atoms[0].length / 10; i++) {
                     set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
                 }

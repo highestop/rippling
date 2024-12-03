@@ -1,18 +1,18 @@
 import { expect, it } from 'vitest'
-import { computed, effect, value } from '..'
+import { $computed, $effect, $value } from '..'
 
 it('creates atoms', () => {
   // primitive atom
-  const countAtom = value(0)
-  const anotherCountAtom = value(1)
+  const countAtom = $value(0)
+  const anotherCountAtom = $value(1)
   // read-only derived atom
-  const doubledCountAtom = computed((get) => get(countAtom) * 2)
+  const doubledCountAtom = $computed((get) => get(countAtom) * 2)
   // read-write derived atom
-  const sumAtom = computed(
+  const sumAtom = $computed(
     (get) => get(countAtom) + get(anotherCountAtom)
   )
 
-  const setSumAtom = effect(
+  const setSumAtom = $effect(
     (get, set, num: number) => {
       set(countAtom, get(countAtom) + num / 2)
       set(anotherCountAtom, get(anotherCountAtom) + num / 2)
@@ -20,7 +20,7 @@ it('creates atoms', () => {
   )
 
   // write-only derived atom
-  const decrementCountAtom = effect(
+  const decrementCountAtom = $effect(
     (get, set) => {
       set(countAtom, get(countAtom) - 1)
     }
