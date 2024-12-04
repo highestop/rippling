@@ -60,5 +60,17 @@
       "require": "./dist/rippling.cjs",
       "import": "./dist/rippling.js"
     }
+  },
+  "peerDependencies": {
+    "@types/react": ">=17.0.0",
+    "react": ">=17.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   }
 }

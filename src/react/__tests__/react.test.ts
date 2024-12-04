@@ -1,7 +1,7 @@
 import { render, cleanup, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { $computed, Computed, createStore, $effect, Effect, Value, $value, Store } from '..'
+import { $computed, Computed, createStore, $effect, Effect, Value, $value, Store } from '../../vanilla'
 import React, { useSyncExternalStore } from 'react'
 import { isPromise } from 'util/types'
 
