@@ -14,7 +14,8 @@ describe('set with subscription', () => {
             const atoms = atomsRippling
             const store = storeRippling
             for (let i = 0; i < atoms[0].length / 10; i++) {
-                store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
+                const idx = Math.floor(Math.random() * atoms[0].length)
+                store.set(atoms[0][idx] as Value<number>, (x) => x + 1)
             }
         })
 
@@ -23,14 +24,16 @@ describe('set with subscription', () => {
             const atoms = atomsJotai
             const store = storeJotai
             for (let i = 0; i < atoms[0].length / 10; i++) {
-                store.set(atoms[0][i * 10] as PrimitiveAtom<number>, (x) => x + 1)
+                const idx = Math.floor(Math.random() * atoms[0].length)
+                store.set(atoms[0][idx] as PrimitiveAtom<number>, (x) => x + 1)
             }
         })
 
         const { atoms: signals } = setupStore(PROP_GRAPH_DEPTH, signalStrategy)
         bench.skip('signals', () => {
             for (let i = 0; i < signals[0].length / 10; i++) {
-                const signal = signals[0][i * 10]
+                const idx = Math.floor(Math.random() * signals[0].length)
+                const signal = signals[0][idx]
                 signal.value = signal.value + 1
             }
         })
@@ -46,7 +49,8 @@ describe('set without sub', () => {
             const atoms = atomsWithoutSubRippling
             const store = storeWithoutSubRippling
             for (let i = 0; i < atoms[0].length / 10; i++) {
-                store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
+                const idx = Math.floor(Math.random() * atoms[0].length)
+                store.set(atoms[0][idx] as Value<number>, (x) => x + 1)
             }
         })
 
@@ -55,14 +59,16 @@ describe('set without sub', () => {
             const atoms = atomsWithoutSubJotai
             const store = storeWithoutSubJotai
             for (let i = 0; i < atoms[0].length / 10; i++) {
-                store.set(atoms[0][i * 10] as PrimitiveAtom<number>, (x) => x + 1)
+                const idx = Math.floor(Math.random() * atoms[0].length)
+                store.set(atoms[0][idx] as PrimitiveAtom<number>, (x) => x + 1)
             }
         })
 
         const { atoms: signals } = setupStoreWithoutSub(PROP_GRAPH_DEPTH, signalStrategy)
         bench.skip('signals', () => {
             for (let i = 0; i < signals[0].length / 10; i++) {
-                const signal = signals[0][i * 10]
+                const idx = Math.floor(Math.random() * signals[0].length)
+                const signal = signals[0][idx]
                 signal.value = signal.value + 1
             }
         })
