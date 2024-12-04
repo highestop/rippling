@@ -1,6 +1,6 @@
 import { bench, describe } from 'vitest'
 import { setupStore, setupStoreWithoutSub } from './case'
-import { $effect, Value } from '..'
+import { Value } from '..'
 import { PrimitiveAtom } from 'jotai/vanilla'
 import { ripplingStrategy } from './strategy/rippling'
 import { jotaiStrategy } from './strategy/jotai'
@@ -32,28 +32,6 @@ describe('set with subscription', () => {
             for (let i = 0; i < signals[0].length / 10; i++) {
                 const signal = signals[0][i * 10]
                 signal.value = signal.value + 1
-            }
-        })
-    })
-
-    describe(`set with lazy notify, ${String(PROP_GRAPH_DEPTH)} layer states, each computed has 10 children`, () => {
-        const { atoms: atomsRippling, store: storeRippling } = setupStore(PROP_GRAPH_DEPTH, ripplingStrategy)
-
-        bench('batch notify', () => {
-            const atoms = atomsRippling
-            const store = storeRippling
-            store.set($effect((get, set) => {
-                for (let i = 0; i < atoms[0].length / 10; i++) {
-                    set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
-                }
-            }))
-        })
-
-        bench('immediate notify', () => {
-            const atoms = atomsRippling
-            const store = storeRippling
-            for (let i = 0; i < atoms[0].length / 10; i++) {
-                store.set(atoms[0][i * 10] as Value<number>, (x) => x + 1)
             }
         })
     })
