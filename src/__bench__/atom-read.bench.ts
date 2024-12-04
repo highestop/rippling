@@ -28,7 +28,7 @@ describe('set with subscription', () => {
         })
 
         const { atoms: signals } = setupStore(PROP_GRAPH_DEPTH, signalStrategy)
-        bench('signals', () => {
+        bench.skip('signals', () => {
             for (let i = 0; i < signals[0].length / 10; i++) {
                 const signal = signals[0][i * 10]
                 signal.value = signal.value + 1
@@ -82,7 +82,7 @@ describe('set without sub', () => {
         })
 
         const { atoms: signals } = setupStoreWithoutSub(PROP_GRAPH_DEPTH, signalStrategy)
-        bench('signals', () => {
+        bench.skip('signals', () => {
             for (let i = 0; i < signals[0].length / 10; i++) {
                 const signal = signals[0][i * 10]
                 signal.value = signal.value + 1
