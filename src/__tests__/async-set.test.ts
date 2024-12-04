@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest'
 import { createStore, $effect, $value } from '..'
 
-it('multiple set in async effect should trigger notify once', async () => {
+it('multiple set in async effect should trigger notify multiple times', async () => {
     const base = $value(0)
     const action = $effect(async (_, set) => {
         set(base, 1)
@@ -18,7 +18,7 @@ it('multiple set in async effect should trigger notify once', async () => {
     }))
 
     const ret = store.set(action)
-    expect(trace).toHaveBeenCalledTimes(1)
+    expect(trace).toHaveBeenCalledTimes(2)
     await ret;
-    expect(trace).toHaveBeenCalledTimes(3)
+    expect(trace).toHaveBeenCalledTimes(4)
 })

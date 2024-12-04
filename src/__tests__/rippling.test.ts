@@ -101,7 +101,7 @@ test('set an atom should trigger subscribe', () => {
     expect(trace).toBeCalledTimes(1)
 })
 
-test('set an atom in effect should trigger once in multiple set', () => {
+test('set an atom in effect should trigger multiple times', () => {
     const store = createStore()
     const anAtom = $value(1)
     const trace = vi.fn()
@@ -113,7 +113,7 @@ test('set an atom in effect should trigger once in multiple set', () => {
         set(anAtom, 3)
         set(anAtom, 4)
     }))
-    expect(trace).toBeCalledTimes(1)
+    expect(trace).toBeCalledTimes(3)
 })
 
 test('sub multiple atoms', () => {

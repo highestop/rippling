@@ -49,19 +49,11 @@ export class StoreImpl implements Store {
         atom: Value<T> | Effect<T, Args>,
         ...args: [T | Updater<T>] | Args
     ): undefined | T => {
-        const shouldNotify = !this.isOuterSet;
-        if (shouldNotify) {
-            this.isOuterSet = true;
-        }
-
         let ret: T | undefined;
         try {
             ret = this.innerSet(atom, ...args) as T | undefined
         } finally {
-            if (shouldNotify) {
-                this.notify()
-                this.isOuterSet = false;
-            }
+            this.notify()
         }
 
         return ret;

@@ -49,10 +49,6 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
         )] as NestedAtom;
     }
 
-    getPendingListeners = (): NestedAtom => {
-        return this.listenerManager._debugGetPendingListeners();
-    }
-
     getSubscribeGraph = (): NestedAtom => {
         return Array.from(this.subscribedAtoms.keys()).map(atom => {
             const atomState = this.atomManager.readAtomState(atom);
