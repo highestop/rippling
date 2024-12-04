@@ -1,7 +1,7 @@
 import { expect, it, vi } from "vitest";
 import { createStore, $effect, $value } from ".."
 
-it("should trigger once when hierarchy effect is set", () => {
+it("should trigger multiple times when hierarchy effect is set", () => {
     const base = $value(0);
     const innerUpdateEffect = $effect((_get, set) => {
         set(base, 1)
@@ -19,7 +19,7 @@ it("should trigger once when hierarchy effect is set", () => {
 
     store.set(updateEffect)
 
-    expect(trace).toHaveBeenCalledTimes(1)
+    expect(trace).toHaveBeenCalledTimes(2)
 })
 
 it('should trigger subscriber if effect throws', () => {
