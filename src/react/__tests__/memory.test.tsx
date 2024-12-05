@@ -1,10 +1,11 @@
+// @vitest-environment happy-dom
+
 import LeakDetector from 'jest-leak-detector'
 import { expect, it } from 'vitest'
 import { $value, Value, Computed, $computed, createStore, $effect, createDebugStore, useGet, StoreProvider } from '../..'
 import { cleanup, render } from '@testing-library/react';
 
 
-// @vitest-environment happy-dom
 it('should release memory after component unmount', async () => {
     const store = createStore()
     let base: Value<{ foo: string }> | undefined = $value({

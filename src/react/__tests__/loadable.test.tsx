@@ -1,3 +1,5 @@
+// @vitest-environment happy-dom
+
 import { render, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -36,7 +38,6 @@ function makeDefered<T>(): {
     return deferred;
 }
 
-// @vitest-environment happy-dom
 it('convert promise to loadable', async () => {
     const base = $value(Promise.resolve('foo'))
     const App = () => {
@@ -261,16 +262,15 @@ it('loadable can recover from error', async () => {
 
 // sync atom is not supported in Rippling
 it.skip('loadable immediately resolves sync values', async () => {
-    const syncAtom = $computed(async () => {
-        return 5
-    })
+    const syncAtom = $value(5)
     const effectCallback = vi.fn()
 
     const store = createStore()
     render(
         <StrictMode>
             <StoreProvider value={store}>
-                <LoadableComponent effectCallback={effectCallback} asyncAtom={syncAtom} />
+                {/* this line will trigger type error until useLoadable supports sync atom */}
+                {/* <LoadableComponent effectCallback={effectCallback} asyncAtom={syncAtom} /> */}
             </StoreProvider>
         </StrictMode>,
     )
@@ -412,6 +412,23 @@ it('does not repeatedly attempt to get the value of an unresolved promise atom w
 // sync atom is not supported in Rippling
 it.skip('should handle sync error (#1843)', async () => {
     const syncAtom = $computed(() => {
+        throw new Error('thrown in syncAtom')
+    })
+
+    const store = createStore()
+    render(
+        <StrictMode>
+            <StoreProvider value={store}>
+                <LoadableComponent asyncAtom={syncAtom} />
+            </StoreProvider>
+        </StrictMode>,
+    )
+
+    await screen.findByText('Error: thrown in syncAtom')
+})
+
+it('should handle async error', async () => {
+    const syncAtom = $computed(async () => {
         throw new Error('thrown in syncAtom')
     })
 
