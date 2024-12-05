@@ -1,6 +1,6 @@
 {
   "name": "rippling",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/e7h4n/rippling.git"
@@ -57,44 +57,20 @@
   "main": "./dist/index.cjs",
   "exports": {
     ".": {
-      "require": {
-        "default": "./dist/index.cjs",
-        "types": "./dist/index.d.cts"
-      },
-      "import": {
-        "default": "./dist/index.js",
-        "types": "./dist/index.d.ts"
-      }
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
     },
     "./react": {
-      "require": {
-        "default": "./dist/react.cjs",
-        "types": "./dist/react.d.cts"
-      },
-      "import": {
-        "default": "./dist/react.js",
-        "types": "./dist/react.d.ts"
-      }
+      "require": "./dist/react.cjs",
+      "import": "./dist/react.js"
     },
     "./debug": {
-      "require": {
-        "default": "./dist/debug.cjs",
-        "types": "./dist/debug.d.cts"
-      },
-      "import": {
-        "default": "./dist/debug.js",
-        "types": "./dist/debug.d.ts"
-      }
+      "require": "./dist/debug.cjs",
+      "import": "./dist/debug.js"
     },
     "./core": {
-      "require": {
-        "default": "./dist/core.cjs",
-        "types": "./dist/core.d.cts"
-      },
-      "import": {
-        "default": "./dist/core.js",
-        "types": "./dist/core.d.ts"
-      }
+      "require": "./dist/core.cjs",
+      "import": "./dist/core.js"
     }
   },
   "peerDependencies": {
