@@ -7,4 +7,4 @@ export type { Subscribe, Store } from './core'
 export { createDebugStore } from './debug'
 export type { DebugStore } from './debug'
 
-export { useGet, useSet, StoreProvider } from './react'
+export { useGet, useSet, useLoadable, useResolved, StoreProvider } from './react'
