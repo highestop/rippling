@@ -87,7 +87,7 @@ export default [
         input: "./src/react/index.ts",
         targetCJS: './dist/react.cjs',
         targetES: './dist/react.js',
-        external: ['react'],
+        external: [...Object.keys(pkg.peerDependencies)],
     }),
 
     ...generateTarget({
