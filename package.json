@@ -54,11 +54,28 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/rippling.cjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/rippling.cjs",
-      "import": "./dist/rippling.js"
+      "import": {
+        "types": "./dist/esm/index.d.mts",
+        "default": "./dist/esm/index.mjs"
+      },
+      "default": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./*": {
+      "import": {
+        "types": "./dist/esm/*.d.mts",
+        "default": "./dist/esm/*.mjs"
+      },
+      "default": {
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.js"
+      }
     }
   },
   "peerDependencies": {
