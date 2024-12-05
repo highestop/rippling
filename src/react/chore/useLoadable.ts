@@ -42,7 +42,6 @@ export function useLoadable<T>(atom: Value<Promise<T>> | Computed<Promise<T>>): 
             })
         })
 
-
         return () => {
             ctrl.abort()
         }

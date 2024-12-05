@@ -56,6 +56,10 @@ console.log(store.get(count)); // 1
 console.log(store.get(doubleCount)); // 2
 ```
 
+## Special Thanks
+
+Thanks [Jotai](https://github.com/pmndrs/jotai) for the inspiration and some code snippets, especially the test cases. Without their work, this project would not exist.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
