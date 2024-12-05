@@ -1,16 +1,9 @@
-import { ReadableAtom, Effect, Getter, Setter, Computed } from "./atom";
-import { NestedAtom } from "./util";
+import { ReadableAtom, Effect, Getter, Setter } from "./atom";
 
 export interface Store {
     get: Getter;
     set: Setter;
     sub: Subscribe;
-}
-
-export interface DebugStore extends Store {
-    getReadDependencies: (atom: Computed<unknown>) => NestedAtom;
-    getReadDependents: (atom: ReadableAtom<unknown>) => NestedAtom;
-    getSubscribeGraph: () => NestedAtom;
 }
 
 export type Subscribe = (atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>, callback: Effect<unknown, unknown[]>) => () => void;

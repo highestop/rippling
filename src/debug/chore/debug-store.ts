@@ -1,13 +1,13 @@
-import { ReadableAtom, Effect } from "../typing/atom";
-import { DebugStore, Subscribe } from "../typing/store";
+import { Computed, Effect, Subscribe, Value } from "../../core";
+import { AtomManager, ComputedState, ListenerManager } from "../../core/chore/atom-manager";
+import { StoreImpl } from "../../core/chore/store";
+import { DebugStore } from "../typing/debug-store";
 import { NestedAtom } from "../typing/util";
-import { AtomManager, ComputedState, ListenerManager } from "./atom-manager";
-import { StoreImpl } from "./store";
 
 class DebugStoreImpl extends StoreImpl implements DebugStore {
-    private readonly subscribedAtoms = new Map<ReadableAtom<unknown>, number>()
+    private readonly subscribedAtoms = new Map<Value<unknown> | Computed<unknown>, number>()
 
-    sub: Subscribe = (atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void => {
+    sub: Subscribe = (atoms: (Value<unknown> | Computed<unknown>)[] | (Value<unknown> | Computed<unknown>), cbEffect: Effect<unknown, unknown[]>): () => void => {
         const atomList = Array.isArray(atoms) ? atoms : [atoms]
 
         atomList.forEach((atom) => {
@@ -30,7 +30,7 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
         }
     }
 
-    getReadDependencies = (atom: ReadableAtom<unknown>): NestedAtom => {
+    getReadDependencies = (atom: Value<unknown> | Computed<unknown>): NestedAtom => {
         const atomState = this.atomManager.readAtomState(atom);
 
         if (!('dependencies' in atomState)) {
@@ -42,7 +42,7 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
         })] as NestedAtom;
     }
 
-    getReadDependents = (atom: ReadableAtom<unknown>): NestedAtom => {
+    getReadDependents = (atom: Value<unknown> | Computed<unknown>): NestedAtom => {
         const atomState = this.atomManager.readAtomState(atom);
         return [atom, ...Array.from(atomState.mounted?.readDepts ?? []).map((key) =>
             this.getReadDependents(key)

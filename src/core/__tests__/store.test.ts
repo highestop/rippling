@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
-import { $computed, createDebugStore, createStore, $effect, $value } from '..'
+import { $computed, createStore, $effect, $value } from '..'
 import { suspense } from './utils'
 import { Getter } from '../typing/atom'
+import { createDebugStore } from '../../debug'
 
 it('should not fire on subscribe', () => {
     const store = createStore()

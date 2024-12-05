@@ -1,6 +1,7 @@
 import LeakDetector from 'jest-leak-detector'
 import { expect, it } from 'vitest'
-import { $value, Value, Computed, $computed, createStore, $effect, createDebugStore } from '..'
+import { $value, Value, Computed, $computed, createStore, $effect } from '..'
+import { createDebugStore } from '../../debug'
 
 
 it('should release memory after delete value', async () => {

@@ -1,5 +1,6 @@
 import { expect, it } from "vitest";
-import { $computed, createDebugStore, $effect, nestedAtomToString, $value } from "..";
+import { $computed, $effect, nestedAtomToString, $value } from "../../core";
+import { createDebugStore } from "../chore/debug-store";
 
 
 it('get all subscribed atoms', () => {

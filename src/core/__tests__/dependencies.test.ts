@@ -1,7 +1,8 @@
 import { expect, it, vi } from 'vitest'
-import { $computed, createStore, $effect, $value, createDebugStore } from '..'
+import { $computed, createStore, $effect, $value } from '..'
 import { suspense } from './utils'
 import { delay } from 'signal-timers'
+import { createDebugStore } from '../../debug'
 
 it('can propagate updates with async atom chains', async () => {
     const { pause, restore } = suspense()

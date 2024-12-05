@@ -58,6 +58,17 @@ const entries = {
                 }
             }
         },
+        debug: {
+            input: "./src/debug/index.ts",
+            output: {
+                cjs: "./dist/debug.js",
+                esm: "./dist/esm/debug.mjs",
+                dts: {
+                    cjs: "./dist/debug.d.ts",
+                    esm: "./dist/esm/debug.d.mts"
+                }
+            }
+        }
     };
 
     /** @type { (entry: typeof entries[keyof typeof entries]) => import('rollup').RollupOptions } */

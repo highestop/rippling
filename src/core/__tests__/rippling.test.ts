@@ -1,5 +1,6 @@
 import { expect, test, vi } from 'vitest';
-import { $value, createStore, Value, $computed, Computed, $effect, createDebugStore, Effect } from '..';
+import { $value, createStore, Value, $computed, Computed, $effect, Effect } from '..';
+import { createDebugStore } from '../../debug';
 
 test('should work', () => {
     const store = createStore();
