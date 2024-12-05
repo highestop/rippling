@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { $effect, Computed, Value } from "../../core"
-import { useStore } from "./provider"
+import { Computed, Value } from "../../core"
+import { useGet } from "./useGet"
 
 type Loadable<T> = {
     state: 'loading'
@@ -13,17 +13,10 @@ type Loadable<T> = {
 }
 
 export function useLoadable<T>(atom: Value<Promise<T>> | Computed<Promise<T>>): Loadable<T> {
-    const store = useStore()
+    const promise = useGet(atom)
     const [promiseResult, setPromiseResult] = useState<Loadable<T>>({
         state: 'loading'
     })
-    const [promise, setPromise] = useState(store.get(atom))
-
-    useEffect(() => {
-        return store.sub(atom, $effect(() => {
-            setPromise(store.get(atom))
-        }))
-    }, [atom])
 
     useEffect(() => {
         const ctrl = new AbortController()
