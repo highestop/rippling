@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { $effect, Computed, Value } from "../../core"
 import { useStore } from "./provider"
-import { useRef } from "react"
 
 type Loadable<T> = {
     state: 'loading'
