@@ -26,9 +26,9 @@ store.set(i, (x) => x * 10);
 console.log(store.get(i)); // 10
 ```
 
-### `computed` (equivalent to "Read-only Atom" in Jotai)
+### `$computed` (equivalent to "Read-only Atom" in Jotai)
 
-`computed` is a readable computed variable whose calculation process should be side-effect free. As long as its dependent Atoms don't change, repeatedly reading the value of a `computed` should yield identical results. `computed` is similar to a Read-only Atom in Jotai.
+`$computed` is a readable computed variable whose calculation process should be side-effect free. As long as its dependent Atoms don't change, repeatedly reading the value of a `$computed` should yield identical results. `$computed` is similar to a Read-only Atom in Jotai.
 
 ```typescript
 const i = $value(0);
@@ -38,9 +38,9 @@ store.set(i, 1);
 console.log(store.get(j)); // 10
 ```
 
-### `effect` (equivalent to "Write-only Atom" in Jotai)
+### `$effect` (equivalent to "Write-only Atom" in Jotai)
 
-`effect` is used to encapsulate a process code block. The code inside an Effect only executes when an external `set` call is made on it. `effect` is also the only type in rippling that can modify value without relying on a `store`.
+`$effect` is used to encapsulate a process code block. The code inside an Effect only executes when an external `set` call is made on it. `$effect` is also the only type in rippling that can modify value without relying on a `store`.
 
 ```typescript
 const num = $value(1);
