@@ -90,7 +90,6 @@ export class AtomManager {
             return depState.val;
         }
 
-
         const ret = self.read(wrappedGet, {
             get signal() {
                 atomState.abortController?.abort(`abort ${self.debugLabel ?? 'anonymous'} atom`)
