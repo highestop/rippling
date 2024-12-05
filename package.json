@@ -54,11 +54,47 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/rippling.cjs",
+  "main": "./dist/index.cjs",
   "exports": {
     ".": {
-      "require": "./dist/rippling.cjs",
-      "import": "./dist/rippling.js"
+      "require": {
+        "default": "./dist/index.cjs",
+        "types": "./dist/index.d.cts"
+      },
+      "import": {
+        "default": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "./react": {
+      "require": {
+        "default": "./dist/react.cjs",
+        "types": "./dist/react.d.cts"
+      },
+      "import": {
+        "default": "./dist/react.js",
+        "types": "./dist/react.d.ts"
+      }
+    },
+    "./debug": {
+      "require": {
+        "default": "./dist/debug.cjs",
+        "types": "./dist/debug.d.cts"
+      },
+      "import": {
+        "default": "./dist/debug.js",
+        "types": "./dist/debug.d.ts"
+      }
+    },
+    "./core": {
+      "require": {
+        "default": "./dist/core.cjs",
+        "types": "./dist/core.d.cts"
+      },
+      "import": {
+        "default": "./dist/core.js",
+        "types": "./dist/core.d.ts"
+      }
     }
   },
   "peerDependencies": {

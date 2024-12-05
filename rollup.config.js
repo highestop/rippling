@@ -13,71 +13,87 @@ const pkg = JSON.parse(
     fs.readFileSync("./package.json", { encoding: "utf-8" }),
 );
 
-const targetCJS = pkg.exports["."].require
-const targetES = pkg.exports["."].import
-
-/** @type { import('rollup').RollupOptions } */
-const commonConfig = {
-    input: "./src/index.ts",
-    external: [
-        ...Object.keys(pkg.peerDependencies),
-    ],
-    onwarn: (warning) => {
-        throw new Error(warning?.message);
-    },
-};
-
-/** @type { import('rollup').RollupOptions } */
-const dtsConfig = {
-    plugins: [
-        dts({
-            respectExternal: true,
-            tsconfig: path.resolve(projectRootDir, "./tsconfig.json"),
-        }),
-    ],
-    output: [
+function generateTarget({ input, targetCJS, targetES, external }) {
+    return [
         {
-            file: targetCJS.replace(/\.cjs$/, ".d.cts"),
+            input,
+            onwarn: (warning) => {
+                throw new Error(warning?.message);
+            },
+            external,
+            plugins: [
+                nodeResolve({
+                    extensions: ['.ts']
+                }),
+                babel({
+                    exclude: "node_modules/**",
+                    extensions: [".ts"],
+                    babelHelpers: "bundled",
+                    configFile: path.resolve(projectRootDir, "./babel.config.json"),
+                }),
+            ],
+            output: [
+                {
+                    file: targetCJS,
+                    format: "cjs",
+                },
+                {
+                    file: targetES,
+                    format: "es",
+                },
+            ],
         },
         {
-            file: targetES.replace(/\.js$/, ".d.ts"),
+            input,
+            onwarn: (warning) => {
+                throw new Error(warning?.message);
+            },
+            external,
+            plugins: [
+                dts({
+                    respectExternal: true,
+                    tsconfig: path.resolve(projectRootDir, "./tsconfig.json"),
+                }),
+            ],
+            output: [
+                {
+                    file: targetCJS.replace(/\.cjs$/, ".d.cts"),
+                },
+                {
+                    file: targetES.replace(/\.js$/, ".d.ts"),
+                },
+            ],
         },
-    ],
-}
-
-/** @type { import('rollup').RollupOptions } */
-const sourceConfig = {
-    plugins: [
-        nodeResolve({
-            extensions: ['.ts']
-        }),
-        babel({
-            exclude: "node_modules/**",
-            extensions: [".ts"],
-            babelHelpers: "bundled",
-            configFile: path.resolve(projectRootDir, "./babel.config.json"),
-        }),
-    ],
-    output: [
-        {
-            file: targetCJS,
-            format: "cjs",
-        },
-        {
-            file: targetES,
-            format: "es",
-        },
-    ],
+    ]
 }
 
 /** @type { Array<import('rollup').RollupOptions> } */
 export default [
-    {
-        ...commonConfig,
-        ...sourceConfig,
-    },
-    {
-        ...commonConfig,
-        ...dtsConfig,
-    },
+    ...generateTarget({
+        input: "./src/index.ts",
+        targetCJS: './dist/index.cjs',
+        targetES: './dist/index.js',
+        external: ['react'],
+    }),
+
+    ...generateTarget({
+        input: "./src/core/index.ts",
+        targetCJS: './dist/core.cjs',
+        targetES: './dist/core.js',
+        external: [],
+    }),
+
+    ...generateTarget({
+        input: "./src/react/index.ts",
+        targetCJS: './dist/react.cjs',
+        targetES: './dist/react.js',
+        external: ['react'],
+    }),
+
+    ...generateTarget({
+        input: "./src/debug/index.ts",
+        targetCJS: './dist/debug.cjs',
+        targetES: './dist/debug.js',
+        external: [],
+    }),
 ];
