@@ -29,6 +29,7 @@ export function useLoadable<T>(atom: Value<Promise<T>> | Computed<Promise<T>>): 
         const ctrl = new AbortController()
         const signal = ctrl.signal
 
+
         setPromiseResult({
             state: 'loading'
         })
@@ -39,9 +40,7 @@ export function useLoadable<T>(atom: Value<Promise<T>> | Computed<Promise<T>>): 
                 state: 'hasData',
                 data: ret
             })
-        })
-
-        void promise.catch((error: unknown) => {
+        }).catch((error: unknown) => {
             if (signal.aborted) return
 
             setPromiseResult({
@@ -49,6 +48,7 @@ export function useLoadable<T>(atom: Value<Promise<T>> | Computed<Promise<T>>): 
                 error
             })
         })
+
 
         return () => {
             ctrl.abort()

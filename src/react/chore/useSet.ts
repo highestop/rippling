@@ -1,18 +1,21 @@
-import { isPromise } from "util/types"
-import { Effect } from "../.."
+import { Effect, Updater, Value } from "../../core"
 import { useStore } from "./provider"
-export function useSet<T, ARGS extends unknown[]>(atom: Effect<T, ARGS>): (...args: ARGS) => T {
+
+
+export function useSet<T>(atom: Value<T>): (value: T | Updater<T>) => void;
+export function useSet<T, ARGS extends unknown[]>(atom: Effect<T, ARGS>): (...args: ARGS) => T;
+export function useSet<T, ARGS extends unknown[]>(atom: Value<T> | Effect<T, ARGS>): ((value: T | Updater<T>) => void) | ((...args: ARGS) => T) {
     const store = useStore()
 
-    return (...args: ARGS): T => {
-        const ret = store.set(atom, ...args)
+    if ('write' in atom) {
+        return (...args: ARGS): T => {
+            const ret = store.set(atom, ...args)
 
-        if (isPromise(ret)) {
-            return ret.then(v => {
-                return v
-            }) as T
+            return ret
         }
+    }
 
-        return ret
+    return (value: T | Updater<T>) => {
+        store.set(atom, value)
     }
 }
