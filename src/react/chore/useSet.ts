@@ -1,7 +1,9 @@
 import { isPromise } from "util/types"
-import { Effect, Store } from "../.."
+import { Effect } from "../.."
+import { useStore } from "./provider"
+export function useSet<T, ARGS extends unknown[]>(atom: Effect<T, ARGS>): (...args: ARGS) => T {
+    const store = useStore()
 
-export function useSet<T, ARGS extends unknown[]>(store: Store, atom: Effect<T, ARGS>): (...args: ARGS) => T {
     return (...args: ARGS): T => {
         const ret = store.set(atom, ...args)
 
