@@ -1,27 +1,26 @@
 {
-  "name": "@rippling/react",
-  "private": true,
-  "version": "1.0.0",
-  "description": "Rippling React Hooks",
-  "dependencies": {
-    "@rippling/core": "workspace:^"
-  },
-  "peerDependencies": {
-    "@types/react": ">=17.0.0",
-    "react": ">=17.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@types/react": {
-      "optional": true
+    "name": "@rippling/react",
+    "version": "1.0.0",
+    "description": "Rippling React Hooks",
+    "dependencies": {
+        "@rippling/core": "workspace:^"
     },
-    "react": {
-      "optional": true
+    "peerDependencies": {
+        "@types/react": ">=17.0.0",
+        "react": ">=17.0.0"
+    },
+    "peerDependenciesMeta": {
+        "@types/react": {
+            "optional": true
+        },
+        "react": {
+            "optional": true
+        }
+    },
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "exports": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
     }
-  },
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "exports": {
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
-  }
 }

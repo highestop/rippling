@@ -1,15 +1,14 @@
 {
-  "name": "@rippling/debug",
-  "private": true,
-  "version": "1.0.0",
-  "description": "Debug utilities for rippling",
-  "dependencies": {
-    "@rippling/core": "workspace:^"
-  },
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "exports": {
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
-  }
+    "name": "@rippling/debug",
+    "version": "1.0.0",
+    "description": "Debug utilities for rippling",
+    "dependencies": {
+        "@rippling/core": "workspace:^"
+    },
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "exports": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+    }
 }

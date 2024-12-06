@@ -1,12 +1,11 @@
 {
-  "name": "@rippling/core",
-  "private": true,
-  "version": "1.0.0",
-  "description": "Rippling Core",
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "exports": {
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
-  }
+    "name": "@rippling/core",
+    "version": "1.0.0",
+    "description": "Rippling Core",
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "exports": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+    }
 }
