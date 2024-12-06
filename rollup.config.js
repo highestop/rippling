@@ -13,7 +13,7 @@ const pkg = JSON.parse(
     fs.readFileSync("./package.json", { encoding: "utf-8" }),
 );
 
-function generateTarget({ input, targetCJS, targetES, external }) {
+function generateTarget({ input, targetCJS, targetES, external, tsconfig }) {
     return [
         {
             input,
@@ -52,7 +52,7 @@ function generateTarget({ input, targetCJS, targetES, external }) {
             plugins: [
                 dts({
                     respectExternal: true,
-                    tsconfig: path.resolve(projectRootDir, "./tsconfig.json"),
+                    tsconfig
                 }),
             ],
             output: [
@@ -70,30 +70,34 @@ function generateTarget({ input, targetCJS, targetES, external }) {
 /** @type { Array<import('rollup').RollupOptions> } */
 export default [
     ...generateTarget({
-        input: "./src/index.ts",
+        input: "./packages/aio/index.ts",
         targetCJS: './dist/index.cjs',
         targetES: './dist/index.js',
         external: ['react'],
+        tsconfig: path.resolve(projectRootDir, "./tsconfig.json"),
     }),
 
     ...generateTarget({
-        input: "./src/core/index.ts",
+        input: "./packages/core/index.ts",
         targetCJS: './dist/core.cjs',
         targetES: './dist/core.js',
         external: [],
+        tsconfig: path.resolve(projectRootDir, "./packages/core/tsconfig.json"),
     }),
 
     ...generateTarget({
-        input: "./src/react/index.ts",
+        input: "./packages/react/index.ts",
         targetCJS: './dist/react.cjs',
         targetES: './dist/react.js',
         external: [...Object.keys(pkg.peerDependencies)],
+        tsconfig: path.resolve(projectRootDir, "./packages/react/tsconfig.json"),
     }),
 
     ...generateTarget({
-        input: "./src/debug/index.ts",
+        input: "./packages/debug/index.ts",
         targetCJS: './dist/debug.cjs',
         targetES: './dist/debug.js',
         external: [],
+        tsconfig: path.resolve(projectRootDir, "./packages/debug/tsconfig.json"),
     }),
 ];

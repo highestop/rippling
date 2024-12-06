@@ -1,0 +1,24 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "composite": true,
+        "noEmit": false
+    },
+    "files": [
+        "index.ts"
+    ],
+    "include": [
+        ".."
+    ],
+    "references": [
+        {
+            "path": "../core"
+        },
+        {
+            "path": "../debug"
+        },
+        {
+            "path": "../react"
+        }
+    ]
+}

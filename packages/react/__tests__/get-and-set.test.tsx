@@ -1,9 +1,7 @@
-// @vitest-environment happy-dom
 import { render, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { $computed, createStore, $effect, $value } from "../../core";
-import React from "react";
 import { StoreProvider, useGet, useSet } from "..";
 
 describe("react", () => {
@@ -19,7 +17,7 @@ describe("react", () => {
         function App() {
             trace();
             const ret = useGet(base);
-            return React.createElement("div", null, ret);
+            return <div>{ret}</div>;
         }
 
         render(
@@ -52,11 +50,9 @@ describe("react", () => {
         }
 
         render(
-            React.createElement(
-                StoreProvider,
-                { value: store },
-                React.createElement(App)
-            )
+            <StoreProvider value={store}>
+                <App />
+            </StoreProvider>
         );
         expect(trace).toHaveBeenCalledTimes(1);
 
@@ -93,11 +89,9 @@ describe("react", () => {
         }
 
         render(
-            React.createElement(
-                StoreProvider,
-                { value: store },
-                React.createElement(App)
-            )
+            <StoreProvider value={store}>
+                <App />
+            </StoreProvider>
         );
         const button = screen.getByText("0");
         expect(button).toBeTruthy();
@@ -124,11 +118,9 @@ describe("react", () => {
         }
 
         render(
-            React.createElement(
-                StoreProvider,
-                { value: store },
-                React.createElement(App)
-            )
+            <StoreProvider value={store}>
+                <App />
+            </StoreProvider>
         );
         expect(screen.getByText("0")).toBeTruthy();
         expect(trace).toHaveBeenCalledTimes(1);
@@ -156,11 +148,9 @@ describe("react", () => {
         }
 
         render(
-            React.createElement(
-                StoreProvider,
-                { value: store },
-                React.createElement(App)
-            )
+            <StoreProvider value={store}>
+                <App />
+            </StoreProvider>
         );
         const button = screen.getByText("0");
         expect(button).toBeTruthy();

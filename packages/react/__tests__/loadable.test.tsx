@@ -1,9 +1,7 @@
-// @vitest-environment happy-dom
-
 import { render, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { $computed, createStore, $effect, $value, Value, Computed } from "../../core";
+import { afterEach, expect, it, vi } from "vitest";
+import { $computed, createStore, $value, Value, Computed } from "../../core";
 import { StrictMode, useEffect, version as reactVersion, Suspense } from "react";
 import { StoreProvider, useGet, useSet } from "..";
 import { useLoadable } from "../chore/useLoadable";
