@@ -30,21 +30,13 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Cache playwright binaries
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-          path: ~/.cache/ms-playwright
-
       - name: Install Playwright Browsers
         run: pnpm playwright install --with-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-    
+
       - name: Run test
         uses: CodSpeedHQ/action@v3
         with:
-          run: CI=true pnpm test
+          run: CI=true ${{ env.RUNNER_DEBUG && 'DEBUG=pw:browser' || '' }} pnpm test
           token: ${{ secrets.CODSPEED_TOKEN }}
 
       - name: "Report Coverage"
@@ -56,3 +48,10 @@ jobs:
           file: coverage/cobertura-coverage.xml
           format: cobertura
           fail-on-error: true
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
