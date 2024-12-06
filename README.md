@@ -13,7 +13,7 @@
 
 ### Value
 
-Value are the basic stateful units in Rippling. The can be thought of as a simple key-value store.
+Value is the basic stateful unit in Rippling. They can be thought of as a simple key-value store.
 
 For Example:
 
@@ -26,7 +26,7 @@ console.log(store.get(count)); // 1
 
 ### Computed
 
-Computed are the basic compute units in Rippling. The can read other Value / Computed / Effect.
+Computed are the basic compute units in Rippling. They can read other Values / Computed.
 
 For Example:
 
@@ -39,7 +39,7 @@ console.log(store.get(doubleCount)); // 0
 
 ### Effect
 
-Effect are the basic command units in Rippling. The can read other Value / Computed / Effect and write to Value / Effect.
+Effect is the basic command unit in Rippling. It can read Value / Computed and write to Value / Effect.
 
 For Example:
 
