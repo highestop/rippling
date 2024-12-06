@@ -1,6 +1,6 @@
 {
   "name": "@rippling/debug",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Debug utilities for rippling",
   "dependencies": {
     "@rippling/core": "workspace:^"
