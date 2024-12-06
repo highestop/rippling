@@ -21,14 +21,11 @@ jobs:
           run_install: |
             - args: [--frozen-lockfile, --strict-peer-dependencies]
 
-      - name: "Run lint"
-        run: pnpm lint
-
-      - name: "Type check"
-        run: pnpm type-check
-
-      - name: Run tests
-        run: pnpm coverage
+      - name: Run test
+        uses: CodSpeedHQ/action@v3
+        with:
+          run: pnpm test
+          token: ${{ secrets.CODSPEED_TOKEN }}
 
       - name: "Report Coverage"
         uses: davelosert/vitest-coverage-report-action@v2
@@ -39,9 +36,3 @@ jobs:
           file: coverage/cobertura-coverage.xml
           format: cobertura
           fail-on-error: true
-
-      - name: Run benchmarks
-        uses: CodSpeedHQ/action@v3
-        with:
-          run: pnpm vitest bench
-          token: ${{ secrets.CODSPEED_TOKEN }}

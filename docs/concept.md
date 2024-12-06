@@ -111,14 +111,14 @@ store.sub(
   computedArea,
   effect(() => {
     // ...
-  })
+  }),
 );
 
 store.set(
   effect((get, set) => {
     set(width, 200);
     set(height, 200);
-  })
+  }),
 ); // subscriber will be notified once
 ```
 

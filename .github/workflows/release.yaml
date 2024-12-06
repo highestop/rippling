@@ -1,7 +1,9 @@
-name: Publish Package to npmjs
+name: Publish
+
 on:
   release:
     types: [published]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,8 +17,12 @@ jobs:
           version: 9
           run_install: |
             - args: [--frozen-lockfile, --strict-peer-dependencies]
+      - name: test
+        run:
+          - pnpm test
       - name: build
         run: pnpm build
-      - run: npm publish --provenance --access public
+      - run: npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: dist

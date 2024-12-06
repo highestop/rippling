@@ -6,14 +6,22 @@
     "url": "git+https://github.com/e7h4n/rippling.git"
   },
   "license": "MIT",
+  "private": true,
   "scripts": {
-    "type-check": "tsc --noEmit",
-    "prepack": "pnpm run build",
-    "lint": "eslint .",
-    "test": "pnpm vitest",
+    "format": "prettier '*.{js,json,md}' '{src,tests,benchmarks,docs}/**/*.{ts,tsx,md,mdx}' --write",
+    "test": "pnpm --sequential '/^test:.*/'",
+    "test:unit": "vitest --run --coverage",
+    "test:lint": "eslint .",
+    "test:format": "prettier '*.{js,json,md}' '{src,tests,benchmarks,docs}/**/*.{ts,tsx,md,mdx}' --list-different",
+    "test:type": "tsc --noEmit",
+    "test:bench": "vitest bench --run",
     "build": "rollup -c",
-    "coverage": "vitest run --coverage",
-    "bench": "vitest bench"
+    "prebuild": "shx rm -rf dist && mkdir dist",
+    "postbuild": "pnpm run --sequential '/^postbuild:.*/'",
+    "postbuild:copy": "shx cp package.json README.md LICENSE dist",
+    "postbuild:patch:package_private": "json -I -f dist/package.json -e \"this.private=false;\"",
+    "postbuild:patch:package_dev_deps": "json -I -f dist/package.json -e \"this.devDependencies=undefined;\"",
+    "postbuild:patch:package_scripts": "json -I -f dist/package.json -e \"this.scripts=undefined;\""
   },
   "engines": {
     "node": ">=10"
@@ -40,11 +48,14 @@
     "jest-leak-detector": "^29.7.0",
     "jotai": "^2.10.3",
     "jsdom": "^25.0.1",
+    "json": "^11.0.0",
     "playwright": "^1.49.0",
+    "prettier": "^3.4.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rollup": "^4.22.0",
     "rollup-plugin-dts": "^6.1.1",
+    "shx": "^0.3.4",
     "signal-timers": "^1.0.4",
     "typescript": "^5.6.2",
     "typescript-eslint": "^8.6.0",
@@ -52,25 +63,25 @@
   },
   "type": "module",
   "files": [
-    "dist"
+    "."
   ],
-  "main": "./dist/index.cjs",
+  "main": "./index.cjs",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./index.js",
+      "require": "./index.cjs"
     },
     "./react": {
-      "import": "./dist/react.js",
-      "require": "./dist/react.cjs"
+      "import": "./react/index.js",
+      "require": "./react/index.cjs"
     },
     "./debug": {
-      "import": "./dist/debug.js",
-      "require": "./dist/debug.cjs"
+      "import": "./debug/index.js",
+      "require": "./debug/index.cjs"
     },
     "./core": {
-      "import": "./dist/core.js",
-      "require": "./dist/core.cjs"
+      "import": "./core/index.js",
+      "require": "./core/index.cjs"
     }
   },
   "peerDependencies": {
