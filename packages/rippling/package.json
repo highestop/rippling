@@ -1,0 +1,35 @@
+{
+  "name": "rippling",
+  "version": "0.2.0",
+  "description": "Rippling Core",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/e7h4n/rippling.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "./index.cjs",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    },
+    "./*": {
+      "import": "./*/index.js",
+      "require": "./*/index.cjs"
+    }
+  },
+  "peerDependencies": {
+    "@types/react": ">=17.0.0",
+    "react": ">=17.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  }
+}

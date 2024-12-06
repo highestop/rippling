@@ -11,6 +11,7 @@
   "scripts": {
     "format": "prettier '**/*.{js,json,md,ts,tsx,md,mdx}' --write",
     "test": "pnpm '/^test:.*/'",
+    "test:type": "pnpm -F rippling exec tsc --noEmit",
     "test:unit": "vitest --run --coverage",
     "test:lint": "eslint .",
     "test:format": "prettier '**/*.{js,json,md,ts,tsx,md,mdx}' --list-different",
@@ -20,6 +21,10 @@
     "build:lib": "pnpm -F '!rippling-devtools' exec rollup -c",
     "build:devtools": "pnpm -F rippling-devtools exec vite build",
     "prebuild": "pnpm -F '*' exec shx rm -rf dist",
+    "postbuild": "pnpm run --sequential '/^postbuild:.*/'",
+    "postbuild:copy": "pnpm -F rippling exec shx cp package.json ../../README.md ../../LICENSE dist",
+    "postbuild:patch:package_private": "pnpm -F rippling exec json -I -f dist/package.json -e \"this.private=false;\"",
+    "dev:devtool": "vite build --watch --mode development --config packages/devtool/vite.config.ts",
     "dev:devtools": "pnpm -F rippling-devtools exec vite build --watch"
   },
   "engines": {

@@ -14,11 +14,5 @@
     /* Linting */
     "strict": true
   },
-  "include": [
-    "src",
-    "e2e",
-    "vite.config.ts",
-    "vitest.config.ts",
-    "playwright.config.ts"
-  ]
+  "include": ["src", "types", "__bench__", "vitest.config.ts"]
 }
