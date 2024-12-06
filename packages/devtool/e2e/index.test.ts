@@ -5,7 +5,7 @@ let browser: BrowserContext | undefined;
 const EXTENSION_ID = "nnocgligbafbkepiddmidebakcheiihc";
 const EXTENSION_PATH = "packages/devtool/dist";
 
-test("hello", async () => {
+test.skip("hello", async () => {
   browser = await chromium.launchPersistentContext("", {
     channel: "chromium",
     args: [

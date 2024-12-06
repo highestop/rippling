@@ -1,26 +1,34 @@
 {
-    "name": "@rippling/react",
-    "version": "1.0.0",
-    "description": "Rippling React Hooks",
-    "dependencies": {
-        "@rippling/core": "workspace:^"
+  "name": "@rippling/react",
+  "version": "1.0.0",
+  "description": "Rippling React Hooks",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/e7h4n/rippling.git"
+  },
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@rippling/core": "workspace:^"
+  },
+  "peerDependencies": {
+    "@types/react": ">=17.0.0",
+    "react": ">=17.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
     },
-    "peerDependencies": {
-        "@types/react": ">=17.0.0",
-        "react": ">=17.0.0"
-    },
-    "peerDependenciesMeta": {
-        "@types/react": {
-            "optional": true
-        },
-        "react": {
-            "optional": true
-        }
-    },
-    "type": "module",
-    "main": "./dist/index.cjs",
-    "exports": {
-        "import": "./dist/index.js",
-        "require": "./dist/index.cjs"
+    "react": {
+      "optional": true
     }
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  }
 }

@@ -43,7 +43,7 @@ it("convert promise to awaited value", async () => {
     <StoreProvider value={store}>
       <App />
     </StoreProvider>,
-    { wrapper: StrictMode }
+    { wrapper: StrictMode },
   );
 
   expect(await screen.findByText("foo")).toBeTruthy();
@@ -62,7 +62,7 @@ it("loading state", async () => {
     <StoreProvider value={store}>
       <App />
     </StoreProvider>,
-    { wrapper: StrictMode }
+    { wrapper: StrictMode },
   );
 
   expect(await screen.findByText("loading")).toBeTruthy();
