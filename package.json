@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "format": "prettier '*.{js,json,md}' '{src,tests,benchmarks,docs}/**/*.{ts,tsx,md,mdx}' --write",
-    "test": "pnpm --sequential '/^test:.*/'",
+    "test": "pnpm '/^test:.*/'",
     "test:unit": "vitest --run --coverage",
     "test:lint": "eslint .",
     "test:format": "prettier '*.{js,json,md}' '{src,tests,benchmarks,docs}/**/*.{ts,tsx,md,mdx}' --list-different",
