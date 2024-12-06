@@ -35,8 +35,8 @@ jobs:
           path: ~/.cache/ms-playwright
 
       - name: Install Playwright Browsers
-          run: pnpm playwright install --with-deps
-          if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
     
       - name: Run test
         uses: CodSpeedHQ/action@v3
