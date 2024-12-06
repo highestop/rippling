@@ -1,4 +1,4 @@
-import { Computed, Store, Value } from "../../core";
+import { Computed, Store, Value } from "@rippling/core";
 import { NestedAtom } from "./util";
 
 export interface DebugStore extends Store {

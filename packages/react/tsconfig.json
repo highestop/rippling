@@ -1,16 +1,9 @@
 {
-    "extends": "../../tsconfig.json",
-    "compilerOptions": {
-        "jsx": "react-jsx",
-        "composite": true,
-        "noEmit": false
-    },
-    "include": [
-        "."
-    ],
-    "references": [
-        {
-            "path": "../core"
-        }
-    ]
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react-jsx",
+    "composite": true
+  },
+  "include": ["."]
 }

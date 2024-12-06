@@ -1,14 +1,9 @@
-import { Computed, Effect, Subscribe, Value } from "../../core";
-import {
-  AtomManager,
-  ComputedState,
-  ListenerManager,
-} from "../../core/chore/atom-manager";
-import { StoreImpl } from "../../core/chore/store";
-import { DebugStore } from "../typing/debug-store";
-import { NestedAtom } from "../typing/util";
+import { Computed, Effect, Subscribe, Value, CoreStore } from "@rippling/core";
+import { AtomManager, ComputedState, ListenerManager } from "@rippling/core";
+import { DebugStore } from "../types/debug-store";
+import { NestedAtom } from "../types/util";
 
-class DebugStoreImpl extends StoreImpl implements DebugStore {
+class DebugStoreImpl extends CoreStore implements DebugStore {
   private readonly subscribedAtoms = new Map<
     Value<unknown> | Computed<unknown>,
     number

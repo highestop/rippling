@@ -1,30 +1,26 @@
 {
   "name": "rippling",
   "version": "0.1.0",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/e7h4n/rippling.git"
   },
   "license": "MIT",
-  "private": true,
+  "type": "module",
   "scripts": {
-    "format": "prettier '*.{js,json,md}' '{src,tests,benchmarks,docs}/**/*.{ts,tsx,md,mdx}' --write",
+    "format": "prettier '**/*.{js,json,md,ts,tsx,md,mdx}' --write",
     "test": "pnpm '/^test:.*/'",
     "test:unit": "vitest --run --coverage",
     "test:lint": "eslint .",
-    "test:format": "prettier '*.{js,json,md}' '{src,tests,benchmarks,docs}/**/*.{ts,tsx,md,mdx}' --list-different",
-    "test:type": "tsc --noEmit",
+    "test:format": "prettier '**/*.{js,json,md,ts,tsx,md,mdx}' --list-different",
+    "test:type": "pnpm -F '*' tsc --noEmit",
     "test:bench": "vitest bench --run",
     "test:e2e": "playwright test e2e",
     "build": "pnpm '/^build:.*/'",
-    "build:lib": "rollup -c",
-    "build:devtool": "vite build -c packages/devtool/vite.config.ts",
-    "prebuild": "shx rm -rf dist && mkdir dist",
-    "postbuild": "pnpm run --sequential '/^postbuild:.*/'",
-    "postbuild:copy": "shx cp package.json README.md LICENSE dist",
-    "postbuild:patch:package_private": "json -I -f dist/package.json -e \"this.private=false;\"",
-    "postbuild:patch:package_dev_deps": "json -I -f dist/package.json -e \"this.devDependencies=undefined;\"",
-    "postbuild:patch:package_scripts": "json -I -f dist/package.json -e \"this.scripts=undefined;\"",
+    "build:lib": "pnpm -F '!devtool' exec rollup -c",
+    "build:devtool": "pnpm -F devtool exec vite build",
+    "prebuild": "pnpm -F '*' shx rm -rf dist",
     "dev:devtool": "vite build --watch --mode development --config packages/devtool/vite.config.ts"
   },
   "engines": {
@@ -39,12 +35,13 @@
     "@preact/signals": "^1.3.1",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-typescript": "^12.1.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/chrome": "^0.0.287",
-    "@types/node": "^22.5.5",
+    "@types/node": "^22.9.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitest/browser": "^2.1.6",
@@ -56,7 +53,6 @@
     "happy-dom": "^15.11.7",
     "jest-leak-detector": "^29.7.0",
     "jotai": "^2.10.3",
-    "jsdom": "^25.0.1",
     "json": "^11.0.0",
     "playwright": "^1.49.0",
     "postcss": "^8.4.49",
@@ -69,44 +65,9 @@
     "shx": "^0.3.4",
     "signal-timers": "^1.0.4",
     "tailwindcss": "^3.4.16",
-    "typescript": "^5.6.2",
-    "typescript-eslint": "^8.6.0",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.15.0",
     "vite": "^6.0.3",
-    "vitest": "^2.1.1"
-  },
-  "type": "module",
-  "files": [
-    "."
-  ],
-  "main": "./index.cjs",
-  "exports": {
-    ".": {
-      "import": "./index.js",
-      "require": "./index.cjs"
-    },
-    "./react": {
-      "import": "./react/index.js",
-      "require": "./react/index.cjs"
-    },
-    "./debug": {
-      "import": "./debug/index.js",
-      "require": "./debug/index.cjs"
-    },
-    "./core": {
-      "import": "./core/index.js",
-      "require": "./core/index.cjs"
-    }
-  },
-  "peerDependencies": {
-    "@types/react": ">=17.0.0",
-    "react": ">=17.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@types/react": {
-      "optional": true
-    },
-    "react": {
-      "optional": true
-    }
+    "vitest": "^2.1.5"
   }
 }

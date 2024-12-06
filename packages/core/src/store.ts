@@ -5,11 +5,11 @@ import {
   Value,
   Updater,
   Setter,
-} from "../typing/atom";
-import { Store } from "../typing/store";
+} from "../types/atom";
+import { Store } from "../types/store";
 import { AtomManager, ListenerManager } from "./atom-manager";
 
-export class StoreImpl implements Store {
+export class CoreStore implements Store {
   constructor(
     protected readonly atomManager: AtomManager,
     protected readonly listenerManager: ListenerManager,
@@ -117,5 +117,5 @@ export function createStore(): Store {
   const atomManager = new AtomManager();
   const listenerManager = new ListenerManager();
 
-  return new StoreImpl(atomManager, listenerManager);
+  return new CoreStore(atomManager, listenerManager);
 }

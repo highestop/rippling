@@ -1,4 +1,4 @@
-import { NestedAtom, NestedString } from "../typing/util";
+import { NestedAtom, NestedString } from "../types/util";
 
 export function nestedAtomToString(atoms: NestedAtom): NestedString {
   return atoms.map((atom) => {

@@ -1,15 +1,20 @@
 import { render, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
-import { $computed, createStore, $value, Value, Computed } from "../../core";
+import {
+  $computed,
+  createStore,
+  $value,
+  Value,
+  Computed,
+} from "@rippling/core";
 import {
   StrictMode,
   useEffect,
   version as reactVersion,
   Suspense,
 } from "react";
-import { StoreProvider, useGet, useSet } from "..";
-import { useLoadable } from "../chore/useLoadable";
+import { StoreProvider, useGet, useSet, useLoadable } from "..";
 import { delay } from "signal-timers";
 
 const IS_REACT18 = /^18\./.test(reactVersion);

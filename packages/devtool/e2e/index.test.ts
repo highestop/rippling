@@ -16,8 +16,8 @@ test("hello", async () => {
   const page = await browser.newPage();
   await page.goto(`chrome-extension://${EXTENSION_ID}/panel.html`);
 
-  const bodyText = await page.getByText("StoreInspector").textContent();
-  expect(bodyText).toBe("StoreInspector");
+  const bodyText = await page.getByText("Store 1").textContent();
+  expect(bodyText).toBe("Store 1");
 
   expect(true).toBe(true);
 

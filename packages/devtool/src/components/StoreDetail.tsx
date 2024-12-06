@@ -22,4 +22,4 @@ export function StoreDetail() {
       </div>
     </div>
   );
-} 
+}

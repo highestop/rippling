@@ -1,4 +1,4 @@
-import { Computed, Effect, Value } from "../../core";
+import { Computed, Effect, Value } from "@rippling/core";
 
 export type NestedAtom = (
   | Value<unknown>

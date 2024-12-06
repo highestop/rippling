@@ -1,9 +1,9 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, it } from "vitest";
-import { $value, createStore } from "../../core";
-import { StoreProvider } from "../chore/provider";
+import { $value, createStore } from "@rippling/core";
+import { StoreProvider } from "../src/provider";
 import { StrictMode } from "react";
-import { useResolved } from "../chore/useResolved";
+import { useResolved } from "../src/useResolved";
 
 afterEach(() => {
   cleanup();
@@ -43,7 +43,7 @@ it("convert promise to awaited value", async () => {
     <StoreProvider value={store}>
       <App />
     </StoreProvider>,
-    { wrapper: StrictMode },
+    { wrapper: StrictMode }
   );
 
   expect(await screen.findByText("foo")).toBeTruthy();
@@ -62,7 +62,7 @@ it("loading state", async () => {
     <StoreProvider value={store}>
       <App />
     </StoreProvider>,
-    { wrapper: StrictMode },
+    { wrapper: StrictMode }
   );
 
   expect(await screen.findByText("loading")).toBeTruthy();

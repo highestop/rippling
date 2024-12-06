@@ -4,5 +4,5 @@ chrome.devtools.panels.create(
   "panel.html",
   function () {
     // code invoked on panel creation
-  }
+  },
 );

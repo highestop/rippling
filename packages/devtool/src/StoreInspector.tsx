@@ -6,7 +6,7 @@ export function StoreInspector() {
   const { size: leftWidth, handleMouseDown } = useResizable(
     "x",
     "25%",
-    ".store-inspector-container"
+    ".store-inspector-container",
   );
 
   return (

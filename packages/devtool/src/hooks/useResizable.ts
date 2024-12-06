@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from "react";
 export function useResizable(
   axis: "x" | "y",
   initialSize = "50%",
-  containerSelector?: string
+  containerSelector?: string,
 ) {
   const [size, setSize] = useState(initialSize);
   const isResizing = useRef(false);
@@ -29,7 +29,7 @@ export function useResizable(
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [axis, containerSelector]
+    [axis, containerSelector],
   );
 
   const handleMouseMove = useCallback(
@@ -56,7 +56,7 @@ export function useResizable(
 
       setSize(`${String(Math.max(10, Math.min(90, newSizePercent)))}%`);
     },
-    [axis, containerSelector]
+    [axis, containerSelector],
   );
 
   const handleMouseUp = useCallback(() => {

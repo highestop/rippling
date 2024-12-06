@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { Store } from "../../core";
+import { Store } from "@rippling/core";
 
 const StoreContext = createContext<Store | null>(null);
 

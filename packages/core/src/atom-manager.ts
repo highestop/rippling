@@ -1,4 +1,4 @@
-import { ReadableAtom, Effect, Getter, Computed, Value } from "../typing/atom";
+import { ReadableAtom, Effect, Getter, Computed, Value } from "../types/atom";
 const EMPTY_MAP = new Map<ReadableAtom<unknown>, number>();
 
 export interface StateState<T> {

@@ -36,7 +36,7 @@ jobs:
       - name: Run test
         uses: CodSpeedHQ/action@v3
         with:
-          run: CI=true ${{ env.RUNNER_DEBUG && 'DEBUG=pw:api' || '' }} pnpm test
+          run: CI=true pnpm test
           token: ${{ secrets.CODSPEED_TOKEN }}
 
       - name: "Report Coverage"
