@@ -14,7 +14,6 @@
     "test:unit": "vitest --run --coverage",
     "test:lint": "eslint .",
     "test:format": "prettier '**/*.{js,json,md,ts,tsx,md,mdx}' --list-different",
-    "test:type": "pnpm -F '*' tsc --noEmit",
     "test:bench": "vitest bench --run",
     "test:e2e": "playwright test e2e",
     "build": "pnpm '/^build:.*/'",
