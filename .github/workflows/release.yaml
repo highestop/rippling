@@ -24,4 +24,4 @@ jobs:
       - run: npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: dist
+        working-directory: packages/rippling/dist
