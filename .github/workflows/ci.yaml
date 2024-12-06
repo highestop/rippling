@@ -23,7 +23,7 @@ jobs:
 
       - name: Get installed Playwright version
         id: playwright-version
-        run: |
+        run:
           - PLAYWRIGHT_VERSION=$(cat pnpm-lock.yaml | grep playwright-core | head -n 1 | cut -d '@' -f 2)
           - echo "PLAYWRIGHT_VERSION=${PLAYWRIGHT_VERSION}" >> $GITHUB_ENV
 
