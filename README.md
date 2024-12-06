@@ -19,7 +19,7 @@ For Example:
 
 ```typescript
 const store = createStore();
-const count = value(0);
+const count = $value(0);
 store.set(count, 1);
 console.log(store.get(count)); // 1
 ```
@@ -32,8 +32,8 @@ For Example:
 
 ```typescript
 const store = createStore();
-const count = value(0);
-const doubleCount = computed((get) => get(count) * 2);
+const count = $value(0);
+const doubleCount = $computed((get) => get(count) * 2);
 console.log(store.get(doubleCount)); // 0
 ```
 
@@ -45,9 +45,9 @@ For Example:
 
 ```typescript
 const store = createStore();
-const count = value(0);
-const doubleCount = value(0);
-const updateCount = effect((get, set, value) => {
+const count = $value(0);
+const doubleCount = $value(0);
+const updateCount = $effect((get, set, value) => {
   set(count, value);
   set(doubleCount, get(count) * 2);
 });
