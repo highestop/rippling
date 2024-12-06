@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { $computed, createStore, $effect, $value } from "..";
 import { suspense } from "./utils";
-import { Getter } from "../typing/atom";
+import { Getter } from "../types/atom";
 import { createDebugStore } from "../../debug";
 
 it("should not fire on subscribe", () => {

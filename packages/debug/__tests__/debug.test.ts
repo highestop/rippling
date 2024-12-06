@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { $computed, $effect, $value } from "../../core";
-import { createDebugStore } from "../chore/debug-store";
-import { nestedAtomToString } from "../chore/util";
+import { createDebugStore } from "../src/debug-store";
+import { nestedAtomToString } from "../src/util";
 
 it("get all subscribed atoms", () => {
   const store = createDebugStore();

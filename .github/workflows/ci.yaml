@@ -21,10 +21,22 @@ jobs:
           run_install: |
             - args: [--frozen-lockfile, --strict-peer-dependencies]
 
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: |
+          PLAYWRIGHT_VERSION=$(cat pnpm-lock.yaml | grep playwright-core | head -n 1 | cut -d '@' -f 2)
+          echo "PLAYWRIGHT_VERSION=${PLAYWRIGHT_VERSION}" >> $GITHUB_ENV
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright Browsers
+        run: pnpm playwright install --with-deps
+
       - name: Run test
         uses: CodSpeedHQ/action@v3
         with:
-          run: pnpm test
+          run: CI=true pnpm test
           token: ${{ secrets.CODSPEED_TOKEN }}
 
       - name: "Report Coverage"
@@ -36,3 +48,10 @@ jobs:
           file: coverage/cobertura-coverage.xml
           format: cobertura
           fail-on-error: true
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
