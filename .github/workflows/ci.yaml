@@ -27,6 +27,9 @@ jobs:
           PLAYWRIGHT_VERSION=$(cat pnpm-lock.yaml | grep playwright-core | head -n 1 | cut -d '@' -f 2)
           echo "PLAYWRIGHT_VERSION=${PLAYWRIGHT_VERSION}" >> $GITHUB_ENV
 
+      - name: Build
+        run: pnpm build
+
       - name: Cache playwright binaries
         uses: actions/cache@v4
         id: playwright-cache

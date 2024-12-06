@@ -17,11 +17,11 @@ jobs:
           version: 9
           run_install: |
             - args: [--frozen-lockfile, --strict-peer-dependencies]
+      - name: build
+        run: pnpm build
       - name: test
         run:
           - pnpm test
-      - name: build
-        run: pnpm build
       - run: npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
