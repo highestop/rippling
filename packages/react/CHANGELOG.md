@@ -1,4 +1,4 @@
-# @rippling/react
+# rippling-react
 
 ## 0.2.0
 
@@ -9,4 +9,4 @@
 ### Patch Changes
 
 - Updated dependencies [d9fa790]
-  - @rippling/core@0.2.0
+  - rippling@0.2.0

@@ -1,6 +1,6 @@
 {
-  "name": "rippling",
-  "version": "0.1.0",
+  "name": "rippling-monorepo",
+  "version": "1.0.0",
   "private": true,
   "repository": {
     "type": "git",
@@ -17,10 +17,10 @@
     "test:bench": "vitest bench --run",
     "test:e2e": "playwright test e2e",
     "build": "pnpm '/^build:.*/'",
-    "build:lib": "pnpm -F '!devtools' exec rollup -c",
-    "build:devtools": "pnpm -F devtools exec vite build",
-    "prebuild": "pnpm -F '*' shx rm -rf dist",
-    "dev:devtools": "pnpm -F devtools exec vite build --watch"
+    "build:lib": "pnpm -F '!rippling-devtools' exec rollup -c",
+    "build:devtools": "pnpm -F rippling-devtools exec vite build",
+    "prebuild": "pnpm -F '*' exec shx rm -rf dist",
+    "dev:devtools": "pnpm -F rippling-devtools exec vite build --watch"
   },
   "engines": {
     "node": ">=10"

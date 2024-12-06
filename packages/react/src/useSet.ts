@@ -1,4 +1,4 @@
-import { Effect, Updater, Value } from "@rippling/core";
+import { Effect, Updater, Value } from "rippling";
 import { useStore } from "./provider";
 
 export function useSet<T>(atom: Value<T>): (value: T | Updater<T>) => void;

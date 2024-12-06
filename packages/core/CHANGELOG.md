@@ -1,4 +1,4 @@
-# @rippling/core
+# rippling
 
 ## 0.2.0
 

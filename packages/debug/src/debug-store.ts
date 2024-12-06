@@ -1,5 +1,5 @@
-import { Computed, Effect, Subscribe, Value, CoreStore } from "@rippling/core";
-import { AtomManager, ComputedState, ListenerManager } from "@rippling/core";
+import { Computed, Effect, Subscribe, Value, CoreStore } from "rippling";
+import { AtomManager, ComputedState, ListenerManager } from "rippling";
 import { DebugStore } from "../types/debug-store";
 import { NestedAtom } from "../types/util";
 

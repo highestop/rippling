@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { $effect, Computed, Value } from "@rippling/core";
+import { $effect, Computed, Value } from "rippling";
 import { useStore } from "./provider";
 
 export function useGet<T>(atom: Value<T> | Computed<T>) {

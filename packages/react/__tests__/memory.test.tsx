@@ -1,6 +1,6 @@
 import LeakDetector from "jest-leak-detector";
 import { expect, it } from "vitest";
-import { $value, Value, createStore } from "@rippling/core";
+import { $value, Value, createStore } from "rippling";
 import { useGet, StoreProvider } from "../";
 import { cleanup, render } from "@testing-library/react";
 

@@ -1,5 +1,5 @@
 {
-  "name": "@rippling/devtools",
+  "name": "rippling-devtools",
   "private": true,
   "version": "0.1.0",
   "description": "devtools package for rippling",

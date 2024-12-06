@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Computed, Value } from "@rippling/core";
+import { Computed, Value } from "rippling";
 import { useGet } from "./useGet";
 
 type Loadable<T> =

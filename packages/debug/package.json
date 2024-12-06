@@ -1,9 +1,9 @@
 {
-  "name": "@rippling/debug",
+  "name": "rippling-debug",
   "version": "0.2.0",
   "description": "Debug utilities for rippling",
   "dependencies": {
-    "@rippling/core": "workspace:^"
+    "rippling": "workspace:^"
   },
   "repository": {
     "type": "git",

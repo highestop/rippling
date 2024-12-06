@@ -1,7 +1,7 @@
 import { render, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { $computed, createStore, $effect, $value } from "@rippling/core";
+import { $computed, createStore, $effect, $value } from "rippling";
 import { StoreProvider, useGet, useSet } from "..";
 
 describe("react", () => {

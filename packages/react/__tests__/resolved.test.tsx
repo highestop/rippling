@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, it } from "vitest";
-import { $value, createStore } from "@rippling/core";
+import { $value, createStore } from "rippling";
 import { StoreProvider } from "../src/provider";
 import { StrictMode } from "react";
 import { useResolved } from "../src/useResolved";

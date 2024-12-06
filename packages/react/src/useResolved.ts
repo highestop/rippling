@@ -1,4 +1,4 @@
-import { Computed, Value } from "@rippling/core";
+import { Computed, Value } from "rippling";
 import { useLoadable } from "./useLoadable";
 
 export function useResolved<T>(
