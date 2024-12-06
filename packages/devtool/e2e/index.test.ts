@@ -14,10 +14,10 @@ test("hello", async () => {
     ],
   });
   const page = await browser.newPage();
-  await page.goto(`chrome-extension://${EXTENSION_ID}/index.html`);
+  await page.goto(`chrome-extension://${EXTENSION_ID}/panel.html`);
 
-  const bodyText = await page.getByText("Hello Extensions").textContent();
-  expect(bodyText).toBe("Hello Extensions");
+  const bodyText = await page.getByText("StoreInspector").textContent();
+  expect(bodyText).toBe("StoreInspector");
 
   expect(true).toBe(true);
 
