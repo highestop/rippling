@@ -6,7 +6,7 @@
     "composite": true,
     "noEmit": false
   },
-  "include": [".", "vite.config.ts", "../devtool-e2e"],
+  "include": [".", "vite.config.ts", "../devtool-e2e", "playwright.config.ts.bak"],
   "references": [
     {
       "path": "../core"

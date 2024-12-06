@@ -1,21 +1,16 @@
-import path from "path";
 import { BrowserContext, chromium } from "playwright";
-import { afterEach, expect, test } from "vitest";
+import { test, expect } from "@playwright/test";
 
 let browser: BrowserContext | undefined;
 const EXTENSION_ID = "nnocgligbafbkepiddmidebakcheiihc";
-
-afterEach(async () => {
-  await browser?.close();
-});
+const EXTENSION_PATH = "packages/devtool/dist";
 
 test("hello", async () => {
-  const pathToExtension = path.join(__dirname, "../devtool/dist");
   browser = await chromium.launchPersistentContext("", {
     channel: "chromium",
     args: [
-      `--disable-extensions-except=${pathToExtension}`,
-      `--load-extension=${pathToExtension}`,
+      `--disable-extensions-except=${EXTENSION_PATH}`,
+      `--load-extension=${EXTENSION_PATH}`,
     ],
   });
   const page = await browser.newPage();
@@ -24,4 +19,6 @@ test("hello", async () => {
   expect(bodyText).toBe("Hello Extensions");
 
   expect(true).toBe(true);
+
+  await browser.close();
 });

@@ -15,6 +15,7 @@
     "test:format": "prettier '*.{js,json,md}' '{src,tests,benchmarks,docs}/**/*.{ts,tsx,md,mdx}' --list-different",
     "test:type": "tsc --noEmit",
     "test:bench": "vitest bench --run",
+    "test:e2e": "playwright test e2e",
     "build": "rollup -c",
     "prebuild": "shx rm -rf dist && mkdir dist",
     "postbuild": "pnpm run --sequential '/^postbuild:.*/'",
