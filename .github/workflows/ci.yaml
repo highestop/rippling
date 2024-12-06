@@ -21,6 +21,23 @@ jobs:
           run_install: |
             - args: [--frozen-lockfile, --strict-peer-dependencies]
 
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: |
+          - PLAYWRIGHT_VERSION=$(cat pnpm-lock.yaml | grep playwright-core | head -n 1 | cut -d '@' -f 2)
+          - echo "PLAYWRIGHT_VERSION=${PLAYWRIGHT_VERSION}" >> $GITHUB_ENV
+
+      - name: Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+          path: ~/.cache/ms-playwright
+
+      - name: Install Playwright Browsers
+          run: pnpm playwright install --with-deps
+          if: steps.playwright-cache.outputs.cache-hit != 'true'
+    
       - name: Run test
         uses: CodSpeedHQ/action@v3
         with:
