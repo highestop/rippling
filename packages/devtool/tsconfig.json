@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react-jsx",
+    "composite": true,
+    "noEmit": false
+  },
+  "include": [".", "vite.config.ts"],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../react"
+    },
+    {
+      "path": "../debug"
+    }
+  ]
+}
