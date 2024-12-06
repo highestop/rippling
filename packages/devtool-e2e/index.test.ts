@@ -20,9 +20,7 @@ test("hello", async () => {
   });
   const page = await browser.newPage();
   await page.goto(`chrome-extension://${EXTENSION_ID}/index.html`);
-  const bodyText = await page
-    .locator("body")
-    .evaluate((el) => (el.textContent as string).trim());
+  const bodyText = await page.getByText("Hello Extensions").textContent();
   expect(bodyText).toBe("Hello Extensions");
 
   expect(true).toBe(true);
