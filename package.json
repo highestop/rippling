@@ -17,10 +17,10 @@
     "test:bench": "vitest bench --run",
     "test:e2e": "playwright test e2e",
     "build": "pnpm '/^build:.*/'",
-    "build:lib": "pnpm -F '!devtool' exec rollup -c",
-    "build:devtool": "pnpm -F devtool exec vite build",
+    "build:lib": "pnpm -F '!devtools' exec rollup -c",
+    "build:devtools": "pnpm -F devtools exec vite build",
     "prebuild": "pnpm -F '*' shx rm -rf dist",
-    "dev:devtool": "vite build --watch --mode development --config packages/devtool/vite.config.ts"
+    "dev:devtools": "pnpm -F devtools exec vite build --watch"
   },
   "engines": {
     "node": ">=10"

@@ -1,8 +1,8 @@
 {
-  "name": "@rippling/devtool",
+  "name": "@rippling/devtools",
   "private": true,
   "version": "0.1.0",
-  "description": "Devtool package for rippling",
+  "description": "devtools package for rippling",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   }

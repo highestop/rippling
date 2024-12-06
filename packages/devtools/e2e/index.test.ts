@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 
 let browser: BrowserContext | undefined;
 const EXTENSION_ID = "nnocgligbafbkepiddmidebakcheiihc";
-const EXTENSION_PATH = "packages/devtool/dist";
+const EXTENSION_PATH = "packages/devtools/dist";
 
 test.skip("hello", async () => {
   browser = await chromium.launchPersistentContext("", {

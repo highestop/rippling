@@ -12,7 +12,7 @@
       "path": "./packages/debug"
     },
     {
-      "path": "./packages/devtool"
+      "path": "./packages/devtools"
     }
   ]
 }
