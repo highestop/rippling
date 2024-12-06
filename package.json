@@ -25,6 +25,7 @@
     "postbuild:copy": "pnpm -F rippling exec shx cp package.json ../../README.md ../../LICENSE dist",
     "postbuild:patch:package_private": "pnpm -F rippling exec json -I -f dist/package.json -e \"this.private=false;\"",
     "dev:devtools": "pnpm -F rippling-devtools exec vite build --watch",
+    "ci:version": "changeset version && pnpm format",
     "ci:publish": "cd packages/rippling/dist && pnpm publish --provenance",
     "prepare": "husky"
   },
