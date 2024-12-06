@@ -25,7 +25,8 @@
     "postbuild:copy": "pnpm -F rippling exec shx cp package.json ../../README.md ../../LICENSE dist",
     "postbuild:patch:package_private": "pnpm -F rippling exec json -I -f dist/package.json -e \"this.private=false;\"",
     "dev:devtools": "pnpm -F rippling-devtools exec vite build --watch",
-    "ci:publish": "cd packages/rippling/dist && pnpm publish --provenance"
+    "ci:publish": "cd packages/rippling/dist && pnpm publish --provenance",
+    "prepare": "husky"
   },
   "engines": {
     "node": ">=10"
@@ -56,6 +57,7 @@
     "eslint": "^9.10.0",
     "eslint-plugin-vitest": "^0.5.4",
     "happy-dom": "^15.11.7",
+    "husky": "^9.1.7",
     "jest-leak-detector": "^29.7.0",
     "jotai": "^2.10.3",
     "json": "^11.0.0",

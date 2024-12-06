@@ -83,6 +83,9 @@ importers:
       happy-dom:
         specifier: ^15.11.7
         version: 15.11.7
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
       jest-leak-detector:
         specifier: ^29.7.0
         version: 29.7.0
@@ -2168,6 +2171,11 @@ packages:
 
   human-id@1.0.2:
     resolution: {integrity: sha512-UNopramDEhHJD+VR+ehk8rOslwSfByxPIZyJRfV739NDhN5LF1fa1MqnzKm2lGTQRjNrjK19Q5fhkgIfjlVUKw==}
+
+  husky@9.1.7:
+    resolution: {integrity: sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   iconv-lite@0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
@@ -5618,6 +5626,8 @@ snapshots:
     optional: true
 
   human-id@1.0.2: {}
+
+  husky@9.1.7: {}
 
   iconv-lite@0.4.24:
     dependencies:
