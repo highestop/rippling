@@ -1,5 +1,5 @@
-import { ReadableAtom, Effect, Getter, Value, Updater, Setter } from '../../types/core/atom';
-import { Store } from '../../types/core/store';
+import type { ReadableAtom, Effect, Getter, Value, Updater, Setter } from '../../types/core/atom';
+import type { Store } from '../../types/core/store';
 import { AtomManager, ListenerManager } from './atom-manager';
 
 export class StoreImpl implements Store {
@@ -7,8 +7,6 @@ export class StoreImpl implements Store {
     protected readonly atomManager: AtomManager,
     protected readonly listenerManager: ListenerManager,
   ) {}
-
-  private isOuterSet = false;
 
   private innerSet = <T, Args extends unknown[]>(
     atom: Value<T> | Effect<T, Args>,
@@ -37,6 +35,7 @@ export class StoreImpl implements Store {
     atomState.val = newValue;
     atomState.epoch += 1;
     this.listenerManager.markPendingListeners(this.atomManager, atom);
+    return undefined;
   };
 
   get: Getter = <T>(atom: ReadableAtom<T>): T => {

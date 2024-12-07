@@ -1,6 +1,6 @@
-import { Computed, Value } from '../core/atom';
-import { Store } from '../core/store';
-import { NestedAtom } from './util';
+import type { Computed, Value } from '../core/atom';
+import type { Store } from '../core/store';
+import type { NestedAtom } from './util';
 
 export interface DebugStore extends Store {
   getReadDependencies: (atom: Computed<unknown>) => NestedAtom;

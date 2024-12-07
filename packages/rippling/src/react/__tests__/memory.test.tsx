@@ -2,7 +2,8 @@
 
 import LeakDetector from 'jest-leak-detector';
 import { expect, it } from 'vitest';
-import { $value, Value, createStore } from '../../core';
+import { $value, createStore } from '../../core';
+import type { Value } from '../../core';
 import { useGet, StoreProvider } from '../';
 import { cleanup, render } from '@testing-library/react';
 

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { $computed, createStore, $effect, $value, Getter } from '..';
+import { $computed, createStore, $effect, $value } from '..';
+import type { Getter } from '..';
 import { suspense } from './utils';
 import { createDebugStore } from '../../debug';
 

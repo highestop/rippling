@@ -1,13 +1,14 @@
-import { DebugStore } from '../../types/debug/debug-store';
-import { NestedAtom } from '../../types/debug/util';
-import { Computed, Effect, Subscribe, Value } from '../core';
-import { AtomManager, ComputedState, ListenerManager } from '../core/atom-manager';
+import type { DebugStore } from '../../types/debug/debug-store';
+import type { NestedAtom } from '../../types/debug/util';
+import type { Computed, Effect, Subscribe, Value } from '../core';
+import { AtomManager, ListenerManager } from '../core/atom-manager';
+import type { ComputedState } from '../core/atom-manager';
 import { StoreImpl } from '../core/store';
 
 class DebugStoreImpl extends StoreImpl implements DebugStore {
   private readonly subscribedAtoms = new Map<Value<unknown> | Computed<unknown>, number>();
 
-  sub: Subscribe = (
+  override sub: Subscribe = (
     atoms: (Value<unknown> | Computed<unknown>)[] | (Value<unknown> | Computed<unknown>),
     cbEffect: Effect<unknown, unknown[]>,
   ): (() => void) => {

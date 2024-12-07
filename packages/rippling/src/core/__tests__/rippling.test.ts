@@ -1,5 +1,6 @@
 import { expect, test, vi } from 'vitest';
-import { $value, createStore, Value, $computed, Computed, $effect, Effect } from '..';
+import { $value, createStore, $computed, $effect } from '..';
+import type { Computed, Effect, Value } from '..';
 import { createDebugStore } from '../../debug';
 
 test('should work', () => {

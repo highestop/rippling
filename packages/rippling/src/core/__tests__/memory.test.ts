@@ -1,7 +1,8 @@
 import LeakDetector from 'jest-leak-detector';
 import { expect, it } from 'vitest';
-import { $value, Value, Computed, $computed, createStore, $effect } from '..';
+import { $value, $computed, createStore, $effect } from '..';
 import { createDebugStore } from '../../debug';
+import type { Computed, Value } from '..';
 
 it('should release memory after delete value', async () => {
   const store = createStore();

@@ -7,7 +7,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "rippling": "workspace:*"
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "playwright": "^1.49.0",
+    "react": "^18.3.1",
+    "react-json-view": "^1.21.3",
+    "rippling": "workspace:^",
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8"
   }
 }

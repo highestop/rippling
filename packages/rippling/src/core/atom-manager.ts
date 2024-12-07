@@ -1,4 +1,4 @@
-import { ReadableAtom, Effect, Getter, Computed, Value } from '../../types/core/atom';
+import type { ReadableAtom, Effect, Getter, Computed, Value } from '../../types/core/atom';
 const EMPTY_MAP = new Map<ReadableAtom<unknown>, number>();
 
 export interface StateState<T> {

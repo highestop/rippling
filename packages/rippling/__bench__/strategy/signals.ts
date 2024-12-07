@@ -1,5 +1,6 @@
-import { computed, effect, signal, Signal } from '@preact/signals';
-import { Strategy } from './type';
+import { computed, effect, signal } from '@preact/signals';
+import type { Signal } from '@preact/signals';
+import type { Strategy } from './type';
 
 interface SignalStore {
   set: (signal: Signal<number>, value: number) => void;
@@ -20,8 +21,8 @@ export const signalStrategy: Strategy<Signal<number>, SignalStore> = {
   },
   sub(store, signal, callback) {
     return effect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const a = signal.value;
+      void a;
       callback();
     });
   },

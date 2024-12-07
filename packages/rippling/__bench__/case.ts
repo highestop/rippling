@@ -1,4 +1,4 @@
-import { Strategy } from './strategy/type';
+import type { Strategy } from './strategy/type';
 
 function fib(n: number): number {
   if (n <= 1) return n;

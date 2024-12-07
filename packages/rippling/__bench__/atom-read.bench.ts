@@ -1,7 +1,7 @@
 import { bench, describe } from 'vitest';
 import { setupStore, setupStoreWithoutSub } from './case';
-import { Value } from '../src';
-import { PrimitiveAtom } from 'jotai/vanilla';
+import type { Value } from '../src';
+import type { PrimitiveAtom } from 'jotai/vanilla';
 import { ripplingStrategy } from './strategy/rippling';
 import { jotaiStrategy } from './strategy/jotai';
 import { signalStrategy } from './strategy/signals';

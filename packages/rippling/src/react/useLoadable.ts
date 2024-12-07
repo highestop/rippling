@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useGet } from './useGet';
-import { Computed, Value } from '../core';
+import type { Computed, Value } from '../core';
 
 type Loadable<T> =
   | {

@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config';
-import { Plugin } from 'vite';
+import type { Plugin } from 'vite';
 import codspeedPlugin from '@codspeed/vitest-plugin';
 
 const plugins: Plugin[] = [];

@@ -1,5 +1,6 @@
-import { atom, Atom, createStore, PrimitiveAtom } from 'jotai/vanilla';
-import { Strategy } from './type';
+import { atom, createStore } from 'jotai/vanilla';
+import type { Strategy } from './type';
+import type { Atom, PrimitiveAtom } from 'jotai/vanilla';
 
 export const jotaiStrategy: Strategy<Atom<number>, ReturnType<typeof createStore>> = {
   createStore() {

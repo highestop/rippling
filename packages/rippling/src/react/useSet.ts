@@ -1,5 +1,5 @@
-import { Effect, Updater, Value } from '../core';
 import { useStore } from './provider';
+import type { Effect, Updater, Value } from '../core';
 
 export function useSet<T>(atom: Value<T>): (value: T | Updater<T>) => void;
 export function useSet<T, ARGS extends unknown[]>(atom: Effect<T, ARGS>): (...args: ARGS) => T;

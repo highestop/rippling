@@ -3,7 +3,8 @@
 import { render, cleanup, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
-import { $computed, createStore, $value, Value, Computed } from '../../core';
+import { $computed, createStore, $value } from '../../core';
+import type { Computed, Value } from '../../core';
 import { StrictMode, useEffect, version as reactVersion, Suspense } from 'react';
 import { StoreProvider, useGet, useSet, useLoadable } from '..';
 import { delay } from 'signal-timers';

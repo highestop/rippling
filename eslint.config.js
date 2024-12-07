@@ -1,10 +1,11 @@
-import tseslint from 'typescript-eslint';
+import { config, configs } from 'typescript-eslint';
 import vitest from 'eslint-plugin-vitest';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import importPlugin from 'eslint-plugin-import';
 
-export default tseslint.config(
+export default config(
   {
-    extends: [...tseslint.configs.strictTypeChecked, ...tseslint.configs.stylisticTypeChecked],
+    extends: [...configs.strictTypeChecked, ...configs.stylisticTypeChecked],
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parserOptions: {
@@ -20,6 +21,31 @@ export default tseslint.config(
     },
     rules: {
       ...vitest.configs.recommended.rules,
+    },
+  },
+  importPlugin.flatConfigs.recommended,
+  {
+    settings: {
+      'import/parsers': {
+        '@typescript-eslint/parser': ['.ts', '.tsx'],
+      },
+      'import/resolver': {
+        typescript: {
+          project: ['tsconfig.json', 'packages/*/tsconfig.json'],
+        },
+        node: {
+          project: ['tsconfig.json', 'packages/*/tsconfig.json'],
+        },
+      },
+    },
+    rules: {
+      'import/no-extraneous-dependencies': ['error'],
+    },
+  },
+  {
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
     },
   },
   eslintPluginPrettierRecommended,

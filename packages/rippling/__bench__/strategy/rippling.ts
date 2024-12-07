@@ -1,5 +1,6 @@
-import { Strategy } from './type';
-import { createStore, Computed, Value, $computed, $effect, $value } from '../../src';
+import type { Strategy } from './type';
+import { createStore, $computed, $effect, $value } from '../../src';
+import type { Computed, Value } from '../../src';
 
 export const ripplingStrategy: Strategy<Value<number> | Computed<number>, ReturnType<typeof createStore>> = {
   createStore() {

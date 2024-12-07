@@ -1,4 +1,4 @@
-import { Computed, Effect, Read, Value, Write } from '../../types/core/atom';
+import type { Computed, Effect, Read, Value, Write } from '../../types/core/atom';
 
 interface Options {
   debugLabel?: string;
