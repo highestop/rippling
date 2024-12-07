@@ -5,8 +5,6 @@
   "description": "devtools package for rippling",
   "type": "module",
   "scripts": {
-    "test": "pnpm '/^test:.*/'",
-    "test:unit": "vitest --run --coverage",
     "test:e2e": "playwright test e2e",
     "build": "vite build",
     "prebuild": "shx rm -rf dist",
@@ -19,13 +17,14 @@
     "@types/chrome": "^0.0.287",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitest/coverage-v8": "^2.1.8",
+    "autoprefixer": "^10.4.20",
     "playwright": "^1.49.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-json-view": "^1.21.3",
     "rippling": "workspace:^",
     "shx": "^0.3.4",
+    "tailwindcss": "^3.4.16",
     "vite": "^6.0.3",
     "vitest": "^2.1.8"
   }
