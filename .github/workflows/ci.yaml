@@ -18,8 +18,8 @@ jobs:
             - args: [--frozen-lockfile, --strict-peer-dependencies]
       - name: Install commitlint
         run: |
-          pnpm install conventional-changelog-conventionalcommits
-          pnpm install commitlint@latest
+          pnpm install -w conventional-changelog-conventionalcommits
+          pnpm install -w commitlint@latest
 
       - name: Validate current commit (last commit) with commitlint
         if: github.event_name == 'push'

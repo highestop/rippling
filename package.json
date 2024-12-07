@@ -18,7 +18,7 @@
     "test:unit": "vitest --run --coverage",
     "test:bench": "vitest bench --run",
     "test:e2e": "playwright test e2e",
-    "build": "pnpm '/^build:.*/'",
+    "build": "pnpm build:lib && pnpm build:devtools",
     "build:lib": "pnpm -F '!rippling-devtools' exec rollup -c",
     "build:devtools": "pnpm -F rippling-devtools exec vite build",
     "prebuild": "pnpm -F '*' exec shx rm -rf dist",
