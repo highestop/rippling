@@ -9,15 +9,15 @@
   },
   "license": "MIT",
   "type": "module",
-  "main": "./index.cjs",
+  "main": "./dist/index.cjs",
   "exports": {
     ".": {
-      "import": "./index.js",
-      "require": "./index.cjs"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./*": {
-      "import": "./*/index.js",
-      "require": "./*/index.cjs"
+      "import": "./dist/*/index.js",
+      "require": "./dist/*/index.cjs"
     }
   },
   "peerDependencies": {

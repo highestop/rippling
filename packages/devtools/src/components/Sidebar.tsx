@@ -1,35 +1,29 @@
-import { useState } from 'react';
+import { useGet, useSet } from 'rippling';
+import { selectedStoreIndex, updateSelectedStoreIndex } from '../atoms/selectedStore';
+import { getMockStores } from '../mocks/mockStores';
 
 export function Sidebar() {
-  const [selectedStore, setSelectedStore] = useState(0);
+  const index = useGet(selectedStoreIndex);
+  const updateIndex = useSet(updateSelectedStoreIndex);
+  const stores = getMockStores();
 
   return (
-    <aside className="p-2 text-[#586e75] h-full overflow-y-auto text-sm">
-      <ul className="space-y-1">
-        <li
-          className={`px-2 py-1 hover:bg-[#eee8d5] rounded cursor-pointer ${selectedStore === 0 ? 'bg-[#eee8d5]' : ''}`}
-          onClick={() => {
-            setSelectedStore(0);
-          }}
-        >
-          Store 1
-        </li>
-        <li
-          className={`px-2 py-1 hover:bg-[#eee8d5] rounded cursor-pointer ${selectedStore === 1 ? 'bg-[#eee8d5]' : ''}`}
-          onClick={() => {
-            setSelectedStore(1);
-          }}
-        >
-          Store 2
-        </li>
-        <li
-          className={`px-2 py-1 hover:bg-[#eee8d5] rounded cursor-pointer ${selectedStore === 2 ? 'bg-[#eee8d5]' : ''}`}
-          onClick={() => {
-            setSelectedStore(2);
-          }}
-        >
-          Store 3
-        </li>
+    <aside className="h-full overflow-y-auto text-[11px] bg-[#f3f3f3] border-r border-[#e0e0e0]">
+      <div className="p-2 border-b border-[#e0e0e0] text-[#5f6368] font-medium">Store</div>
+      <ul>
+        {stores.map((store) => (
+          <li
+            key={store.id}
+            className={`px-4 py-[6px] hover:bg-[#e8eaed] cursor-pointer ${
+              index === store.id ? 'bg-[#e8eaed] text-[#1a73e8]' : 'text-[#333]'
+            }`}
+            onClick={() => {
+              updateIndex(store.id);
+            }}
+          >
+            {store.name}
+          </li>
+        ))}
       </ul>
     </aside>
   );
