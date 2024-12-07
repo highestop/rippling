@@ -10,7 +10,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "test": "pnpm '/^(test|lint):.*/'",
+    "test": "pnpm '/^test:.*/'",
     "test:unit": "vitest --run --coverage",
     "test:bench": "vitest bench --run",
     "build": "rollup -c",
@@ -50,17 +50,27 @@
     }
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
     "@codspeed/vitest-plugin": "^3.1.1",
     "@preact/signals": "^1.3.1",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
-    "@types/react": "^18.3.12",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "happy-dom": "^15.11.7",
     "jest-leak-detector": "^29.7.0",
     "jotai": "^2.10.3",
+    "json": "^11.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "rollup-plugin-dts": "^6.1.1",
+    "shx": "^0.3.4",
     "signal-timers": "^1.0.4",
+    "vite": "^6.0.3",
     "vitest": "^2.1.8"
   }
 }
