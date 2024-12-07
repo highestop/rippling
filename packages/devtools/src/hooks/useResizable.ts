@@ -1,10 +1,6 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from 'react';
 
-export function useResizable(
-  axis: "x" | "y",
-  initialSize = "50%",
-  containerSelector?: string,
-) {
+export function useResizable(axis: 'x' | 'y', initialSize = '50%', containerSelector?: string) {
   const [size, setSize] = useState(initialSize);
   const isResizing = useRef(false);
   const startPos = useRef({ x: 0, y: 0 });
@@ -24,10 +20,10 @@ export function useResizable(
       if (!container) return;
 
       const rect = container.getBoundingClientRect();
-      startSize.current = axis === "x" ? rect.width : rect.height;
+      startSize.current = axis === 'x' ? rect.width : rect.height;
 
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
     },
     [axis, containerSelector],
   );
@@ -45,12 +41,9 @@ export function useResizable(
       if (!container) return;
 
       const rect = container.getBoundingClientRect();
-      const delta =
-        axis === "x"
-          ? e.clientX - startPos.current.x
-          : e.clientY - startPos.current.y;
+      const delta = axis === 'x' ? e.clientX - startPos.current.x : e.clientY - startPos.current.y;
 
-      const containerSize = axis === "x" ? rect.width : rect.height;
+      const containerSize = axis === 'x' ? rect.width : rect.height;
       const newSizePixels = startSize.current + delta;
       const newSizePercent = (newSizePixels / containerSize) * 100;
 
@@ -61,8 +54,8 @@ export function useResizable(
 
   const handleMouseUp = useCallback(() => {
     isResizing.current = false;
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
   }, [handleMouseMove]);
 
   return {

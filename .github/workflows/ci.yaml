@@ -5,7 +5,31 @@ on:
   push:
 
 jobs:
-  ci:
+  commitlint:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: |
+            - args: [--frozen-lockfile, --strict-peer-dependencies]
+      - name: Install commitlint
+        run: |
+          pnpm install conventional-changelog-conventionalcommits
+          pnpm install commitlint@latest
+
+      - name: Validate current commit (last commit) with commitlint
+        if: github.event_name == 'push'
+        run: pnpm exec commitlint --last --verbose
+
+      - name: Validate PR commits with commitlint
+        if: github.event_name == 'pull_request'
+        run: pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+  test:
     runs-on: ubuntu-latest
 
     permissions:
@@ -39,7 +63,7 @@ jobs:
           run: CI=true pnpm test
           token: ${{ secrets.CODSPEED_TOKEN }}
 
-      - name: "Report Coverage"
+      - name: 'Report Coverage'
         uses: davelosert/vitest-coverage-report-action@v2
 
       - name: Coveralls

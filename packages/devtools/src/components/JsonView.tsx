@@ -1,19 +1,19 @@
-import ReactJson from "react-json-view";
+import ReactJson from 'react-json-view';
 
 export function JsonView() {
   const mockData = {
     store: {
-      name: "TodoStore",
+      name: 'TodoStore',
       state: {
         todos: [
-          { id: 1, text: "Learn React", completed: true },
-          { id: 2, text: "Learn TypeScript", completed: false },
-          { id: 3, text: "Build an app", completed: false },
+          { id: 1, text: 'Learn React', completed: true },
+          { id: 2, text: 'Learn TypeScript', completed: false },
+          { id: 3, text: 'Build an app', completed: false },
         ],
-        filter: "all",
+        filter: 'all',
         loading: false,
       },
-      actions: ["addTodo", "toggleTodo", "setFilter"],
+      actions: ['addTodo', 'toggleTodo', 'setFilter'],
     },
   };
 
@@ -25,9 +25,9 @@ export function JsonView() {
       enableClipboard={false}
       collapsed={1}
       style={{
-        fontFamily: "monospace",
-        height: "100%",
-        backgroundColor: "#002b36",
+        fontFamily: 'monospace',
+        height: '100%',
+        backgroundColor: '#002b36',
       }}
     />
   );

@@ -8,11 +8,7 @@ export interface GetterOptions {
   signal: AbortSignal;
 }
 export type Read<T> = (get: Getter, options: GetterOptions) => T;
-export type Write<T, Args extends unknown[]> = (
-  get: Getter,
-  set: Setter,
-  ...args: Args
-) => T;
+export type Write<T, Args extends unknown[]> = (get: Getter, set: Setter, ...args: Args) => T;
 
 export interface Value<T> {
   init: T;

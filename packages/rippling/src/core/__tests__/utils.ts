@@ -6,9 +6,7 @@ export function suspense() {
     for (const [n, resolve] of queueCountPromises) {
       if (n === resolves.length) resolve();
     }
-    queueCountPromises = queueCountPromises.filter(
-      ([n]) => n !== resolves.length,
-    );
+    queueCountPromises = queueCountPromises.filter(([n]) => n !== resolves.length);
   }
 
   function pause(): Promise<void> {
@@ -25,9 +23,7 @@ export function suspense() {
   }
 
   function waitQueueCount(n: number) {
-    return new Promise<void>((resolve) =>
-      queueCountPromises.push([n, resolve]),
-    );
+    return new Promise<void>((resolve) => queueCountPromises.push([n, resolve]));
   }
 
   return {

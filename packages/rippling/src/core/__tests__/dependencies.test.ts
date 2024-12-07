@@ -1,10 +1,10 @@
-import { expect, it, vi } from "vitest";
-import { $computed, createStore, $effect, $value } from "..";
-import { suspense } from "./utils";
-import { delay } from "signal-timers";
-import { createDebugStore } from "../../debug";
+import { expect, it, vi } from 'vitest';
+import { $computed, createStore, $effect, $value } from '..';
+import { suspense } from './utils';
+import { delay } from 'signal-timers';
+import { createDebugStore } from '../../debug';
 
-it("can propagate updates with async atom chains", async () => {
+it('can propagate updates with async atom chains', async () => {
   const { pause, restore } = suspense();
   const store = createStore();
 
@@ -33,7 +33,7 @@ it("can propagate updates with async atom chains", async () => {
   await expect(store.get(async3Atom)).resolves.toBe(3);
 });
 
-it("can get async atom with deps more than once before resolving (#1668)", async () => {
+it('can get async atom with deps more than once before resolving (#1668)', async () => {
   const { pause, restore } = suspense();
   const countAtom = $value(0);
 
@@ -56,7 +56,7 @@ it("can get async atom with deps more than once before resolving (#1668)", async
   expect(count).toBe(2);
 });
 
-it("correctly updates async derived atom after get/set update", async () => {
+it('correctly updates async derived atom after get/set update', async () => {
   const baseAtom = $value(0);
   const derivedAsyncAtom = $computed(
     // eslint-disable-next-line @typescript-eslint/require-await
@@ -83,10 +83,10 @@ it("correctly updates async derived atom after get/set update", async () => {
   expect(derived).toBe(3);
 });
 
-it("correctly handles the same promise being returned twice from an atom getter (#2151)", async () => {
+it('correctly handles the same promise being returned twice from an atom getter (#2151)', async () => {
   // eslint-disable-next-line @typescript-eslint/require-await
   const asyncDataAtom = $computed(async () => {
-    return "Asynchronous Data";
+    return 'Asynchronous Data';
   });
 
   const counterAtom = $value(0);
@@ -102,12 +102,12 @@ it("correctly handles the same promise being returned twice from an atom getter 
   // setting the `counterAtom` dependency on the same JS event loop cycle, before
   // the `derivedAtom` promise resolves.
   store.set(counterAtom, 1);
-  await expect(store.get(derivedAtom)).resolves.toBe("Asynchronous Data");
+  await expect(store.get(derivedAtom)).resolves.toBe('Asynchronous Data');
 });
 
 // jotai will keep atoms mounted between async recalculations
 // we do not do this, just clean all deps when new calculation starts
-it("do not keep atoms mounted between async recalculations", async () => {
+it('do not keep atoms mounted between async recalculations', async () => {
   const { pause, restore } = suspense();
   const base = $value(0);
 
@@ -130,7 +130,7 @@ it("do not keep atoms mounted between async recalculations", async () => {
   expect(store.getReadDependents(base)).toEqual([base]);
 });
 
-it("should not provide stale values to conditional dependents", () => {
+it('should not provide stale values to conditional dependents', () => {
   const baseAtom = $value<number[]>([100]);
   const hasFilterAtom = $value(false);
   const derivedAtom = $computed((get) => {
@@ -146,9 +146,9 @@ it("should not provide stale values to conditional dependents", () => {
     const hasFilter = get(hasFilterAtom);
     if (hasFilter) {
       const filtered = get(derivedAtom);
-      return filtered.length === 0 ? "is-empty" : "has-data";
+      return filtered.length === 0 ? 'is-empty' : 'has-data';
     } else {
-      return "no-filter";
+      return 'no-filter';
     }
   });
 
@@ -162,12 +162,12 @@ it("should not provide stale values to conditional dependents", () => {
     $effect(() => undefined),
   );
 
-  expect(store.get(stageAtom)).toBe("no-filter");
+  expect(store.get(stageAtom)).toBe('no-filter');
   store.set(hasFilterAtom, true);
-  expect(store.get(stageAtom)).toBe("is-empty");
+  expect(store.get(stageAtom)).toBe('is-empty');
 });
 
-it("settles never resolving async derivations with deps picked up sync", async () => {
+it('settles never resolving async derivations with deps picked up sync', async () => {
   const { pause, restore } = suspense();
 
   const syncAtom = $value({
@@ -185,7 +185,7 @@ it("settles never resolving async derivations with deps picked up sync", async (
 
   // first get should got a never resolving promise
   void store.get(asyncAtom).then(() => {
-    trace("NEVER");
+    trace('NEVER');
   });
 
   store.sub(
@@ -193,7 +193,7 @@ it("settles never resolving async derivations with deps picked up sync", async (
     $effect(async (get) => {
       traceSub();
       await get(asyncAtom);
-      trace("OK");
+      trace('OK');
     }),
   );
 
@@ -204,11 +204,11 @@ it("settles never resolving async derivations with deps picked up sync", async (
 
   await delay(0);
   expect(trace).toHaveBeenCalledTimes(1);
-  expect(trace).toBeCalledWith("OK");
+  expect(trace).toBeCalledWith('OK');
   expect(traceSub).toHaveBeenCalledTimes(1);
 });
 
-it("settles never resolving async derivations with deps picked up async", async () => {
+it('settles never resolving async derivations with deps picked up async', async () => {
   const syncAtom = $value({
     promise: new Promise<void>(() => void 0),
   });
@@ -223,14 +223,14 @@ it("settles never resolving async derivations with deps picked up async", async 
 
   const trace = vi.fn();
   void store.get(asyncAtom).then(() => {
-    trace("NEVER");
+    trace('NEVER');
   });
   store.sub(
     asyncAtom,
     $effect(async (get) => {
-      trace("SUB");
+      trace('SUB');
       await get(asyncAtom);
-      trace("OK");
+      trace('OK');
     }),
   );
 
@@ -241,11 +241,11 @@ it("settles never resolving async derivations with deps picked up async", async 
 
   await delay(0);
   expect(trace).toHaveBeenCalledTimes(2);
-  expect(trace).nthCalledWith(1, "SUB");
-  expect(trace).nthCalledWith(2, "OK");
+  expect(trace).nthCalledWith(1, 'SUB');
+  expect(trace).nthCalledWith(2, 'OK');
 });
 
-it("refreshes deps for each async read", async () => {
+it('refreshes deps for each async read', async () => {
   const { pause, restore } = suspense();
 
   const countAtom = $value(0);
@@ -279,7 +279,7 @@ it("refreshes deps for each async read", async () => {
   expect(trace).not.toBeCalled();
 });
 
-it("should not re-evaluate stable derived atom values in situations where dependencies are re-ordered (#2738)", () => {
+it('should not re-evaluate stable derived atom values in situations where dependencies are re-ordered (#2738)', () => {
   const callCounter = vi.fn();
   const countAtom = $value(0);
   const rootAtom = $value(false);
@@ -323,7 +323,7 @@ it("should not re-evaluate stable derived atom values in situations where depend
   expect(callCounter).toHaveBeenCalledTimes(2);
 });
 
-it("handles complex dependency chains", async () => {
+it('handles complex dependency chains', async () => {
   const { pause, restore } = suspense();
   const baseAtom = $value(1);
   const derived1 = $computed((get) => get(baseAtom) * 2);

@@ -1,19 +1,14 @@
 // @vitest-environment happy-dom
 
-import { render, cleanup, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { afterEach, expect, it, vi } from "vitest";
-import { $computed, createStore, $value, Value, Computed } from "../../core";
-import {
-  StrictMode,
-  useEffect,
-  version as reactVersion,
-  Suspense,
-} from "react";
-import { StoreProvider, useGet, useSet, useLoadable } from "..";
-import { delay } from "signal-timers";
+import { render, cleanup, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, expect, it, vi } from 'vitest';
+import { $computed, createStore, $value, Value, Computed } from '../../core';
+import { StrictMode, useEffect, version as reactVersion, Suspense } from 'react';
+import { StoreProvider, useGet, useSet, useLoadable } from '..';
+import { delay } from 'signal-timers';
 
-const IS_REACT18 = /^18\./.test(reactVersion);
+const IS_REACT18 = reactVersion.startsWith('18.');
 
 afterEach(() => {
   cleanup();
@@ -42,11 +37,11 @@ function makeDefered<T>(): {
   return deferred;
 }
 
-it("convert promise to loadable", async () => {
-  const base = $value(Promise.resolve("foo"));
+it('convert promise to loadable', async () => {
+  const base = $value(Promise.resolve('foo'));
   const App = () => {
     const ret = useLoadable(base);
-    if (ret.state === "loading" || ret.state === "hasError") {
+    if (ret.state === 'loading' || ret.state === 'hasError') {
       return <div>loading</div>;
     }
     return <div>{ret.data}</div>;
@@ -59,15 +54,15 @@ it("convert promise to loadable", async () => {
     { wrapper: StrictMode },
   );
 
-  expect(screen.getByText("loading")).toBeTruthy();
-  expect(await screen.findByText("foo")).toBeTruthy();
+  expect(screen.getByText('loading')).toBeTruthy();
+  expect(await screen.findByText('foo')).toBeTruthy();
 });
 
-it("reset promise atom will reset loadable", async () => {
-  const base = $value(Promise.resolve("foo"));
+it('reset promise atom will reset loadable', async () => {
+  const base = $value(Promise.resolve('foo'));
   const App = () => {
     const ret = useLoadable(base);
-    if (ret.state === "loading" || ret.state === "hasError") {
+    if (ret.state === 'loading' || ret.state === 'hasError') {
       return <div>loading</div>;
     }
     return <div>{ret.data}</div>;
@@ -80,23 +75,23 @@ it("reset promise atom will reset loadable", async () => {
     { wrapper: StrictMode },
   );
 
-  expect(await screen.findByText("foo")).toBeTruthy();
+  expect(await screen.findByText('foo')).toBeTruthy();
 
-  const [_, promise] = (() => {
+  const [, promise] = (() => {
     let ret;
     const promise = new Promise((r) => (ret = r));
     return [ret, promise];
   })();
 
   store.set(base, promise);
-  expect(await screen.findByText("loading")).toBeTruthy();
+  expect(await screen.findByText('loading')).toBeTruthy();
 });
 
-it("switchMap", async () => {
-  const base = $value(Promise.resolve("foo"));
+it('switchMap', async () => {
+  const base = $value(Promise.resolve('foo'));
   const App = () => {
     const ret = useLoadable(base);
-    if (ret.state === "loading" || ret.state === "hasError") {
+    if (ret.state === 'loading' || ret.state === 'hasError') {
       return <div>loading</div>;
     }
     return <div>{ret.data}</div>;
@@ -109,23 +104,23 @@ it("switchMap", async () => {
     { wrapper: StrictMode },
   );
 
-  expect(await screen.findByText("foo")).toBeTruthy();
+  expect(await screen.findByText('foo')).toBeTruthy();
 
   const defered = makeDefered();
 
   store.set(base, defered.promise);
-  expect(await screen.findByText("loading")).toBeTruthy();
+  expect(await screen.findByText('loading')).toBeTruthy();
 
-  store.set(base, Promise.resolve("bar"));
-  expect(await screen.findByText("bar")).toBeTruthy();
+  store.set(base, Promise.resolve('bar'));
+  expect(await screen.findByText('bar')).toBeTruthy();
 
-  defered.resolve("baz");
+  defered.resolve('baz');
   await delay(0);
-  expect(() => screen.getByText("baz")).toThrow();
+  expect(() => screen.getByText('baz')).toThrow();
 });
 
-it("loadable turns suspense into values", async () => {
-  let resolve: (x: number) => void = () => {};
+it('loadable turns suspense into values', async () => {
+  let resolve: (x: number) => void = () => void 0;
   const asyncAtom = $computed(() => {
     return new Promise<number>((r) => (resolve = r));
   });
@@ -139,12 +134,12 @@ it("loadable turns suspense into values", async () => {
     </StrictMode>,
   );
 
-  await screen.findByText("Loading...");
+  await screen.findByText('Loading...');
   resolve(5);
-  await screen.findByText("Data: 5");
+  await screen.findByText('Data: 5');
 });
 
-it("loadable turns errors into values", async () => {
+it('loadable turns errors into values', async () => {
   const deferred = makeDefered<number>();
 
   const asyncAtom = $value(deferred.promise);
@@ -158,12 +153,12 @@ it("loadable turns errors into values", async () => {
     </StrictMode>,
   );
 
-  await screen.findByText("Loading...");
-  deferred.reject(new Error("An error occurred"));
-  await screen.findByText("Error: An error occurred");
+  await screen.findByText('Loading...');
+  deferred.reject(new Error('An error occurred'));
+  await screen.findByText('Error: An error occurred');
 });
 
-it("loadable turns primitive throws into values", async () => {
+it('loadable turns primitive throws into values', async () => {
   const deferred = makeDefered<number>();
 
   const asyncAtom = $value(deferred.promise);
@@ -177,13 +172,13 @@ it("loadable turns primitive throws into values", async () => {
     </StrictMode>,
   );
 
-  await screen.findByText("Loading...");
-  deferred.reject("An error occurred");
-  await screen.findByText("An error occurred");
+  await screen.findByText('Loading...');
+  deferred.reject('An error occurred');
+  await screen.findByText('An error occurred');
 });
 
-it("loadable goes back to loading after re-fetch", async () => {
-  let resolve: (x: number) => void = () => {};
+it('loadable goes back to loading after re-fetch', async () => {
+  let resolve: (x: number) => void = () => void 0;
   const refreshAtom = $value(0);
   const asyncAtom = $computed((get) => {
     get(refreshAtom);
@@ -194,7 +189,13 @@ it("loadable goes back to loading after re-fetch", async () => {
     const setRefresh = useSet(refreshAtom);
     return (
       <>
-        <button onClick={() => setRefresh((value) => value + 1)}>
+        <button
+          onClick={() => {
+            setRefresh((value) => {
+              return value + 1;
+            });
+          }}
+        >
           refresh
         </button>
       </>
@@ -211,18 +212,18 @@ it("loadable goes back to loading after re-fetch", async () => {
     </StrictMode>,
   );
 
-  screen.getByText("Loading...");
+  screen.getByText('Loading...');
   resolve(5);
-  await screen.findByText("Data: 5");
-  await userEvent.click(screen.getByText("refresh"));
-  await screen.findByText("Loading...");
+  await screen.findByText('Data: 5');
+  await userEvent.click(screen.getByText('refresh'));
+  await screen.findByText('Loading...');
   resolve(6);
-  await screen.findByText("Data: 6");
+  await screen.findByText('Data: 6');
 });
 
-it("loadable can recover from error", async () => {
-  let resolve: (x: number) => void = () => {};
-  let reject: (error: unknown) => void = () => {};
+it('loadable can recover from error', async () => {
+  let resolve: (x: number) => void = () => void 0;
+  let reject: (error: unknown) => void = () => void 0;
   const refreshAtom = $value(0);
   const asyncAtom = $computed((get) => {
     get(refreshAtom);
@@ -236,7 +237,11 @@ it("loadable can recover from error", async () => {
     const setRefresh = useSet(refreshAtom);
     return (
       <>
-        <button onClick={() => setRefresh((value) => value + 1)}>
+        <button
+          onClick={() => {
+            setRefresh((value) => value + 1);
+          }}
+        >
           refresh
         </button>
       </>
@@ -253,18 +258,18 @@ it("loadable can recover from error", async () => {
     </StrictMode>,
   );
 
-  screen.getByText("Loading...");
-  reject(new Error("An error occurred"));
-  await screen.findByText("Error: An error occurred");
-  await userEvent.click(screen.getByText("refresh"));
-  await screen.findByText("Loading...");
+  screen.getByText('Loading...');
+  reject(new Error('An error occurred'));
+  await screen.findByText('Error: An error occurred');
+  await userEvent.click(screen.getByText('refresh'));
+  await screen.findByText('Loading...');
   resolve(6);
-  await screen.findByText("Data: 6");
+  await screen.findByText('Data: 6');
 });
 
 // sync atom is not supported in Rippling
-it.skip("loadable immediately resolves sync values", async () => {
-  const syncAtom = $value(5);
+it.skip('loadable immediately resolves sync values', () => {
+  // const syncAtom = $value(5);
   const effectCallback = vi.fn();
 
   const store = createStore();
@@ -277,23 +282,21 @@ it.skip("loadable immediately resolves sync values", async () => {
     </StrictMode>,
   );
 
-  screen.getByText("Data: 5");
-  expect(effectCallback.mock.calls).not.toContain(
-    expect.objectContaining({ state: "loading" }),
-  );
+  screen.getByText('Data: 5');
+  expect(effectCallback.mock.calls).not.toContain(expect.objectContaining({ state: 'loading' }));
   expect(effectCallback).toHaveBeenLastCalledWith({
-    state: "hasData",
+    state: 'hasData',
     data: 5,
   });
 });
 
 // Suspense is not supported in Rippling
-it.skip("loadable can use resolved promises synchronously", async () => {
+it.skip('loadable can use resolved promises synchronously', async () => {
   const asyncAtom = $value(Promise.resolve(5));
   const effectCallback = vi.fn();
 
   const ResolveAtomComponent = () => {
-    useGet(asyncAtom);
+    void useGet(asyncAtom);
 
     return <div>Ready</div>;
   };
@@ -312,33 +315,28 @@ it.skip("loadable can use resolved promises synchronously", async () => {
   );
 
   if (IS_REACT18) {
-    await screen.findByText("loading");
+    await screen.findByText('loading');
     // FIXME React 18 Suspense does not show "Ready"
   } else {
-    await screen.findByText("Ready");
+    await screen.findByText('Ready');
   }
 
   rerender(
     <StrictMode>
-      <LoadableComponent
-        effectCallback={effectCallback}
-        asyncAtom={asyncAtom}
-      />
+      <LoadableComponent effectCallback={effectCallback} asyncAtom={asyncAtom} />
     </StrictMode>,
   );
-  await screen.findByText("Data: 5");
+  await screen.findByText('Data: 5');
 
-  expect(effectCallback.mock.calls).not.toContain(
-    expect.objectContaining({ state: "loading" }),
-  );
+  expect(effectCallback.mock.calls).not.toContain(expect.objectContaining({ state: 'loading' }));
   expect(effectCallback).toHaveBeenLastCalledWith({
-    state: "hasData",
+    state: 'hasData',
     data: 5,
   });
 });
 
-it("loadable of a derived async atom does not trigger infinite loop (#1114)", async () => {
-  let resolve: (x: number) => void = () => {};
+it('loadable of a derived async atom does not trigger infinite loop (#1114)', async () => {
+  let resolve: (x: number) => void = () => void 0;
   const baseAtom = $value(0);
   const asyncAtom = $computed((get) => {
     get(baseAtom);
@@ -349,7 +347,13 @@ it("loadable of a derived async atom does not trigger infinite loop (#1114)", as
     const trigger = useSet(baseAtom);
     return (
       <>
-        <button onClick={() => trigger((value) => value)}>trigger</button>
+        <button
+          onClick={() => {
+            trigger((value) => value);
+          }}
+        >
+          trigger
+        </button>
       </>
     );
   };
@@ -364,19 +368,20 @@ it("loadable of a derived async atom does not trigger infinite loop (#1114)", as
     </StrictMode>,
   );
 
-  screen.getByText("Loading...");
-  await userEvent.click(screen.getByText("trigger"));
+  screen.getByText('Loading...');
+  await userEvent.click(screen.getByText('trigger'));
   resolve(5);
-  await screen.findByText("Data: 5");
+  await screen.findByText('Data: 5');
 });
 
-it("loadable of a derived async atom with error does not trigger infinite loop (#1330)", async () => {
+it('loadable of a derived async atom with error does not trigger infinite loop (#1330)', async () => {
   const baseAtom = $computed(() => {
-    throw new Error("thrown in baseAtom");
+    throw new Error('thrown in baseAtom');
   });
+  // eslint-disable-next-line @typescript-eslint/require-await
   const asyncAtom = $computed(async (get) => {
     get(baseAtom);
-    return "";
+    return '';
   });
 
   const store = createStore();
@@ -388,12 +393,12 @@ it("loadable of a derived async atom with error does not trigger infinite loop (
     </StrictMode>,
   );
 
-  screen.getByText("Loading...");
-  await screen.findByText("Error: thrown in baseAtom");
+  screen.getByText('Loading...');
+  await screen.findByText('Error: thrown in baseAtom');
 });
 
-it("does not repeatedly attempt to get the value of an unresolved promise atom wrapped in a loadable (#1481)", async () => {
-  const baseAtom = $value(new Promise<number>(() => {}));
+it('does not repeatedly attempt to get the value of an unresolved promise atom wrapped in a loadable (#1481)', async () => {
+  const baseAtom = $value(new Promise<number>(() => void 0));
 
   let callsToGetBaseAtom = 0;
   const derivedAtom = $computed((get) => {
@@ -418,9 +423,9 @@ it("does not repeatedly attempt to get the value of an unresolved promise atom w
 });
 
 // sync atom is not supported in Rippling
-it.skip("should handle sync error (#1843)", async () => {
+it.skip('should handle sync error (#1843)', async () => {
   const syncAtom = $computed(() => {
-    throw new Error("thrown in syncAtom");
+    throw new Error('thrown in syncAtom');
   });
 
   const store = createStore();
@@ -432,12 +437,13 @@ it.skip("should handle sync error (#1843)", async () => {
     </StrictMode>,
   );
 
-  await screen.findByText("Error: thrown in syncAtom");
+  await screen.findByText('Error: thrown in syncAtom');
 });
 
-it("should handle async error", async () => {
+it('should handle async error', async () => {
+  // eslint-disable-next-line @typescript-eslint/require-await
   const syncAtom = $computed(async () => {
-    throw new Error("thrown in syncAtom");
+    throw new Error('thrown in syncAtom');
   });
 
   const store = createStore();
@@ -449,20 +455,15 @@ it("should handle async error", async () => {
     </StrictMode>,
   );
 
-  await screen.findByText("Error: thrown in syncAtom");
+  await screen.findByText('Error: thrown in syncAtom');
 });
 
-type LoadableComponentProps = {
-  asyncAtom:
-    | Value<Promise<number | string>>
-    | Computed<Promise<number | string>>;
-  effectCallback?: (loadableValue: any) => void;
-};
+interface LoadableComponentProps {
+  asyncAtom: Value<Promise<number | string>> | Computed<Promise<number | string>>;
+  effectCallback?: (loadableValue: unknown) => void;
+}
 
-const LoadableComponent = ({
-  asyncAtom,
-  effectCallback,
-}: LoadableComponentProps) => {
+const LoadableComponent = ({ asyncAtom, effectCallback }: LoadableComponentProps) => {
   const value = useLoadable(asyncAtom);
 
   useEffect(() => {
@@ -471,11 +472,11 @@ const LoadableComponent = ({
     }
   }, [value, effectCallback]);
 
-  if (value.state === "loading") {
+  if (value.state === 'loading') {
     return <>Loading...</>;
   }
 
-  if (value.state === "hasError") {
+  if (value.state === 'hasError') {
     return <>{String(value.error)}</>;
   }
 

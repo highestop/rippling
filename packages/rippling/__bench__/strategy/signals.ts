@@ -1,5 +1,5 @@
-import { computed, effect, signal, Signal } from "@preact/signals";
-import { Strategy } from "./type";
+import { computed, effect, signal, Signal } from '@preact/signals';
+import { Strategy } from './type';
 
 interface SignalStore {
   set: (signal: Signal<number>, value: number) => void;

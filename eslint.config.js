@@ -1,13 +1,11 @@
-import tseslint from "typescript-eslint";
-import vitest from "eslint-plugin-vitest";
+import tseslint from 'typescript-eslint';
+import vitest from 'eslint-plugin-vitest';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default tseslint.config(
   {
-    extends: [
-      ...tseslint.configs.strictTypeChecked,
-      ...tseslint.configs.stylisticTypeChecked,
-    ],
-    files: ["**/*.ts"],
+    extends: [...tseslint.configs.strictTypeChecked, ...tseslint.configs.stylisticTypeChecked],
+    files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parserOptions: {
         projectService: true,
@@ -16,7 +14,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["**/*.test.ts"],
+    files: ['**/*.test.ts'],
     plugins: {
       vitest,
     },
@@ -24,7 +22,6 @@ export default tseslint.config(
       ...vitest.configs.recommended.rules,
     },
   },
-  {
-    ignores: ["**/dist/", "coverage/"],
-  },
+  eslintPluginPrettierRecommended,
+  { ignores: ['**/dist/', 'coverage/'] },
 );

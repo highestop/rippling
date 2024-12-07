@@ -68,7 +68,7 @@ export const userIdChangeEffect = $effect((get, set) => {
 });
 
 // ...
-import { userId, userIdChangeEffect } from "./atoms";
+import { userId, userIdChangeEffect } from './atoms';
 
 function setupPage() {
   const store = createStore();

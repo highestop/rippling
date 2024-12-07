@@ -1,11 +1,11 @@
 // @vitest-environment happy-dom
 
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, expect, it } from "vitest";
-import { $value, createStore } from "../../core";
-import { StoreProvider } from "../provider";
-import { StrictMode } from "react";
-import { useResolved } from "../useResolved";
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, expect, it } from 'vitest';
+import { $value, createStore } from '../../core';
+import { StoreProvider } from '../provider';
+import { StrictMode } from 'react';
+import { useResolved } from '../useResolved';
 
 afterEach(() => {
   cleanup();
@@ -34,8 +34,8 @@ function makeDefered<T>(): {
   return deferred;
 }
 
-it("convert promise to awaited value", async () => {
-  const base = $value(Promise.resolve("foo"));
+it('convert promise to awaited value', async () => {
+  const base = $value(Promise.resolve('foo'));
   const App = () => {
     const ret = useResolved(base);
     return <div>{ret}</div>;
@@ -48,15 +48,15 @@ it("convert promise to awaited value", async () => {
     { wrapper: StrictMode },
   );
 
-  expect(await screen.findByText("foo")).toBeTruthy();
+  expect(await screen.findByText('foo')).toBeTruthy();
 });
 
-it("loading state", async () => {
-  const deferred = makeDefered();
+it('loading state', async () => {
+  const deferred = makeDefered<string>();
   const base = $value(deferred.promise);
   const App = () => {
     const ret = useResolved(base);
-    return <div>{String(ret ?? "loading")}</div>;
+    return <div>{String(ret ?? 'loading')}</div>;
   };
 
   const store = createStore();
@@ -67,7 +67,7 @@ it("loading state", async () => {
     { wrapper: StrictMode },
   );
 
-  expect(await screen.findByText("loading")).toBeTruthy();
-  deferred.resolve("foo");
-  expect(await screen.findByText("foo")).toBeTruthy();
+  expect(await screen.findByText('loading')).toBeTruthy();
+  deferred.resolve('foo');
+  expect(await screen.findByText('foo')).toBeTruthy();
 });

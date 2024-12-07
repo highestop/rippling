@@ -1,10 +1,4 @@
-import {
-  ReadableAtom,
-  Effect,
-  Getter,
-  Computed,
-  Value,
-} from "../../types/core/atom";
+import { ReadableAtom, Effect, Getter, Computed, Value } from '../../types/core/atom';
 const EMPTY_MAP = new Map<ReadableAtom<unknown>, number>();
 
 export interface StateState<T> {
@@ -34,19 +28,13 @@ interface Mounted {
 }
 
 function canReadAsCompute<T>(atom: ReadableAtom<T>): atom is Computed<T> {
-  return "read" in atom;
+  return 'read' in atom;
 }
 
 export class AtomManager {
-  private atomStateMap = new WeakMap<
-    ReadableAtom<unknown>,
-    AtomState<unknown>
-  >();
+  private atomStateMap = new WeakMap<ReadableAtom<unknown>, AtomState<unknown>>();
 
-  private shouldRecalculate = <T>(
-    atom: ReadableAtom<T>,
-    ignoreMounted: boolean,
-  ): boolean => {
+  private shouldRecalculate = <T>(atom: ReadableAtom<T>, ignoreMounted: boolean): boolean => {
     const atomState = this.atomStateMap.get(atom) as AtomState<T> | undefined;
     if (!atomState) {
       return true;
@@ -57,7 +45,7 @@ export class AtomManager {
     }
 
     if (
-      "dependencies" in atomState &&
+      'dependencies' in atomState &&
       Array.from(atomState.dependencies).every(([dep, epoch]) => {
         return this.readAtomState(dep).epoch === epoch;
       })
@@ -68,18 +56,13 @@ export class AtomManager {
     return true;
   };
 
-  private readComputedAtom<T>(
-    atom: Computed<T>,
-    ignoreMounted = false,
-  ): ComputedState<T> {
+  private readComputedAtom<T>(atom: Computed<T>, ignoreMounted = false): ComputedState<T> {
     if (!this.shouldRecalculate(atom, ignoreMounted)) {
       return this.atomStateMap.get(atom) as ComputedState<T>;
     }
 
     const self: Computed<T> = atom;
-    let atomState: ComputedState<T> | undefined = this.atomStateMap.get(
-      self,
-    ) as ComputedState<T> | undefined;
+    let atomState: ComputedState<T> | undefined = this.atomStateMap.get(self) as ComputedState<T> | undefined;
     if (!atomState) {
       atomState = {
         dependencies: new Map<ReadableAtom<unknown>, number>(),
@@ -110,9 +93,7 @@ export class AtomManager {
 
     const ret = self.read(wrappedGet, {
       get signal() {
-        atomState.abortController?.abort(
-          `abort ${self.debugLabel ?? "anonymous"} atom`,
-        );
+        atomState.abortController?.abort(`abort ${self.debugLabel ?? 'anonymous'} atom`);
         atomState.abortController = new AbortController();
         return atomState.abortController.signal;
       },
@@ -149,18 +130,9 @@ export class AtomManager {
     return atomState as StateState<T>;
   }
 
-  public readAtomState<T>(
-    atom: Value<T>,
-    ignoreMounted?: boolean,
-  ): StateState<T>;
-  public readAtomState<T>(
-    atom: Computed<T>,
-    ignoreMounted?: boolean,
-  ): ComputedState<T>;
-  public readAtomState<T>(
-    atom: Value<T> | Computed<T>,
-    ignoreMounted?: boolean,
-  ): CommonReadableState<T>;
+  public readAtomState<T>(atom: Value<T>, ignoreMounted?: boolean): StateState<T>;
+  public readAtomState<T>(atom: Computed<T>, ignoreMounted?: boolean): ComputedState<T>;
+  public readAtomState<T>(atom: Value<T> | Computed<T>, ignoreMounted?: boolean): CommonReadableState<T>;
   public readAtomState<T>(
     atom: Value<T> | Computed<T>,
     ignoreMounted = false,
@@ -180,10 +152,8 @@ export class AtomManager {
       readDepts: new Set(),
     };
 
-    if ("dependencies" in atomState) {
-      atomState.mounted.readDepcs = (
-        atomState as ComputedState<T>
-      ).dependencies;
+    if ('dependencies' in atomState) {
+      atomState.mounted.readDepcs = (atomState as ComputedState<T>).dependencies;
     }
 
     for (const [dep] of Array.from(atomState.mounted.readDepcs ?? EMPTY_MAP)) {

@@ -1,7 +1,7 @@
-import { expect, it } from "vitest";
-import { $computed, $effect, $value } from "..";
+import { expect, it } from 'vitest';
+import { $computed, $effect, $value } from '..';
 
-it("creates atoms", () => {
+it('creates atoms', () => {
   // primitive atom
   const countAtom = $value(0);
   const anotherCountAtom = $value(1);

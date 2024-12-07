@@ -1,13 +1,6 @@
-import {
-  ReadableAtom,
-  Effect,
-  Getter,
-  Value,
-  Updater,
-  Setter,
-} from "../../types/core/atom";
-import { Store } from "../../types/core/store";
-import { AtomManager, ListenerManager } from "./atom-manager";
+import { ReadableAtom, Effect, Getter, Value, Updater, Setter } from '../../types/core/atom';
+import { Store } from '../../types/core/store';
+import { AtomManager, ListenerManager } from './atom-manager';
 
 export class StoreImpl implements Store {
   constructor(
@@ -21,17 +14,17 @@ export class StoreImpl implements Store {
     atom: Value<T> | Effect<T, Args>,
     ...args: [T | Updater<T>] | Args
   ): undefined | T => {
-    if ("read" in atom) {
+    if ('read' in atom) {
       return;
     }
 
-    if ("write" in atom) {
+    if ('write' in atom) {
       const ret = atom.write(this.get, this.set, ...(args as Args));
       return ret;
     }
 
     const newValue =
-      typeof args[0] === "function"
+      typeof args[0] === 'function'
         ? (args[0] as Updater<T>)(this.atomManager.readAtomState(atom).val)
         : (args[0] as T);
 
@@ -70,10 +63,7 @@ export class StoreImpl implements Store {
     return ret;
   };
 
-  private _subSingleAtom(
-    atom: ReadableAtom<unknown>,
-    cbEffect: Effect<unknown, unknown[]>,
-  ): () => void {
+  private _subSingleAtom(atom: ReadableAtom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
     const mounted = this.atomManager.mount(atom);
     mounted.listeners.add(cbEffect);
 
@@ -86,10 +76,7 @@ export class StoreImpl implements Store {
     };
   }
 
-  sub(
-    atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>,
-    cbEffect: Effect<unknown, unknown[]>,
-  ): () => void {
+  sub(atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
     if (Array.isArray(atoms) && atoms.length === 0) {
       return () => void 0;
     }

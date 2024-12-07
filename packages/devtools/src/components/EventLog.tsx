@@ -1,5 +1,5 @@
 function generateMockEvents() {
-  // ... 保持原有的 generateMockEvents 函数不变
+  return [];
 }
 
 export function EventLog() {
@@ -18,9 +18,7 @@ export function EventLog() {
         </div>
       </div>
       <div className="overflow-auto flex-1">
-        <table className="w-full text-sm text-[#586e75]">
-          {/* ... 保持原有的表格结构不变 */}
-        </table>
+        <table className="w-full text-sm text-[#586e75]">{String(events.length)}</table>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { ReadableAtom, Effect, Getter, Setter } from "./atom";
+import { ReadableAtom, Effect, Getter, Setter } from './atom';
 
 export interface Store {
   get: Getter;

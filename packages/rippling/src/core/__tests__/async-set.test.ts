@@ -1,7 +1,7 @@
-import { expect, it, vi } from "vitest";
-import { createStore, $effect, $value } from "..";
+import { expect, it, vi } from 'vitest';
+import { createStore, $effect, $value } from '..';
 
-it("multiple set in async effect should trigger notify multiple times", async () => {
+it('multiple set in async effect should trigger notify multiple times', async () => {
   const base = $value(0);
   const action = $effect(async (_, set) => {
     set(base, 1);

@@ -1,15 +1,11 @@
-import { Strategy } from "./strategy/type";
+import { Strategy } from './strategy/type';
 
 function fib(n: number): number {
   if (n <= 1) return n;
   return fib(n - 1) + fib(n - 2);
 }
 
-function deriveAtoms<T, S>(
-  atoms: T[],
-  childCount: number,
-  strategy: Strategy<T, S>,
-): T[][] {
+function deriveAtoms<T, S>(atoms: T[], childCount: number, strategy: Strategy<T, S>): T[][] {
   let pendingAtoms: T[] = [...atoms];
   const result: T[][] = [];
 
@@ -19,11 +15,7 @@ function deriveAtoms<T, S>(
 
     for (let i = 0; i < pendingAtoms.length / childCount; i++) {
       const innerAtoms: T[] = [];
-      for (
-        let j = 0;
-        j < childCount && i * childCount + j < pendingAtoms.length;
-        j++
-      ) {
+      for (let j = 0; j < childCount && i * childCount + j < pendingAtoms.length; j++) {
         innerAtoms.push(pendingAtoms[i * childCount + j]);
       }
 
@@ -76,10 +68,7 @@ export function setupStore<T, S>(scale: number, strategy: Strategy<T, S>) {
   return { store, atoms, cleanup };
 }
 
-export function setupStoreWithoutSub<T, S>(
-  scale: number,
-  strategy: Strategy<T, S>,
-) {
+export function setupStoreWithoutSub<T, S>(scale: number, strategy: Strategy<T, S>) {
   const store = strategy.createStore();
   const values: T[] = [];
   for (let i = 0; i < Math.pow(10, scale); i++) {

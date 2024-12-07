@@ -1,19 +1,16 @@
-import { bench, describe } from "vitest";
-import { setupStore, setupStoreWithoutSub } from "./case";
-import { Value } from "../src";
-import { PrimitiveAtom } from "jotai/vanilla";
-import { ripplingStrategy } from "./strategy/rippling";
-import { jotaiStrategy } from "./strategy/jotai";
-import { signalStrategy } from "./strategy/signals";
+import { bench, describe } from 'vitest';
+import { setupStore, setupStoreWithoutSub } from './case';
+import { Value } from '../src';
+import { PrimitiveAtom } from 'jotai/vanilla';
+import { ripplingStrategy } from './strategy/rippling';
+import { jotaiStrategy } from './strategy/jotai';
+import { signalStrategy } from './strategy/signals';
 
-describe("set with subscription", () => {
+describe('set with subscription', () => {
   const PROP_GRAPH_DEPTH = 4;
   describe(`set with mount, ${String(PROP_GRAPH_DEPTH)} layer states, each computed has 10 children`, () => {
-    const { atoms: atomsRippling, store: storeRippling } = setupStore(
-      PROP_GRAPH_DEPTH,
-      ripplingStrategy,
-    );
-    bench("rippling", () => {
+    const { atoms: atomsRippling, store: storeRippling } = setupStore(PROP_GRAPH_DEPTH, ripplingStrategy);
+    bench('rippling', () => {
       const atoms = atomsRippling;
       const store = storeRippling;
       for (let i = 0; i < atoms[0].length / 10; i++) {
@@ -22,11 +19,8 @@ describe("set with subscription", () => {
       }
     });
 
-    const { atoms: atomsJotai, store: storeJotai } = setupStore(
-      PROP_GRAPH_DEPTH,
-      jotaiStrategy,
-    );
-    bench("jotai", () => {
+    const { atoms: atomsJotai, store: storeJotai } = setupStore(PROP_GRAPH_DEPTH, jotaiStrategy);
+    bench('jotai', () => {
       const atoms = atomsJotai;
       const store = storeJotai;
       for (let i = 0; i < atoms[0].length / 10; i++) {
@@ -36,7 +30,7 @@ describe("set with subscription", () => {
     });
 
     const { atoms: signals } = setupStore(PROP_GRAPH_DEPTH, signalStrategy);
-    bench.skip("signals", () => {
+    bench.skip('signals', () => {
       for (let i = 0; i < signals[0].length / 10; i++) {
         const idx = Math.floor(Math.random() * signals[0].length);
         const signal = signals[0][idx];
@@ -46,13 +40,15 @@ describe("set with subscription", () => {
   });
 });
 
-describe("set without sub", () => {
+describe('set without sub', () => {
   const PROP_GRAPH_DEPTH = 3;
 
   describe(`set without sub, ${String(PROP_GRAPH_DEPTH)} layer states, each computed has 10 children`, () => {
-    const { store: storeWithoutSubRippling, atoms: atomsWithoutSubRippling } =
-      setupStoreWithoutSub(PROP_GRAPH_DEPTH, ripplingStrategy);
-    bench("rippling", () => {
+    const { store: storeWithoutSubRippling, atoms: atomsWithoutSubRippling } = setupStoreWithoutSub(
+      PROP_GRAPH_DEPTH,
+      ripplingStrategy,
+    );
+    bench('rippling', () => {
       const atoms = atomsWithoutSubRippling;
       const store = storeWithoutSubRippling;
       for (let i = 0; i < atoms[0].length / 10; i++) {
@@ -61,9 +57,11 @@ describe("set without sub", () => {
       }
     });
 
-    const { store: storeWithoutSubJotai, atoms: atomsWithoutSubJotai } =
-      setupStoreWithoutSub(PROP_GRAPH_DEPTH, jotaiStrategy);
-    bench("jotai", () => {
+    const { store: storeWithoutSubJotai, atoms: atomsWithoutSubJotai } = setupStoreWithoutSub(
+      PROP_GRAPH_DEPTH,
+      jotaiStrategy,
+    );
+    bench('jotai', () => {
       const atoms = atomsWithoutSubJotai;
       const store = storeWithoutSubJotai;
       for (let i = 0; i < atoms[0].length / 10; i++) {
@@ -72,11 +70,8 @@ describe("set without sub", () => {
       }
     });
 
-    const { atoms: signals } = setupStoreWithoutSub(
-      PROP_GRAPH_DEPTH,
-      signalStrategy,
-    );
-    bench.skip("signals", () => {
+    const { atoms: signals } = setupStoreWithoutSub(PROP_GRAPH_DEPTH, signalStrategy);
+    bench.skip('signals', () => {
       for (let i = 0; i < signals[0].length / 10; i++) {
         const idx = Math.floor(Math.random() * signals[0].length);
         const signal = signals[0][idx];

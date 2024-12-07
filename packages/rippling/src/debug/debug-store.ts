@@ -1,23 +1,14 @@
-import { DebugStore } from "../../types/debug/debug-store";
-import { NestedAtom } from "../../types/debug/util";
-import { Computed, Effect, Subscribe, Value } from "../core";
-import {
-  AtomManager,
-  ComputedState,
-  ListenerManager,
-} from "../core/atom-manager";
-import { StoreImpl } from "../core/store";
+import { DebugStore } from '../../types/debug/debug-store';
+import { NestedAtom } from '../../types/debug/util';
+import { Computed, Effect, Subscribe, Value } from '../core';
+import { AtomManager, ComputedState, ListenerManager } from '../core/atom-manager';
+import { StoreImpl } from '../core/store';
 
 class DebugStoreImpl extends StoreImpl implements DebugStore {
-  private readonly subscribedAtoms = new Map<
-    Value<unknown> | Computed<unknown>,
-    number
-  >();
+  private readonly subscribedAtoms = new Map<Value<unknown> | Computed<unknown>, number>();
 
   sub: Subscribe = (
-    atoms:
-      | (Value<unknown> | Computed<unknown>)[]
-      | (Value<unknown> | Computed<unknown>),
+    atoms: (Value<unknown> | Computed<unknown>)[] | (Value<unknown> | Computed<unknown>),
     cbEffect: Effect<unknown, unknown[]>,
   ): (() => void) => {
     const atomList = Array.isArray(atoms) ? atoms : [atoms];
@@ -34,10 +25,7 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
           return;
         }
 
-        this.subscribedAtoms.set(
-          atom,
-          (this.subscribedAtoms.get(atom) ?? 0) - 1,
-        );
+        this.subscribedAtoms.set(atom, (this.subscribedAtoms.get(atom) ?? 0) - 1);
         if (this.subscribedAtoms.get(atom) === 0) {
           this.subscribedAtoms.delete(atom);
         }
@@ -45,34 +33,26 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
     };
   };
 
-  getReadDependencies = (
-    atom: Value<unknown> | Computed<unknown>,
-  ): NestedAtom => {
+  getReadDependencies = (atom: Value<unknown> | Computed<unknown>): NestedAtom => {
     const atomState = this.atomManager.readAtomState(atom);
 
-    if (!("dependencies" in atomState)) {
+    if (!('dependencies' in atomState)) {
       return [atom];
     }
 
     return [
       atom,
-      ...Array.from((atomState as ComputedState<unknown>).dependencies).map(
-        ([key]) => {
-          return this.getReadDependencies(key);
-        },
-      ),
+      ...Array.from((atomState as ComputedState<unknown>).dependencies).map(([key]) => {
+        return this.getReadDependencies(key);
+      }),
     ] as NestedAtom;
   };
 
-  getReadDependents = (
-    atom: Value<unknown> | Computed<unknown>,
-  ): NestedAtom => {
+  getReadDependents = (atom: Value<unknown> | Computed<unknown>): NestedAtom => {
     const atomState = this.atomManager.readAtomState(atom);
     return [
       atom,
-      ...Array.from(atomState.mounted?.readDepts ?? []).map((key) =>
-        this.getReadDependents(key),
-      ),
+      ...Array.from(atomState.mounted?.readDepts ?? []).map((key) => this.getReadDependents(key)),
     ] as NestedAtom;
   };
 

@@ -1,0 +1,6 @@
+'*.{cjs,mjs,js,ts,tsx}':
+  - 'eslint --fix'
+  - 'prettier --ignore-unknown --write'
+
+'**/*':
+  - 'prettier --ignore-unknown --write'

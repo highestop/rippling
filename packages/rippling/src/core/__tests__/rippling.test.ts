@@ -1,16 +1,8 @@
-import { expect, test, vi } from "vitest";
-import {
-  $value,
-  createStore,
-  Value,
-  $computed,
-  Computed,
-  $effect,
-  Effect,
-} from "..";
-import { createDebugStore } from "../../debug";
+import { expect, test, vi } from 'vitest';
+import { $value, createStore, Value, $computed, Computed, $effect, Effect } from '..';
+import { createDebugStore } from '../../debug';
 
-test("should work", () => {
+test('should work', () => {
   const store = createStore();
   const anAtom = $value(1);
 
@@ -23,7 +15,7 @@ test("should work", () => {
   expect(store2.get(anAtom)).toBe(1);
 });
 
-test("computed value should work", () => {
+test('computed value should work', () => {
   const store = createStore();
   const base = $value(1);
   const derived = $computed(
@@ -32,14 +24,14 @@ test("computed value should work", () => {
       return num * 2;
     },
     {
-      debugLabel: "derived",
+      debugLabel: 'derived',
     },
   );
 
   expect(store.get(derived)).toBe(2);
 });
 
-test("computed value should not writable", () => {
+test('computed value should not writable', () => {
   const store = createStore();
   const anAtom = $value(1);
   const doubleCmpt = $computed((get) => {
@@ -50,7 +42,7 @@ test("computed value should not writable", () => {
   expect(store.get(doubleCmpt)).toBe(2);
 });
 
-test("async value should works like sync value", async () => {
+test('async value should works like sync value', async () => {
   const store = createStore();
   const anAtom = $value(1);
   const asyncCmpt: Computed<Promise<number>> = $computed(async (get) => {
@@ -61,17 +53,17 @@ test("async value should works like sync value", async () => {
   expect(await store.get(asyncCmpt)).toBe(2);
 });
 
-test("async computed should not follow old value", async () => {
+test('async computed should not follow old value', async () => {
   const store = createStore();
-  const base = $value("foo", {
-    debugLabel: "base",
+  const base = $value('foo', {
+    debugLabel: 'base',
   });
   const cmpt = $computed(
     (get) => {
       return Promise.resolve(get(base) + get(base));
     },
     {
-      debugLabel: "cmpt",
+      debugLabel: 'cmpt',
     },
   );
   const derivedCmpt = $computed(
@@ -79,19 +71,19 @@ test("async computed should not follow old value", async () => {
       return get(base) + (await get(cmpt));
     },
     {
-      debugLabel: "derivedCmpt",
+      debugLabel: 'derivedCmpt',
     },
   );
 
   const ret1 = store.get(derivedCmpt);
-  store.set(base, "bar");
+  store.set(base, 'bar');
   const ret2 = store.get(derivedCmpt);
 
-  expect(await ret1).toBe("foofoofoo");
-  expect(await ret2).toBe("barbarbar");
+  expect(await ret1).toBe('foofoofoo');
+  expect(await ret2).toBe('barbarbar');
 });
 
-test("effect can set other value", () => {
+test('effect can set other value', () => {
   const store = createStore();
   const anAtom = $value(1);
   const doubleAtom = $value(0);
@@ -104,10 +96,10 @@ test("effect can set other value", () => {
   expect(store.get(doubleAtom)).toBe(4);
 });
 
-test("set an atom should trigger subscribe", () => {
+test('set an atom should trigger subscribe', () => {
   const store = createStore();
   const base = $value(1, {
-    debugLabel: "base",
+    debugLabel: 'base',
   });
   const trace = vi.fn();
   store.sub(
@@ -117,7 +109,7 @@ test("set an atom should trigger subscribe", () => {
         trace();
       },
       {
-        debugLabel: "effect",
+        debugLabel: 'effect',
       },
     ),
   );
@@ -125,7 +117,7 @@ test("set an atom should trigger subscribe", () => {
   expect(trace).toBeCalledTimes(1);
 });
 
-test("set an atom in effect should trigger multiple times", () => {
+test('set an atom in effect should trigger multiple times', () => {
   const store = createStore();
   const anAtom = $value(1);
   const trace = vi.fn();
@@ -145,13 +137,13 @@ test("set an atom in effect should trigger multiple times", () => {
   expect(trace).toBeCalledTimes(3);
 });
 
-test("sub multiple atoms", () => {
+test('sub multiple atoms', () => {
   const store = createStore();
   const state1 = $value(1, {
-    debugLabel: "state1",
+    debugLabel: 'state1',
   });
   const state2 = $value(2, {
-    debugLabel: "state2",
+    debugLabel: 'state2',
   });
 
   const trace = vi.fn();
@@ -162,7 +154,7 @@ test("sub multiple atoms", () => {
         get(state2);
       },
       {
-        debugLabel: "cmpt",
+        debugLabel: 'cmpt',
       },
     ),
     $effect(
@@ -170,7 +162,7 @@ test("sub multiple atoms", () => {
         trace();
       },
       {
-        debugLabel: "effect",
+        debugLabel: 'effect',
       },
     ),
   );
@@ -180,17 +172,17 @@ test("sub multiple atoms", () => {
   unsub();
 });
 
-test("sub computed atom", () => {
+test('sub computed atom', () => {
   const store = createStore();
   const base = $value(1, {
-    debugLabel: "base",
+    debugLabel: 'base',
   });
   const cmpt = $computed(
     (get) => {
       return get(base) * 2;
     },
     {
-      debugLabel: "cmpt",
+      debugLabel: 'cmpt',
     },
   );
 
@@ -206,7 +198,7 @@ test("sub computed atom", () => {
   expect(trace).toBeCalledTimes(1);
 });
 
-test("get read deps", () => {
+test('get read deps', () => {
   const store = createDebugStore();
   const base = $value({ a: 1 });
   const cmpt = $computed((get) => {
@@ -215,7 +207,7 @@ test("get read deps", () => {
   expect(store.getReadDependencies(cmpt)).toEqual([cmpt, [base]]);
 });
 
-test("get should return value directly", () => {
+test('get should return value directly', () => {
   const store = createStore();
   const base = $value({ a: 1 });
   const cmpt = $computed((get) => {
@@ -227,11 +219,11 @@ test("get should return value directly", () => {
   expect(b).toEqual({ a: 1, b: 1 });
 
   b.b = 2;
-  expect(store.get(cmpt)).property("a", 2);
-  expect(store.get(cmpt)).property("b", 1);
+  expect(store.get(cmpt)).property('a', 2);
+  expect(store.get(cmpt)).property('b', 1);
 });
 
-test("derived atom should trigger when deps changed", () => {
+test('derived atom should trigger when deps changed', () => {
   const store = createStore();
   const stateA = $value(0);
   const stateB = $value(0);
@@ -269,26 +261,26 @@ test("derived atom should trigger when deps changed", () => {
   expect(traceC).toBeCalled();
 });
 
-test("outdated deps should not trigger sub", async () => {
+test('outdated deps should not trigger sub', async () => {
   const store = createStore();
-  const branch = $value("A", {
-    debugLabel: "branch",
+  const branch = $value('A', {
+    debugLabel: 'branch',
   });
   const refresh = $value(0, {
-    debugLabel: "refresh",
+    debugLabel: 'refresh',
   });
   const derived = $computed(
     (get) => {
-      if (get(branch) == "A") {
+      if (get(branch) == 'A') {
         return Promise.resolve().then(() => {
           get(refresh);
-          return "A";
+          return 'A';
         });
       }
-      return "B";
+      return 'B';
     },
     {
-      debugLabel: "derived",
+      debugLabel: 'derived',
     },
   );
 
@@ -300,23 +292,23 @@ test("outdated deps should not trigger sub", async () => {
         traceSub();
       },
       {
-        debugLabel: "effect",
+        debugLabel: 'effect',
       },
     ),
   );
-  await expect(store.get(derived)).resolves.toBe("A");
+  await expect(store.get(derived)).resolves.toBe('A');
 
-  store.set(branch, "B");
+  store.set(branch, 'B');
   const derivedRet = store.get(derived);
   expect(traceSub).toBeCalled();
-  expect(await derivedRet).toBe("B");
+  expect(await derivedRet).toBe('B');
 
   store.set(refresh, (x) => x + 1);
   traceSub.mockClear();
   expect(traceSub).not.toBeCalled();
 });
 
-test("computed should only compute once if no deps changed", () => {
+test('computed should only compute once if no deps changed', () => {
   const store = createStore();
   const base = $value(1);
   const trace = vi.fn();
@@ -329,7 +321,7 @@ test("computed should only compute once if no deps changed", () => {
   expect(trace).toBeCalledTimes(1);
 });
 
-test("an observable effect process", async () => {
+test('an observable effect process', async () => {
   function observableEffect<T, Args extends unknown[]>(
     effectAtom: Effect<T, Args>,
   ): [Computed<T | null>, Effect<T, Args>] {
@@ -348,17 +340,17 @@ test("an observable effect process", async () => {
   const [setupResult, setupEffect] = observableEffect(
     $effect(async () => {
       await Promise.resolve();
-      return "ok";
+      return 'ok';
     }),
   );
   const store = createStore();
   expect(store.get(setupResult)).toBeNull();
   const ret = store.set(setupEffect);
   expect(ret).toBeInstanceOf(Promise);
-  await expect(ret).resolves.toBe("ok");
+  await expect(ret).resolves.toBe('ok');
 });
 
-test("generator in effect", () => {
+test('generator in effect', () => {
   const step = $value(0);
   const generatorEffect = $effect(function* (_, set) {
     set(step, 1);

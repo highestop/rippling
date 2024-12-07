@@ -1,16 +1,16 @@
 // @vitest-environment happy-dom
-import { render, cleanup, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { $computed, createStore, $effect, $value } from "../../core";
-import { StoreProvider, useGet, useSet } from "..";
+import { render, cleanup, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { $computed, createStore, $effect, $value } from '../../core';
+import { StoreProvider, useGet, useSet } from '..';
 
-describe("react", () => {
+describe('react', () => {
   afterEach(() => {
     cleanup();
   });
 
-  it("using rippling in react", async () => {
+  it('using rippling in react', async () => {
     const store = createStore();
     const base = $value(0);
 
@@ -28,17 +28,17 @@ describe("react", () => {
     );
     expect(trace).toHaveBeenCalledTimes(1);
 
-    expect(screen.getByText("0")).toBeTruthy();
+    expect(screen.getByText('0')).toBeTruthy();
     store.set(base, 1);
-    expect(screen.getByText("0")).toBeTruthy();
+    expect(screen.getByText('0')).toBeTruthy();
     await Promise.resolve();
     expect(trace).toHaveBeenCalledTimes(2);
-    expect(screen.getByText("1")).toBeTruthy();
+    expect(screen.getByText('1')).toBeTruthy();
     await Promise.resolve();
     expect(trace).toHaveBeenCalledTimes(2);
   });
 
-  it("computed should re-render", async () => {
+  it('computed should re-render', async () => {
     const store = createStore();
     const base = $value(0);
     const derived = $computed((get) => get(base) * 2);
@@ -58,13 +58,13 @@ describe("react", () => {
     expect(trace).toHaveBeenCalledTimes(1);
 
     trace.mockClear();
-    expect(screen.getByText("0")).toBeTruthy();
+    expect(screen.getByText('0')).toBeTruthy();
     store.set(base, 1);
     expect(trace).not.toBeCalled();
 
     await Promise.resolve();
     expect(trace).toBeCalledTimes(1);
-    expect(screen.getByText("2")).toBeTruthy();
+    expect(screen.getByText('2')).toBeTruthy();
 
     trace.mockClear();
     store.set(base, 1);
@@ -72,7 +72,7 @@ describe("react", () => {
     expect(trace).not.toBeCalled();
   });
 
-  it("user click counter should increment", async () => {
+  it('user click counter should increment', async () => {
     const store = createStore();
     const count = $value(0);
     const onClickEffect = $effect((get, set) => {
@@ -94,19 +94,19 @@ describe("react", () => {
         <App />
       </StoreProvider>,
     );
-    const button = screen.getByText("0");
+    const button = screen.getByText('0');
     expect(button).toBeTruthy();
 
     const user = userEvent.setup();
     await user.click(button);
-    expect(screen.getByText("1")).toBeTruthy();
+    expect(screen.getByText('1')).toBeTruthy();
     await user.click(button);
-    expect(screen.getByText("2")).toBeTruthy();
+    expect(screen.getByText('2')).toBeTruthy();
 
     expect(trace).toHaveBeenCalledTimes(3);
   });
 
-  it("two atom changes should re-render once", async () => {
+  it('two atom changes should re-render once', async () => {
     const store = createStore();
     const state1 = $value(0);
     const state2 = $value(0);
@@ -123,17 +123,17 @@ describe("react", () => {
         <App />
       </StoreProvider>,
     );
-    expect(screen.getByText("0")).toBeTruthy();
+    expect(screen.getByText('0')).toBeTruthy();
     expect(trace).toHaveBeenCalledTimes(1);
 
     store.set(state1, 1);
     store.set(state2, 2);
     await Promise.resolve();
     expect(trace).toHaveBeenCalledTimes(2);
-    expect(screen.getByText("3")).toBeTruthy();
+    expect(screen.getByText('3')).toBeTruthy();
   });
 
-  it("async callback will trigger rerender", async () => {
+  it('async callback will trigger rerender', async () => {
     const store = createStore();
     const count = $value(0);
     const onClickEffect = $effect((get, set) => {
@@ -145,7 +145,15 @@ describe("react", () => {
     function App() {
       const val = useGet(count);
       const onClick = useSet(onClickEffect);
-      return <button onClick={onClick}>{val}</button>;
+      return (
+        <button
+          onClick={() => {
+            void onClick();
+          }}
+        >
+          {val}
+        </button>
+      );
     }
 
     render(
@@ -153,15 +161,15 @@ describe("react", () => {
         <App />
       </StoreProvider>,
     );
-    const button = screen.getByText("0");
+    const button = screen.getByText('0');
     expect(button).toBeTruthy();
 
     const user = userEvent.setup();
     await user.click(button);
-    expect(screen.getByText("1")).toBeTruthy();
+    expect(screen.getByText('1')).toBeTruthy();
   });
 
-  it("floating promise trigger rerender", async () => {
+  it('floating promise trigger rerender', async () => {
     const store = createStore();
     const count = $value(0);
     const onClickEffect = $effect((get, set) => {
@@ -181,11 +189,11 @@ describe("react", () => {
         <App />
       </StoreProvider>,
     );
-    const button = screen.getByText("0");
+    const button = screen.getByText('0');
     expect(button).toBeTruthy();
 
     const user = userEvent.setup();
     await user.click(button);
-    expect(await screen.findByText("1")).toBeTruthy();
+    expect(await screen.findByText('1')).toBeTruthy();
   });
 });

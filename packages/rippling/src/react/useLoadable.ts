@@ -1,26 +1,24 @@
-import { useEffect, useState } from "react";
-import { useGet } from "./useGet";
-import { Computed, Value } from "../core";
+import { useEffect, useState } from 'react';
+import { useGet } from './useGet';
+import { Computed, Value } from '../core';
 
 type Loadable<T> =
   | {
-      state: "loading";
+      state: 'loading';
     }
   | {
-      state: "hasData";
+      state: 'hasData';
       data: T;
     }
   | {
-      state: "hasError";
+      state: 'hasError';
       error: unknown;
     };
 
-export function useLoadable<T>(
-  atom: Value<Promise<T>> | Computed<Promise<T>>,
-): Loadable<T> {
+export function useLoadable<T>(atom: Value<Promise<T>> | Computed<Promise<T>>): Loadable<T> {
   const promise = useGet(atom);
   const [promiseResult, setPromiseResult] = useState<Loadable<T>>({
-    state: "loading",
+    state: 'loading',
   });
 
   useEffect(() => {
@@ -28,14 +26,14 @@ export function useLoadable<T>(
     const signal = ctrl.signal;
 
     setPromiseResult({
-      state: "loading",
+      state: 'loading',
     });
     void promise
       .then((ret) => {
         if (signal.aborted) return;
 
         setPromiseResult({
-          state: "hasData",
+          state: 'hasData',
           data: ret,
         });
       })
@@ -43,7 +41,7 @@ export function useLoadable<T>(
         if (signal.aborted) return;
 
         setPromiseResult({
-          state: "hasError",
+          state: 'hasError',
           error,
         });
       });

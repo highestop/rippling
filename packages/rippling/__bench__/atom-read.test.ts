@@ -1,12 +1,12 @@
-import { expect, test } from "vitest";
-import { setupStore } from "./case";
-import { Value } from "../src";
-import { PrimitiveAtom } from "jotai/vanilla";
-import { ripplingStrategy } from "./strategy/rippling";
-import { jotaiStrategy } from "./strategy/jotai";
-import { signalStrategy } from "./strategy/signals";
+import { expect, test } from 'vitest';
+import { setupStore } from './case';
+import { Value } from '../src';
+import { PrimitiveAtom } from 'jotai/vanilla';
+import { ripplingStrategy } from './strategy/rippling';
+import { jotaiStrategy } from './strategy/jotai';
+import { signalStrategy } from './strategy/signals';
 
-test("rippling write scenario", () => {
+test('rippling write scenario', () => {
   const { cleanup, atoms, store } = setupStore(2, ripplingStrategy);
   for (let i = 0; i < atoms[0].length / 10; i++) {
     const atom = atoms[0][i * 10] as Value<number>;
@@ -17,7 +17,7 @@ test("rippling write scenario", () => {
   cleanup();
 });
 
-test("jotai write scenario", () => {
+test('jotai write scenario', () => {
   const { cleanup, atoms, store } = setupStore(2, jotaiStrategy);
   for (let i = 0; i < atoms[0].length / 10; i++) {
     const atom = atoms[0][i * 10] as PrimitiveAtom<number>;
@@ -28,7 +28,7 @@ test("jotai write scenario", () => {
   cleanup();
 });
 
-test("signals write scenario", () => {
+test('signals write scenario', () => {
   const { cleanup, atoms: signals } = setupStore(2, signalStrategy);
   for (let i = 0; i < signals[0].length / 10; i++) {
     const signal = signals[0][i * 10];
