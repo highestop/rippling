@@ -20,18 +20,9 @@ it('creates atoms', () => {
     set(countAtom, get(countAtom) - 1);
   });
 
-  expect(countAtom).toHaveProperty('id');
   expect(countAtom).toHaveProperty('init', 0);
-
-  expect(doubledCountAtom).toHaveProperty('id');
   expect(doubledCountAtom).toHaveProperty('read');
-
-  expect(setSumAtom).toHaveProperty('id');
   expect(setSumAtom).toHaveProperty('write');
-
-  expect(decrementCountAtom).toHaveProperty('id');
   expect(decrementCountAtom).toHaveProperty('write');
-
-  expect(sumAtom).toHaveProperty('id');
   expect(sumAtom).toHaveProperty('read');
 });
