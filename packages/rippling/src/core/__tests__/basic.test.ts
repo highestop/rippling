@@ -20,33 +20,18 @@ it('creates atoms', () => {
     set(countAtom, get(countAtom) - 1);
   });
 
-  expect(countAtom).toMatchInlineSnapshot(`
-    {
-      "init": 0,
-    }
-    `);
+  expect(countAtom).toHaveProperty('id');
+  expect(countAtom).toHaveProperty('init', 0);
 
-  expect(doubledCountAtom).toMatchInlineSnapshot(`
-    {
-      "read": [Function],
-    }
-    `);
+  expect(doubledCountAtom).toHaveProperty('id');
+  expect(doubledCountAtom).toHaveProperty('read');
 
-  expect(setSumAtom).toMatchInlineSnapshot(`
-    {
-      "write": [Function],
-    }
-    `);
+  expect(setSumAtom).toHaveProperty('id');
+  expect(setSumAtom).toHaveProperty('write');
 
-  expect(decrementCountAtom).toMatchInlineSnapshot(`
-    {
-      "write": [Function],
-    }
-    `);
+  expect(decrementCountAtom).toHaveProperty('id');
+  expect(decrementCountAtom).toHaveProperty('write');
 
-  expect(sumAtom).toMatchInlineSnapshot(`
-    {
-      "read": [Function],
-    }
-    `);
+  expect(sumAtom).toHaveProperty('id');
+  expect(sumAtom).toHaveProperty('read');
 });
