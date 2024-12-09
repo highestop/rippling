@@ -115,7 +115,7 @@ export function useResolved<T>(atom: Value<Promise<T>> | Computed<Promise<T>>): 
 }
 ```
 
-## Updating Atom Values / Triggering Effects
+## Updating Atom Values / Triggering Funcs
 
 The `useSet` hook can be used to update the value of an Atom. It returns a function equivalent to `store.set` when called.
 

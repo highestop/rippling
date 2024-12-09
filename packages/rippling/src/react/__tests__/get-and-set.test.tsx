@@ -2,7 +2,7 @@
 import { render, cleanup, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { $computed, createStore, $effect, $value } from '../../core';
+import { $computed, createStore, $func, $value } from '../../core';
 import { StoreProvider, useGet, useSet } from '..';
 
 describe('react', () => {
@@ -74,17 +74,17 @@ describe('react', () => {
 
   it('user click counter should increment', async () => {
     const store = createStore();
-    const count = $value(0);
-    const onClickEffect = $effect((get, set) => {
-      const ret = get(count);
-      set(count, ret + 1);
+    const count$ = $value(0);
+    const onClick$ = $func(({ get, set }) => {
+      const ret = get(count$);
+      set(count$, ret + 1);
     });
 
     const trace = vi.fn();
     function App() {
       trace();
-      const ret = useGet(count);
-      const onClick = useSet(onClickEffect);
+      const ret = useGet(count$);
+      const onClick = useSet(onClick$);
 
       return <button onClick={onClick}>{ret}</button>;
     }
@@ -135,16 +135,16 @@ describe('react', () => {
 
   it('async callback will trigger rerender', async () => {
     const store = createStore();
-    const count = $value(0);
-    const onClickEffect = $effect((get, set) => {
+    const count$ = $value(0);
+    const onClick$ = $func(({ get, set }) => {
       return Promise.resolve().then(() => {
-        set(count, get(count) + 1);
+        set(count$, get(count$) + 1);
       });
     });
 
     function App() {
-      const val = useGet(count);
-      const onClick = useSet(onClickEffect);
+      const val = useGet(count$);
+      const onClick = useSet(onClick$);
       return (
         <button
           onClick={() => {
@@ -171,16 +171,16 @@ describe('react', () => {
 
   it('floating promise trigger rerender', async () => {
     const store = createStore();
-    const count = $value(0);
-    const onClickEffect = $effect((get, set) => {
+    const count$ = $value(0);
+    const onClick$ = $func(({ get, set }) => {
       void Promise.resolve().then(() => {
-        set(count, get(count) + 1);
+        set(count$, get(count$) + 1);
       });
     });
 
     function App() {
-      const val = useGet(count);
-      const onClick = useSet(onClickEffect);
+      const val = useGet(count$);
+      const onClick = useSet(onClick$);
       return <button onClick={onClick}>{val}</button>;
     }
 

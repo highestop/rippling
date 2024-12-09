@@ -1,6 +1,6 @@
 import LeakDetector from 'jest-leak-detector';
 import { expect, it } from 'vitest';
-import { $value, $computed, createStore, $effect } from '..';
+import { $value, $computed, createStore, $func } from '..';
 import { createDebugStore } from '../../debug';
 import type { Computed, Value } from '..';
 
@@ -59,7 +59,7 @@ it('unsubscribe on atom should release memory', async () => {
   const detector = new LeakDetector(store.get(objAtom));
   let unsub: (() => void) | undefined = store.sub(
     objAtom,
-    $effect(() => {
+    $func(() => {
       return;
     }),
   );
@@ -80,7 +80,7 @@ it('unsubscribe on computed should release memory', async () => {
   const detector2 = new LeakDetector(store.get(derivedAtom));
   let unsub: (() => void) | undefined = store.sub(
     objAtom,
-    $effect(() => {
+    $func(() => {
       return;
     }),
   );
@@ -101,7 +101,7 @@ it('unsubscribe a long-lived base atom', async () => {
   const detector = new LeakDetector(store.get(cmpt));
   let unsub: (() => void) | undefined = store.sub(
     base,
-    $effect(() => {
+    $func(() => {
       return;
     }),
   );
@@ -123,7 +123,7 @@ it('unsubscribe a computed atom', async () => {
   const detector = new LeakDetector(store.get(cmpt));
   let unsub: (() => void) | undefined = store.sub(
     cmpt,
-    $effect(() => {
+    $func(() => {
       return;
     }),
   );

@@ -1,6 +1,6 @@
 import type { DebugStore } from '../../types/debug/debug-store';
 import type { NestedAtom } from '../../types/debug/util';
-import type { Computed, Effect, Subscribe, Value } from '../core';
+import type { Computed, Func, Subscribe, Value } from '../core';
 import { AtomManager, ListenerManager } from '../core/atom-manager';
 import type { ComputedState } from '../core/atom-manager';
 import { StoreImpl } from '../core/store';
@@ -10,7 +10,7 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
 
   override sub: Subscribe = (
     atoms: (Value<unknown> | Computed<unknown>)[] | (Value<unknown> | Computed<unknown>),
-    cbEffect: Effect<unknown, unknown[]>,
+    cb: Func<unknown, unknown[]>,
   ): (() => void) => {
     const atomList = Array.isArray(atoms) ? atoms : [atoms];
 
@@ -18,7 +18,7 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
       this.subscribedAtoms.set(atom, (this.subscribedAtoms.get(atom) ?? 0) + 1);
     });
 
-    const unsub = super.sub(atoms, cbEffect);
+    const unsub = super.sub(atoms, cb);
     return () => {
       unsub();
       atomList.forEach((atom) => {

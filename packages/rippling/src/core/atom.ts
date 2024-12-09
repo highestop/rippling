@@ -1,4 +1,4 @@
-import type { Computed, Effect, Read, Value, Write } from '../../types/core/atom';
+import type { Computed, Func, Read, Value, Write } from '../../types/core/atom';
 
 interface Options {
   debugLabel?: string;
@@ -35,8 +35,8 @@ export function $computed<T>(read: Read<T>, options?: Options): Computed<T> {
   return ret;
 }
 
-export function $effect<T, Args extends unknown[]>(write: Write<T, Args>, options?: Options): Effect<T, Args> {
-  const ret: Effect<T, Args> = {
+export function $func<T, Args extends unknown[]>(write: Write<T, Args>, options?: Options): Func<T, Args> {
+  const ret: Func<T, Args> = {
     write,
     toString: generateToString(options?.debugLabel),
   };

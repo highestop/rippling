@@ -5,7 +5,7 @@ import { StrictMode } from 'react';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, it } from 'vitest';
-import { $computed, $effect, $value, createStore, type Value } from '../../core';
+import { $computed, $func, $value, createStore, type Updater, type Value } from '../../core';
 import { useGet } from '../useGet';
 import { useSet } from '../useSet';
 import { StoreProvider } from '../provider';
@@ -123,11 +123,10 @@ it('add an item with filtered list', async () => {
     checked: boolean;
   }
   type ItemAtoms = Value<Item>[];
-  type Update = (prev: ItemAtoms) => ItemAtoms;
 
   let itemIndex = 0;
   const itemAtomsAtom = $value<ItemAtoms>([]);
-  const setItemsAtom = $effect((_get, set, update: Update) => {
+  const setItemsAtom = $func(({ set }, update: Updater<ItemAtoms>) => {
     set(itemAtomsAtom, update);
   });
 

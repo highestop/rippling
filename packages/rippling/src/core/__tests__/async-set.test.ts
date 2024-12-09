@@ -1,9 +1,9 @@
 import { expect, it, vi } from 'vitest';
-import { createStore, $effect, $value } from '..';
+import { createStore, $func, $value } from '..';
 
-it('multiple set in async effect should trigger notify multiple times', async () => {
+it('multiple set in async func should trigger notify multiple times', async () => {
   const base = $value(0);
-  const action = $effect(async (_, set) => {
+  const action = $func(async ({ set }) => {
     set(base, 1);
     set(base, 2);
     await Promise.resolve();
@@ -15,7 +15,7 @@ it('multiple set in async effect should trigger notify multiple times', async ()
   const store = createStore();
   store.sub(
     base,
-    $effect(() => {
+    $func(() => {
       trace();
     }),
   );

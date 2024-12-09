@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-import { $computed, createStore, $effect, $value } from '..';
+import { $computed, createStore, $func, $value } from '..';
 import { suspense } from './utils';
 import { delay } from 'signal-timers';
 import { createDebugStore } from '../../debug';
@@ -62,9 +62,9 @@ it('correctly updates async derived atom after get/set update', async () => {
     // eslint-disable-next-line @typescript-eslint/require-await
     async (get) => get(baseAtom) + 1,
   );
-  const updateDerivedAtom = $effect(
+  const updateDerivedAtom = $func(
     // eslint-disable-next-line @typescript-eslint/require-await
-    async (_get, set, val) => {
+    async ({ set }, val) => {
       set(baseAtom, val as number);
     },
   );
@@ -119,7 +119,7 @@ it('do not keep atoms mounted between async recalculations', async () => {
   const store = createDebugStore();
   store.sub(
     derived,
-    $effect(() => void 0),
+    $func(() => void 0),
   );
   restore();
   await Promise.resolve();
@@ -155,11 +155,11 @@ it('should not provide stale values to conditional dependents', () => {
   const store = createStore();
   store.sub(
     derivedAtom,
-    $effect(() => undefined),
+    $func(() => undefined),
   );
   store.sub(
     stageAtom,
-    $effect(() => undefined),
+    $func(() => undefined),
   );
 
   expect(store.get(stageAtom)).toBe('no-filter');
@@ -190,7 +190,7 @@ it('settles never resolving async derivations with deps picked up sync', async (
 
   store.sub(
     asyncAtom,
-    $effect(async (get) => {
+    $func(async ({ get }) => {
       traceSub();
       await get(asyncAtom);
       trace('OK');
@@ -227,7 +227,7 @@ it('settles never resolving async derivations with deps picked up async', async 
   });
   store.sub(
     asyncAtom,
-    $effect(async (get) => {
+    $func(async ({ get }) => {
       trace('SUB');
       await get(asyncAtom);
       trace('OK');
@@ -304,11 +304,11 @@ it('should not re-evaluate stable derived atom values in situations where depend
   const store = createStore();
   store.sub(
     stableDepDep,
-    $effect(() => void 0),
+    $func(() => void 0),
   );
   store.sub(
     newAtom,
-    $effect(() => void 0),
+    $func(() => void 0),
   );
   expect(store.get(stableDepDep)).toBe(2);
   expect(callCounter).toHaveBeenCalledTimes(1);

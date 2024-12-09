@@ -1,4 +1,4 @@
-import type { ReadableAtom, Effect, Getter, Computed, Value } from '../../types/core/atom';
+import type { ReadableAtom, Func, Getter, Computed, Value } from '../../types/core/atom';
 const EMPTY_MAP = new Map<ReadableAtom<unknown>, number>();
 
 export interface StateState<T> {
@@ -22,7 +22,7 @@ type CommonReadableState<T> = {
 type AtomState<T> = StateState<T> | ComputedState<T>;
 
 interface Mounted {
-  listeners: Set<Effect<unknown, []>>;
+  listeners: Set<Func<unknown, []>>;
   readDepcs?: Map<ReadableAtom<unknown>, number>;
   readDepts: Set<ReadableAtom<unknown>>;
 }
@@ -184,7 +184,7 @@ export class AtomManager {
 }
 
 export class ListenerManager {
-  private pendingListeners = new Set<Effect<unknown, []>>();
+  private pendingListeners = new Set<Func<unknown, []>>();
 
   markPendingListeners(atomManager: AtomManager, atom: ReadableAtom<unknown>) {
     let queue = new Set([atom]);
@@ -206,11 +206,11 @@ export class ListenerManager {
     }
   }
 
-  _debugGetPendingListeners = (): Effect<unknown, []>[] => {
+  _debugGetPendingListeners = (): Func<unknown, []>[] => {
     return Array.from(this.pendingListeners);
   };
 
-  *notify(): Generator<Effect<unknown, []>, void, unknown> {
+  *notify(): Generator<Func<unknown, []>, void, unknown> {
     const pendingListeners = this.pendingListeners;
     this.pendingListeners = new Set();
 

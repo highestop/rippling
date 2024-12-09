@@ -1,5 +1,5 @@
 import type { Strategy } from './type';
-import { createStore, $computed, $effect, $value } from '../../src';
+import { createStore, $computed, $func, $value } from '../../src';
 import type { Computed, Value } from '../../src';
 
 export const ripplingStrategy: Strategy<Value<number> | Computed<number>, ReturnType<typeof createStore>> = {
@@ -15,7 +15,7 @@ export const ripplingStrategy: Strategy<Value<number> | Computed<number>, Return
   sub(store, atom, callback) {
     return store.sub(
       atom,
-      $effect(() => {
+      $func(() => {
         callback();
       }),
     );

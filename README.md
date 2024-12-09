@@ -19,9 +19,9 @@ For Example:
 
 ```typescript
 const store = createStore();
-const countAtom = $value(0);
-store.set(countAtom, 1);
-console.log(store.get(countAtom)); // 1
+const count$ = $value(0);
+store.set(count$, 1);
+console.log(store.get(count$)); // 1
 ```
 
 ### Computed
@@ -32,28 +32,28 @@ For Example:
 
 ```typescript
 const store = createStore();
-const countAtom = $value(0);
-const doubleCountAtom = $computed((get) => get(countAtom) * 2);
-console.log(store.get(doubleCountAtom)); // 0
+const count$ = $value(0);
+const doubleCount$ = $computed((get) => get(count$) * 2);
+console.log(store.get(doubleCount$)); // 0
 ```
 
-### Effect
+### Func
 
-Effect is the basic command unit in Rippling. It can read Value / Computed and write to Value / Effect.
+Func is the basic command unit in Rippling. It can read Value / Computed and write to Value / Func.
 
 For Example:
 
 ```typescript
 const store = createStore();
-const countAtom = $value(0);
-const doubleCountAtom = $value(0);
-const updateCountEffect = $effect((get, set, value) => {
-  set(countAtom, value);
-  set(doubleCountAtom, get(count) * 2);
+const count$ = $value(0);
+const doubleCount$ = $value(0);
+const updateCount$ = $func((get, set, value) => {
+  set(count$, value);
+  set(doubleCount$, get(count$) * 2);
 });
-store.set(updateCountEffect, 1);
-console.log(store.get(countAtom)); // 1
-console.log(store.get(doubleCountAtom)); // 2
+store.set(updateCount$, 1);
+console.log(store.get(count$)); // 1
+console.log(store.get(doubleCount$)); // 2
 ```
 
 ## Changelog

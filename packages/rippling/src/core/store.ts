@@ -1,4 +1,4 @@
-import type { ReadableAtom, Effect, Getter, Value, Updater, Setter } from '../../types/core/atom';
+import type { ReadableAtom, Func, Getter, Value, Updater, Setter } from '../../types/core/atom';
 import type { Store, SubscribeOptions } from '../../types/core/store';
 import { AtomManager, ListenerManager } from './atom-manager';
 
@@ -9,7 +9,7 @@ export class StoreImpl implements Store {
   ) {}
 
   private innerSet = <T, Args extends unknown[]>(
-    atom: Value<T> | Effect<T, Args>,
+    atom: Value<T> | Func<T, Args>,
     ...args: [T | Updater<T>] | Args
   ): undefined | T => {
     if ('read' in atom) {
@@ -17,7 +17,7 @@ export class StoreImpl implements Store {
     }
 
     if ('write' in atom) {
-      const ret = atom.write(this.get, this.set, ...(args as Args));
+      const ret = atom.write({ get: this.get, set: this.set }, ...(args as Args));
       return ret;
     }
 
@@ -44,12 +44,12 @@ export class StoreImpl implements Store {
 
   private notify = () => {
     for (const listener of this.listenerManager.notify()) {
-      listener.write(this.get, this.set);
+      listener.write({ get: this.get, set: this.set });
     }
   };
 
   set: Setter = <T, Args extends unknown[]>(
-    atom: Value<T> | Effect<T, Args>,
+    atom: Value<T> | Func<T, Args>,
     ...args: [T | Updater<T>] | Args
   ): undefined | T => {
     let ret: T | undefined;
@@ -62,37 +62,37 @@ export class StoreImpl implements Store {
     return ret;
   };
 
-  private _subSingleAtom(atom: ReadableAtom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
-    const mounted = this.atomManager.mount(atom);
-    mounted.listeners.add(cbEffect);
+  private _subSingleAtom(target$: ReadableAtom<unknown>, cb$: Func<unknown, unknown[]>): () => void {
+    const mounted = this.atomManager.mount(target$);
+    mounted.listeners.add(cb$);
 
     return () => {
-      mounted.listeners.delete(cbEffect);
+      mounted.listeners.delete(cb$);
 
       if (mounted.readDepts.size === 0 && mounted.listeners.size === 0) {
-        this.atomManager.unmount(atom);
+        this.atomManager.unmount(target$);
       }
     };
   }
 
   sub(
-    atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>,
-    cbEffect: Effect<unknown, unknown[]>,
+    targets$: ReadableAtom<unknown>[] | ReadableAtom<unknown>,
+    cb$: Func<unknown, unknown[]>,
     options?: SubscribeOptions,
   ): () => void {
-    if (Array.isArray(atoms) && atoms.length === 0) {
+    if (Array.isArray(targets$) && targets$.length === 0) {
       return () => void 0;
     }
 
-    if (Array.isArray(atoms) && atoms.length === 1) {
-      return this._subSingleAtom(atoms[0], cbEffect);
-    } else if (!Array.isArray(atoms)) {
-      return this._subSingleAtom(atoms, cbEffect);
+    if (Array.isArray(targets$) && targets$.length === 1) {
+      return this._subSingleAtom(targets$[0], cb$);
+    } else if (!Array.isArray(targets$)) {
+      return this._subSingleAtom(targets$, cb$);
     }
 
     const unsubscribes = new Set<() => void>();
-    atoms.forEach((atom) => {
-      unsubscribes.add(this._subSingleAtom(atom, cbEffect));
+    targets$.forEach((atom) => {
+      unsubscribes.add(this._subSingleAtom(atom, cb$));
     });
 
     options?.signal?.addEventListener('abort', () => {

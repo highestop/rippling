@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { $computed, $effect, $value } from '../../core';
+import { $computed, $func, $value } from '../../core';
 import { createDebugStore, nestedAtomToString } from '..';
 
 it('get all subscribed atoms', () => {
@@ -8,7 +8,7 @@ it('get all subscribed atoms', () => {
   const derived = $computed((get) => get(base) + 1, { debugLabel: 'derived' });
   store.sub(
     [base, derived],
-    $effect(
+    $func(
       () => {
         void 0;
       },

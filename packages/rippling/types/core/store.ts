@@ -1,4 +1,4 @@
-import type { ReadableAtom, Effect, Getter, Setter } from './atom';
+import type { ReadableAtom, Func, Getter, Setter } from './atom';
 
 export interface Store {
   get: Getter;
@@ -12,6 +12,6 @@ export interface SubscribeOptions {
 
 export type Subscribe = (
   atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>,
-  callback: Effect<unknown, unknown[]>,
+  callback: Func<unknown, unknown[]>,
   options?: SubscribeOptions,
 ) => () => void;

@@ -1,6 +1,6 @@
-import { $computed, $effect, $value } from 'rippling';
+import { $computed, $func, $value } from 'rippling';
 
-const maskElem = $effect((_get, _set, axis, signal: AbortSignal) => {
+const maskElem = $func(({}, axis, signal: AbortSignal) => {
   const mask = document.createElement('div');
   mask.style.position = 'fixed';
   mask.style.top = '0';
@@ -18,10 +18,9 @@ const maskElem = $effect((_get, _set, axis, signal: AbortSignal) => {
   return mask;
 });
 
-export const resizable = $effect(
+export const resizable = $func(
   (
-    get,
-    set,
+    { get, set },
     handlerElem: HTMLElement,
     targetElem: HTMLElement,
     axis: 'horizontal' | 'vertical',

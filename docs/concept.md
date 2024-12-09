@@ -17,13 +17,13 @@ Like Jotai, Rippling is also an Atom State solution. However, unlike Jotai, Ripp
 `$value` is a readable and writable "variable", similar to a Primitive Atom in Jotai. Reading a `$value` involves no computation process, and writing to a `$value` won't trigger any Listener execution - it's simply a variable.
 
 ```typescript
-const i = $value(0);
+const i$ = $value(0);
 const store = createStore();
-console.log(store.get(i)); // 0
-store.set(i, 1);
-console.log(store.get(i)); // 1
-store.set(i, (x) => x * 10);
-console.log(store.get(i)); // 10
+console.log(store.get(i$)); // 0
+store.set(i$, 1);
+console.log(store.get(i$)); // 1
+store.set(i$, (x) => x * 10);
+console.log(store.get(i$)); // 10
 ```
 
 ### `$computed` (equivalent to "Read-only Atom" in Jotai)
@@ -31,49 +31,49 @@ console.log(store.get(i)); // 10
 `$computed` is a readable computed variable whose calculation process should be side-effect free. As long as its dependent Atoms don't change, repeatedly reading the value of a `$computed` should yield identical results. `$computed` is similar to a Read-only Atom in Jotai.
 
 ```typescript
-const i = $value(0);
-const j = $computed((get) => get(i) * 10);
-console.log(store.get(j)); // 0
-store.set(i, 1);
-console.log(store.get(j)); // 10
+const i$ = $value(0);
+const j$ = $computed((get) => get(i$) * 10);
+console.log(store.get(j$)); // 0
+store.set(i$, 1);
+console.log(store.get(j$)); // 10
 ```
 
-### `$effect` (equivalent to "Write-only Atom" in Jotai)
+### `$func` (equivalent to "Write-only Atom" in Jotai)
 
-`$effect` is used to encapsulate a process code block. The code inside an Effect only executes when an external `set` call is made on it. `$effect` is also the only type in rippling that can modify value without relying on a `store`.
+`$func` is used to encapsulate a process code block. The code inside an Func only executes when an external `set` call is made on it. `$func` is also the only type in rippling that can modify value without relying on a `store`.
 
 ```typescript
-const num = $value(1);
-const doubleEffect = $effect((get, set) => {
-  const double = get(num) * 2;
-  set(num, double);
+const num$ = $value(1);
+const double$ = $func((get, set) => {
+  const double = get(num$) * 2;
+  set(num$, double);
 });
-console.log(store.get(num)); // 1
-store.set(doubleEffect);
-console.log(store.get(num)); // 2
-store.set(doubleEffect);
-console.log(store.get(num)); // 4
+console.log(store.get(num$)); // 1
+store.set(double$);
+console.log(store.get(num$)); // 2
+store.set(double$);
+console.log(store.get(num$)); // 4
 ```
 
 ## Subscription System
 
-Rippling's subscription system is very different from Jotai's. First, Rippling's subscription callback must be an effect.
+Rippling's subscription system is very different from Jotai's. First, Rippling's subscription callback must be an Func.
 
 ```typescript
-export const userId = $value(1);
+export const userId$ = $value(1);
 
-export const userIdChangeEffect = $effect((get, set) => {
-  const userId = get(userId);
+export const userIdChange$ = $func((get, set) => {
+  const userId = get(userId$);
   // ...
 });
 
 // ...
-import { userId, userIdChangeEffect } from './atoms';
+import { userId$, userIdChange$ } from './atoms';
 
 function setupPage() {
   const store = createStore();
   // ...
-  store.sub(userId, userIdChangeEffect);
+  store.sub(userId$, userIdChange$);
   // ...
 }
 ```
@@ -83,44 +83,6 @@ The consideration here is to avoid having callbacks depend on the Store object, 
 Similarly, Rippling does not have APIs like `onMount`. This is because Rippling considers `onMount` to be fundamentally an effect, and providing APIs like `onMount` in `computed` would make the computation process non-idempotent. For example, operators like `loadable` cannot be implemented in Rippling.
 
 As an alternative solution, operators like `loadable` should be implemented as Hooks in React rather than in Rippling.
-
-## Manual Control of Store.sub Notifications
-
-In Jotai, `sub` notifications are automatic - whenever the subscribed Atom or its upstream atoms change, all subscribed callbacks are automatically notified. This can create performance overhead, as shown in this common editor scenario.
-
-```typescript
-const width = $value(100);
-const height = $value(100);
-const area = $computed(() => store.get(width) * store.get(height));
-store.sub(area, () => {
-  // ...
-});
-
-// this will trigger the callback twice
-store.set(width, 200);
-store.set(height, 200);
-```
-
-In this scenario, the area value is computed twice. For an editor like Motiff, frequent CPU usage can significantly slow down the editor's response time. In Rippling, I handle this differently - all notifications are only triggered once after the outermost effect completes its execution.
-
-```typescript
-const width = value(100);
-const height = value(100);
-const computedArea = computed(() => store.get(width) * store.get(height));
-store.sub(
-  computedArea,
-  effect(() => {
-    // ...
-  }),
-);
-
-store.set(
-  effect((get, set) => {
-    set(width, 200);
-    set(height, 200);
-  }),
-); // subscriber will be notified once
-```
 
 ## Reactive is not first-class citizen
 

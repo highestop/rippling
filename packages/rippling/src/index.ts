@@ -1,6 +1,6 @@
-export { $value, $computed, $effect, createStore } from './core';
+export { $value, $computed, $func, createStore } from './core';
 
-export type { Value, Computed, Effect, Getter, Setter, Updater, Subscribe, Store, Read, Write } from './core';
+export type { Value, Computed, Func, Getter, Setter, Updater, Subscribe, Store, Read, Write } from './core';
 
 export { nestedAtomToString, createDebugStore } from './debug';
 export type { DebugStore } from './debug';
