@@ -22,7 +22,7 @@ createRoot(document.getElementById('root')).render(
 
 All descendant components within the `StoreProvider` will use the provided store as the caller for `get` and `set` operations.
 
-You can place the `StoreProvider` either inside or outside of `StrictMode`; the functionality is the same.
+You can place the `StoreProvider` inside or outside of `StrictMode`; the functionality is the same.
 
 ## Retrieving Atom Values
 
@@ -62,15 +62,15 @@ import { useLoadable } from 'rippling';
 import { userAtom } from './atoms/user';
 
 function App() {
-  const user = useLoadable(userAtom);
-  if (user.state === 'loading') return <div>Loading...</div>;
-  if (user.state === 'error') return <div>Error: {user.error.message}</div>;
+  const user_ = useLoadable(userAtom);
+  if (user_.state === 'loading') return <div>Loading...</div>;
+  if (user_.state === 'error') return <div>Error: {user_.error.message}</div>;
 
-  return <div>{user.data.name}</div>;
+  return <div>{user_.data.name}</div>;
 }
 ```
 
-`useLoadable` accepts an Atom that returns a `Promise`, wrapping the result in a `Loadable` structure.
+`useLoadable` accepts an Atom that returns a `Promise` and wraps the result in a `Loadable` structure.
 
 ```typescript
 type Loadable<T> =
