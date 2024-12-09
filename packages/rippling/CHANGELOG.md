@@ -1,5 +1,12 @@
 # rippling
 
+## 0.4.0
+
+### Minor Changes
+
+- bdf0f1f: feat: add toString for atoms
+- 3b193d5: feat: expose Read & Write types
+
 ## 0.3.0
 
 ### Minor Changes
