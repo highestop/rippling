@@ -1,5 +1,5 @@
 import type { ReadableAtom, Effect, Getter, Value, Updater, Setter } from '../../types/core/atom';
-import type { Store } from '../../types/core/store';
+import type { Store, SubscribeOptions } from '../../types/core/store';
 import { AtomManager, ListenerManager } from './atom-manager';
 
 export class StoreImpl implements Store {
@@ -75,7 +75,11 @@ export class StoreImpl implements Store {
     };
   }
 
-  sub(atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>, cbEffect: Effect<unknown, unknown[]>): () => void {
+  sub(
+    atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>,
+    cbEffect: Effect<unknown, unknown[]>,
+    options?: SubscribeOptions,
+  ): () => void {
     if (Array.isArray(atoms) && atoms.length === 0) {
       return () => void 0;
     }
@@ -89,6 +93,12 @@ export class StoreImpl implements Store {
     const unsubscribes = new Set<() => void>();
     atoms.forEach((atom) => {
       unsubscribes.add(this._subSingleAtom(atom, cbEffect));
+    });
+
+    options?.signal?.addEventListener('abort', () => {
+      for (const unsubscribe of unsubscribes) {
+        unsubscribe();
+      }
     });
 
     return () => {

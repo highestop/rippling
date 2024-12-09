@@ -7,7 +7,11 @@ export function useGet<T>(atom: Value<T> | Computed<T>) {
   const store = useStore();
   return useSyncExternalStore(
     (fn) => {
-      return store.sub(atom, $effect(fn));
+      const ctrl = new AbortController();
+      store.sub(atom, $effect(fn), { signal: ctrl.signal });
+      return () => {
+        ctrl.abort();
+      };
     },
     () => {
       return store.get(atom);

@@ -6,7 +6,12 @@ export interface Store {
   sub: Subscribe;
 }
 
+export interface SubscribeOptions {
+  signal?: AbortSignal;
+}
+
 export type Subscribe = (
   atoms: ReadableAtom<unknown>[] | ReadableAtom<unknown>,
   callback: Effect<unknown, unknown[]>,
+  options?: SubscribeOptions,
 ) => () => void;
