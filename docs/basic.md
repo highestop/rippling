@@ -2,10 +2,10 @@
 
 ## Atom
 
-### `value`
+### `Value`
 
-### `derived`
+### `Computed`
 
-### `computed`
+### `Func`
 
 ## Store

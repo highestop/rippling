@@ -31,14 +31,14 @@ The most basic usage is to use `useGet` to retrieve the value of an Atom.
 ```jsx
 // atoms/count.ts
 import { $value } from 'rippling';
-export const countAtom = $value(0);
+export const count$ = $value(0);
 
 // App.tsx
 import { useGet } from 'rippling';
-import { countAtom } from './atoms/count';
+import { count$ } from './atoms/count';
 
 function App() {
-  const count = useGet(countAtom);
+  const count = useGet(count$);
   return <div>{count}</div>;
 }
 ```
@@ -53,16 +53,16 @@ Two other useful hooks are available when dealing with `Promise` values. First, 
 // atoms/user.ts
 import { $computed } from 'rippling';
 
-export const userAtom = $computed(async () => {
+export const user$ = $computed(async () => {
   return fetch('/api/users/current').then((res) => res.json());
 });
 
 // App.tsx
 import { useLoadable } from 'rippling';
-import { userAtom } from './atoms/user';
+import { user$ } from './atoms/user';
 
 function App() {
-  const user_ = useLoadable(userAtom);
+  const user_ = useLoadable(user$);
   if (user_.state === 'loading') return <div>Loading...</div>;
   if (user_.state === 'error') return <div>Error: {user_.error.message}</div>;
 
@@ -94,10 +94,10 @@ Another useful hook is `useResolved`, which always returns the resolved value of
 ```jsx
 // App.tsx
 import { useResolved } from 'rippling';
-import { userAtom } from './atoms/user';
+import { user$ } from './atoms/user';
 
 function App() {
-  const user = useResolved(userAtom);
+  const user = useResolved(user$);
   return <div>{user?.name}</div>;
 }
 ```
@@ -122,11 +122,11 @@ The `useSet` hook can be used to update the value of an Atom. It returns a funct
 ```jsx
 // App.tsx
 import { useSet } from 'rippling';
-import { countAtom } from './atoms/count';
+import { count$ } from './atoms/count';
 
 function App() {
-  const setCount = useSet(countAtom);
-  // setCount(x => x + 1) is equivalent to store.set(countAtom, x => x + 1)
+  const setCount = useSet(count$);
+  // setCount(x => x + 1) is equivalent to store.set(count$, x => x + 1)
   return <button onClick={() => setCount((x) => x + 1)}>Increment</button>;
 }
 ```

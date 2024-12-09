@@ -7,7 +7,7 @@ Add the suffix `$` to atoms. Since we often need to get values from Atoms in man
 ```typescript
 const count$ = $value(0);
 const double$ = $computed((get) => get(count$) * 2);
-const updateCount$ = $func((get, set, val) => {
+const updateCount$ = $func(({ get, set }, val) => {
   set(count$, val);
 });
 

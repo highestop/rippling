@@ -44,7 +44,7 @@ console.log(store.get(j$)); // 10
 
 ```typescript
 const num$ = $value(1);
-const double$ = $func((get, set) => {
+const double$ = $func(({ get, set }) => {
   const double = get(num$) * 2;
   set(num$, double);
 });
@@ -62,7 +62,7 @@ Rippling's subscription system is very different from Jotai's. First, Rippling's
 ```typescript
 export const userId$ = $value(1);
 
-export const userIdChange$ = $func((get, set) => {
+export const userIdChange$ = $func(({ get, set }) => {
   const userId = get(userId$);
   // ...
 });
