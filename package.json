@@ -13,13 +13,18 @@
     "fix:format": "prettier '**/*' --ignore-unknown --write",
     "fix:lint": "eslint . --fix",
     "test": "vitest --run --coverage && pnpm vitest bench --run && pnpm -F rippling-devtools test:e2e",
-    "build": "pnpm -F rippling build && pnpm -F rippling-devtools build",
+    "build": "pnpm build:lib && pnpm build:babel && pnpm build:devtools",
+    "build:lib": "pnpm -F rippling build",
+    "build:devtools": "pnpm -F rippling-devtools build",
+    "build:babel": "pnpm -F rippling-babel build",
     "lint": "pnpm '/^lint:.*/'",
-    "lint:type": "pnpm -F rippling exec tsc --noEmit",
+    "lint:type": "pnpm -F rippling exec tsc --noEmit && pnpm -F rippling-babel exec tsc --noEmit",
     "lint:eslint": "eslint .",
     "lint:format": "prettier '**/*' --ignore-unknown --list-different",
     "ci:version": "changeset version && pnpm lint-staged",
-    "ci:publish": "cd packages/rippling/dist && pnpm publish",
+    "ci:publish": "pnpm publish:lib && pnpm publish:babel",
+    "publish:lib": "cd packages/rippling/dist && pnpm publish",
+    "publish:babel": "cd packages/babel/dist && pnpm publish",
     "prepare": "husky"
   },
   "engines": {
@@ -40,6 +45,7 @@
     "lint-staged": "^15.2.10",
     "prettier": "^3.4.2",
     "tsconfig-moon": "^1.3.0",
+    "typescript": "^5.7.2",
     "typescript-eslint": "^8.17.0",
     "vitest": "^2.1.8"
   }
