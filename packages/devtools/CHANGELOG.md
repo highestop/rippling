@@ -1,5 +1,11 @@
 # rippling-devtools
 
+## 1.0.0
+
+### Major Changes
+
+- e837a17: refactor: rename $effect to $func and change Write interface
+
 ## 0.3.0
 
 ### Minor Changes
