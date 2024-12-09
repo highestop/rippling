@@ -1,5 +1,15 @@
 # rippling
 
+## 1.0.0
+
+### Major Changes
+
+- e837a17: refactor: rename $effect to $func and change Write interface
+
+### Minor Changes
+
+- fa29c0f: feat: store.sub support AbortSignal
+
 ## 0.4.0
 
 ### Minor Changes
