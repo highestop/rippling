@@ -10,8 +10,10 @@ const doubleAtom = $computed((get) => get(countAtom) * 2);
 const updateCountEffect = $effect((get, set, val) => {
   set(countAtom, val);
 });
+
 // ...
 const count = get(countAtom) // will not conflict with normal value
+
 // in react component
 const updateCount = useSet(updateCountEffect) // Effect suffix is useful for this 
 
