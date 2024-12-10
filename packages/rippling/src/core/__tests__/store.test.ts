@@ -579,3 +579,64 @@ it('mount multiple times on same atom', () => {
 
   expect(store.getSubscribeGraph()).toEqual([]);
 });
+
+it('sub empty atoms', () => {
+  const store = createStore();
+  expect(() => {
+    store.sub(
+      [],
+      $func(() => void 0),
+    );
+  }).not.toThrow();
+});
+
+it('mount single atom in array', () => {
+  const store = createStore();
+  const base$ = $value(0);
+  const trace = vi.fn();
+
+  store.sub(
+    [base$],
+    $func(() => {
+      trace();
+    }),
+  );
+
+  store.set(base$, 1);
+  expect(trace).toHaveBeenCalledTimes(1);
+});
+
+it('mount support signal', () => {
+  const store = createStore();
+  const base$ = $value(0);
+  const trace = vi.fn();
+
+  const controller = new AbortController();
+  store.sub(
+    base$,
+    $func(() => {
+      trace();
+    }),
+    {
+      signal: controller.signal,
+    },
+  );
+
+  controller.abort();
+
+  store.set(base$, 1);
+  expect(trace).not.toBeCalled();
+});
+
+it('call unsub for multiple atoms will unsub all listeners', () => {
+  const store = createStore();
+  const base1$ = $value(0);
+  const base2$ = $value(0);
+  const trace = vi.fn();
+
+  const unsub = store.sub([base1$, base2$], $func(trace));
+  unsub();
+  store.set(base1$, 1);
+  store.set(base2$, 2);
+  expect(trace).not.toBeCalled();
+});

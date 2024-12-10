@@ -196,4 +196,15 @@ describe('react', () => {
     await user.click(button);
     expect(await screen.findByText('1')).toBeTruthy();
   });
+
+  it('will throw error if no provider', () => {
+    const count$ = $value(0);
+
+    function App() {
+      const count = useGet(count$);
+      return <div>{count}</div>;
+    }
+
+    expect(() => render(<App />)).toThrow();
+  });
 });

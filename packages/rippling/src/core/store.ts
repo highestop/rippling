@@ -62,17 +62,24 @@ export class StoreImpl implements Store {
     return ret;
   };
 
-  private _subSingleAtom(target$: ReadableAtom<unknown>, cb$: Func<unknown, unknown[]>): () => void {
+  private _subSingleAtom(
+    target$: ReadableAtom<unknown>,
+    cb$: Func<unknown, unknown[]>,
+    options?: SubscribeOptions,
+  ): () => void {
     const mounted = this.atomManager.mount(target$);
     mounted.listeners.add(cb$);
 
-    return () => {
+    const unsub = () => {
       mounted.listeners.delete(cb$);
 
       if (mounted.readDepts.size === 0 && mounted.listeners.size === 0) {
         this.atomManager.unmount(target$);
       }
     };
+
+    options?.signal?.addEventListener('abort', unsub);
+    return unsub;
   }
 
   sub(
@@ -85,27 +92,23 @@ export class StoreImpl implements Store {
     }
 
     if (Array.isArray(targets$) && targets$.length === 1) {
-      return this._subSingleAtom(targets$[0], cb$);
+      return this._subSingleAtom(targets$[0], cb$, options);
     } else if (!Array.isArray(targets$)) {
-      return this._subSingleAtom(targets$, cb$);
+      return this._subSingleAtom(targets$, cb$, options);
     }
 
     const unsubscribes = new Set<() => void>();
     targets$.forEach((atom) => {
-      unsubscribes.add(this._subSingleAtom(atom, cb$));
+      unsubscribes.add(this._subSingleAtom(atom, cb$, options));
     });
 
-    options?.signal?.addEventListener('abort', () => {
-      for (const unsubscribe of unsubscribes) {
-        unsubscribe();
-      }
-    });
-
-    return () => {
+    const unsub = () => {
       for (const unsubscribe of unsubscribes) {
         unsubscribe();
       }
     };
+
+    return unsub;
   }
 }
 

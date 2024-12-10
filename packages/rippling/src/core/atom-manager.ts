@@ -206,10 +206,6 @@ export class ListenerManager {
     }
   }
 
-  _debugGetPendingListeners = (): Func<unknown, []>[] => {
-    return Array.from(this.pendingListeners);
-  };
-
   *notify(): Generator<Func<unknown, []>, void, unknown> {
     const pendingListeners = this.pendingListeners;
     this.pendingListeners = new Set();

@@ -48,6 +48,10 @@ export default function debugLabelPlugin({ types: t }: typeof babel, options?: P
           } else if (path.node.init.arguments.length > 1) {
             const existingOptions = path.node.init.arguments[1];
             if (t.isObjectExpression(existingOptions)) {
+              const hasDebugLabel = existingOptions.properties.some(
+                (prop) => t.isObjectProperty(prop) && t.isIdentifier(prop.key) && prop.key.name === 'debugLabel',
+              );
+              if (hasDebugLabel) return;
               existingOptions.properties.push(debugLabel);
             }
           }
