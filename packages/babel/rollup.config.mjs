@@ -4,31 +4,37 @@ import * as path from 'node:path';
 import { babel } from '@rollup/plugin-babel';
 import { dts } from 'rollup-plugin-dts';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import { ModuleKind } from 'typescript';
+import { ModuleKind, ModuleResolutionKind } from 'typescript';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const projectRootDir = path.resolve(__dirname);
 
 /** @type {import('./package.json')} */
 const pkg = JSON.parse(fs.readFileSync('./package.json', { encoding: 'utf-8' }));
+const extensions = ['.ts', '.js'];
 
-function generateTarget({ input, targetCJS, targetES, external }) {
+function external(id) {
+  return !id.startsWith('.') && !id.startsWith(projectRootDir);
+}
+
+function generateTarget({ input, targetCJS, targetES }) {
+  const commonConfigs = {
+    input,
+    onwarn: (warning) => {
+      throw new Error(warning?.message);
+    },
+    external,
+  };
   return [
     {
-      input,
-      onwarn: (warning) => {
-        throw new Error(warning?.message);
-      },
-      external,
+      ...commonConfigs,
       plugins: [
         nodeResolve({
-          extensions: ['.ts'],
+          extensions,
         }),
-        commonjs(),
         babel({
           exclude: 'node_modules/**',
-          extensions: ['.ts'],
+          extensions,
           babelHelpers: 'bundled',
           configFile: path.resolve(projectRootDir, './babel.config.json'),
         }),
@@ -45,11 +51,7 @@ function generateTarget({ input, targetCJS, targetES, external }) {
       ],
     },
     {
-      input,
-      onwarn: (warning) => {
-        throw new Error(warning?.message);
-      },
-      external,
+      ...commonConfigs,
       plugins: [
         dts({
           respectExternal: true,
@@ -60,25 +62,6 @@ function generateTarget({ input, targetCJS, targetES, external }) {
         {
           file: targetES.replace(/\.js$/, '.d.ts'),
         },
-      ],
-    },
-    {
-      input,
-      onwarn: (warning) => {
-        throw new Error(warning?.message);
-      },
-      external,
-      plugins: [
-        dts({
-          respectExternal: true,
-          tsconfig: path.resolve(projectRootDir, './tsconfig.json'),
-          compilerOptions: {
-            module: ModuleKind.CommonJS,
-            verbatimModuleSyntax: false,
-          },
-        }),
-      ],
-      output: [
         {
           file: targetCJS.replace(/\.cjs$/, '.d.cts'),
         },
@@ -93,19 +76,16 @@ export default [
     input: './src/preset.ts',
     targetCJS: './dist/preset.cjs',
     targetES: './dist/preset.js',
-    external: [...Object.keys(pkg.peerDependencies)],
   }),
   ...generateTarget({
     input: './src/plugin-debug-label.ts',
     targetCJS: './dist/plugin-debug-label.cjs',
     targetES: './dist/plugin-debug-label.js',
-    external: [...Object.keys(pkg.peerDependencies)],
   }),
 
   ...generateTarget({
     input: './src/plugin-react-refresh.ts',
     targetCJS: './dist/plugin-react-refresh.cjs',
     targetES: './dist/plugin-react-refresh.js',
-    external: [...Object.keys(pkg.peerDependencies)],
   }),
 ];
