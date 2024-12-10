@@ -1,5 +1,12 @@
 # rippling
 
+## 1.1.0
+
+### Minor Changes
+
+- 04c0473: feat: store support interceptor to monitor behavior
+- 04c0473: fix: umount should release upstream atoms mounting state
+
 ## 1.0.0
 
 ### Major Changes
