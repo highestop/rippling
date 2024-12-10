@@ -13,7 +13,7 @@
     "build": "rollup -c",
     "prebuild": "shx rm -rf dist",
     "postbuild": "pnpm run --sequential '/^postbuild:.*/'",
-    "postbuild:copy": "shx cp package.json ../../README.md ../../LICENSE dist",
+    "postbuild:copy": "shx cp package.json README.md ../../LICENSE dist",
     "postbuild:patch:package_private": "json -I -f dist/package.json -e \"this.private=false;\"",
     "postbuild:patch:package_dev_deps": "json -I -f dist/package.json -e \"this.devDependencies=undefined;\"",
     "postbuild:patch:package_scripts": "json -I -f dist/package.json -e \"this.scripts=undefined;\"",
