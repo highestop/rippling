@@ -6,7 +6,7 @@ import type { ComputedState } from '../core/atom-manager';
 import { StoreImpl } from '../core/store';
 
 class DebugStoreImpl extends StoreImpl implements DebugStore {
-  private readonly subscribedAtoms = new Map<Value<unknown> | Computed<unknown>, number>();
+  private readonly mountedAtomListenersCount = new Map<Value<unknown> | Computed<unknown>, number>();
 
   override sub: Subscribe = (
     atoms: (Value<unknown> | Computed<unknown>)[] | (Value<unknown> | Computed<unknown>),
@@ -15,20 +15,21 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
     const atomList = Array.isArray(atoms) ? atoms : [atoms];
 
     atomList.forEach((atom) => {
-      this.subscribedAtoms.set(atom, (this.subscribedAtoms.get(atom) ?? 0) + 1);
+      this.mountedAtomListenersCount.set(atom, (this.mountedAtomListenersCount.get(atom) ?? 0) + 1);
     });
 
     const unsub = super.sub(atoms, cb);
     return () => {
       unsub();
       atomList.forEach((atom) => {
-        if (!this.subscribedAtoms.has(atom)) {
+        const count = this.mountedAtomListenersCount.get(atom) ?? 0;
+        if (count === 0) {
           return;
         }
 
-        this.subscribedAtoms.set(atom, (this.subscribedAtoms.get(atom) ?? 0) - 1);
-        if (this.subscribedAtoms.get(atom) === 0) {
-          this.subscribedAtoms.delete(atom);
+        this.mountedAtomListenersCount.set(atom, count - 1);
+        if (count === 1) {
+          this.mountedAtomListenersCount.delete(atom);
         }
       });
     };
@@ -58,9 +59,11 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
   };
 
   getSubscribeGraph = (): NestedAtom => {
-    return Array.from(this.subscribedAtoms.keys()).map((atom) => {
+    const subscribedAtoms = Array.from(this.mountedAtomListenersCount.keys());
+    return subscribedAtoms.map((atom) => {
       const atomState = this.atomManager.readAtomState(atom);
-      const listeners = Array.from(atomState.mounted?.listeners ?? []);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it's mounted
+      const listeners = Array.from(atomState.mounted!.listeners);
       return [atom, ...listeners];
     });
   };

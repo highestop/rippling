@@ -41,7 +41,8 @@ export default function reactRefreshPlugin({ types: t }: typeof babel, options?:
       ) {
         const { node } = nodePath;
         if (t.isCallExpression(node.declaration) && isAtom(t, node.declaration.callee, options?.customAtomNames)) {
-          const filename = state.filename ?? 'unknown';
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const filename = state.filename!;
           const atomKey = `${filename}/defaultExport`;
 
           const ast = buildExport({
@@ -59,7 +60,8 @@ export default function reactRefreshPlugin({ types: t }: typeof babel, options?:
           // Make sure atom declaration is in module scope
           (nodePath.parentPath.parentPath?.isProgram() || nodePath.parentPath.parentPath?.isExportNamedDeclaration())
         ) {
-          const filename = state.filename ?? 'unknown';
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const filename = state.filename!;
           const atomKey = `${filename}/${nodePath.node.id.name}`;
 
           const ast = buildAtomDeclaration({

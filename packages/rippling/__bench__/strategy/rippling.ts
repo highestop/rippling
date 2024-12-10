@@ -23,7 +23,4 @@ export const ripplingStrategy: Strategy<Value<number> | Computed<number>, Return
   get(store, atom) {
     return store.get(atom);
   },
-  setWithNotify(store, atom, value) {
-    store.set(atom as Value<number>, value);
-  },
 };

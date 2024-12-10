@@ -78,4 +78,46 @@ describe('Resizable', () => {
 
     expect(targetElem.style.height).toBe('100px');
   });
+
+  it('should stop resize when mouse up', () => {
+    createStore().set(resizable, handlerElem, targetElem, 'horizontal', signal);
+
+    const mouseDownEvent = new MouseEvent('mousedown', {
+      clientX: 100,
+      clientY: 250,
+    });
+    handlerElem.dispatchEvent(mouseDownEvent);
+
+    const mouseUpEvent = new MouseEvent('mouseup', {
+      clientX: 100,
+      clientY: 250,
+    });
+    document.dispatchEvent(mouseUpEvent);
+
+    expect(targetElem.style.width).toBe('30%');
+  });
+
+  it('double mouse down should cancel the last one', () => {
+    createStore().set(resizable, handlerElem, targetElem, 'vertical', signal);
+
+    handlerElem.dispatchEvent(
+      new MouseEvent('mousedown', {
+        clientX: 0,
+        clientY: 0,
+      }),
+    );
+    const mouseDownEvent = new MouseEvent('mousedown', {
+      clientX: 100,
+      clientY: 250,
+    });
+    handlerElem.dispatchEvent(mouseDownEvent);
+
+    const mouseMoveEvent = new MouseEvent('mousemove', {
+      clientX: 100,
+      clientY: 350,
+    });
+    document.dispatchEvent(mouseMoveEvent);
+
+    expect(targetElem.style.height).toBe('100px');
+  });
 });
