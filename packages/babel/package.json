@@ -1,0 +1,70 @@
+{
+  "name": "rippling-babel",
+  "version": "0.0.0",
+  "description": "Rippling Babel Plugin",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/e7h4n/rippling.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "prebuild": "shx rm -rf dist",
+    "postbuild": "pnpm run --sequential '/^postbuild:.*/'",
+    "postbuild:copy": "shx cp package.json ../../README.md ../../LICENSE dist",
+    "postbuild:patch:package_private": "json -I -f dist/package.json -e \"this.private=false;\"",
+    "postbuild:patch:package_dev_deps": "json -I -f dist/package.json -e \"this.devDependencies=undefined;\"",
+    "postbuild:patch:package_scripts": "json -I -f dist/package.json -e \"this.scripts=undefined;\"",
+    "postbuild:patch:package_dist_main": "json -I -f dist/package.json -e \"this.main='./preset.cjs';\"",
+    "postbuild:patch:package_dist_dot_import": "json -I -f dist/package.json -e \"this.exports['.'].import='./preset.js';\"",
+    "postbuild:patch:package_dist_dot_require": "json -I -f dist/package.json -e \"this.exports['.'].require='./preset.cjs';\"",
+    "postbuild:patch:package_dist_sub_import": "json -I -f dist/package.json -e \"this.exports['./preset'].import='./preset.js';\"",
+    "postbuild:patch:package_dist_sub_require": "json -I -f dist/package.json -e \"this.exports['./preset'].require='./preset.cjs';\"",
+    "postbuild:patch:package_dist_sub_import_plugin_debug_label": "json -I -f dist/package.json -e \"this.exports['./plugin-debug-label'].import='./plugin-debug-label.js';\"",
+    "postbuild:patch:package_dist_sub_require_plugin_debug_label": "json -I -f dist/package.json -e \"this.exports['./plugin-debug-label'].require='./plugin-debug-label.cjs';\"",
+    "postbuild:patch:package_dist_sub_import_plugin_react_refresh": "json -I -f dist/package.json -e \"this.exports['./plugin-react-refresh'].import='./plugin-react-refresh.js';\"",
+    "postbuild:patch:package_dist_sub_require_plugin_react_refresh": "json -I -f dist/package.json -e \"this.exports['./plugin-react-refresh'].require='./plugin-react-refresh.cjs';\""
+  },
+  "main": "./dist/preset.cjs",
+  "exports": {
+    ".": {
+      "import": "./dist/preset.js",
+      "require": "./dist/preset.cjs"
+    },
+    "./preset": {
+      "import": "./dist/preset.js",
+      "require": "./dist/preset.cjs"
+    },
+    "./plugin-debug-label": {
+      "import": "./dist/plugin-debug-label.js",
+      "require": "./dist/plugin-debug-label.cjs"
+    },
+    "./plugin-react-refresh": {
+      "import": "./dist/plugin-react-refresh.js",
+      "require": "./dist/plugin-react-refresh.cjs"
+    }
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/template": "^7.25.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
+    "@babel/template": "^7.25.7",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__template": "^7.4.4",
+    "json": "^11.0.0",
+    "rollup": "^4.28.1",
+    "rollup-plugin-dts": "^6.1.1",
+    "shx": "^0.3.4",
+    "vitest": "^2.1.8"
+  }
+}
