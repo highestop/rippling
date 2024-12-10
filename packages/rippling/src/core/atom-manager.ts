@@ -1,5 +1,4 @@
 import type { ReadableAtom, Func, Getter, Computed, Value } from '../../types/core/atom';
-import type { StoreOptions } from '../../types/core/store';
 const EMPTY_MAP = new Map<ReadableAtom<unknown>, number>();
 
 export interface StateState<T> {
@@ -34,8 +33,6 @@ function canReadAsCompute<T>(atom: ReadableAtom<T>): atom is Computed<T> {
 
 export class AtomManager {
   private atomStateMap = new WeakMap<ReadableAtom<unknown>, AtomState<unknown>>();
-
-  constructor(private readonly options?: StoreOptions) {}
 
   private shouldRecalculate = <T>(atom: ReadableAtom<T>, ignoreMounted: boolean): boolean => {
     const atomState = this.atomStateMap.get(atom) as AtomState<T> | undefined;
@@ -140,45 +137,14 @@ export class AtomManager {
     atom: Value<T> | Computed<T>,
     ignoreMounted = false,
   ): StateState<T> | ComputedState<T> | CommonReadableState<T> {
-    const fn = (): StateState<T> | ComputedState<T> | CommonReadableState<T> => {
-      if (canReadAsCompute(atom)) {
-        return this.readComputedAtom(atom, ignoreMounted);
-      }
-
-      return this.readStateAtom(atom);
-    };
-
-    if (this.options?.inspector?.get) {
-      let ret: StateState<T> | ComputedState<T> | CommonReadableState<T> | undefined;
-
-      const fnWithRet = () => {
-        ret = fn();
-        return ret.val;
-      };
-
-      this.options.inspector.get(atom, fnWithRet);
-      if (!ret) {
-        throw new Error('interceptor must call fn sync');
-      }
-
-      return ret;
+    if (canReadAsCompute(atom)) {
+      return this.readComputedAtom(atom, ignoreMounted);
     }
 
-    return fn();
-  }
-
-  private tryGetMount(atom: ReadableAtom<unknown>): Mounted | undefined {
-    return this.atomStateMap.get(atom)?.mounted;
+    return this.readStateAtom(atom);
   }
 
   public mount<T>(atom: ReadableAtom<T>): Mounted {
-    const mounted = this.tryGetMount(atom);
-    if (mounted) {
-      return mounted;
-    }
-
-    this.options?.inspector?.mount?.(atom);
-
     const atomState = this.readAtomState(atom);
 
     atomState.mounted = atomState.mounted ?? {
@@ -204,14 +170,9 @@ export class AtomManager {
       return;
     }
 
-    this.options?.inspector?.unmount?.(atom);
-
     for (const [dep] of Array.from(atomState.mounted.readDepcs ?? EMPTY_MAP)) {
       const depState = this.readAtomState(dep);
       depState.mounted?.readDepts.delete(atom);
-      if (depState.mounted?.readDepts.size === 0) {
-        this.unmount(dep);
-      }
     }
 
     atomState.mounted = undefined;
