@@ -2,9 +2,9 @@ import babel from '@babel/core';
 import type { PluginObj } from '@babel/core';
 import { isAtom } from './utils';
 import type { PluginOptions } from './utils';
-import template from '@babel/template';
+import { templateBuilder } from './template';
 
-const buildExport = template(`
+const buildExport = templateBuilder(`
     const %%atomIdentifier%% = %%atom%%;
     export default %%atomIdentifier%%
 `);
@@ -18,7 +18,7 @@ export default function debugLabelPlugin({ types: t }: typeof babel, options?: P
       ) {
         const { node } = nodePath;
         if (t.isCallExpression(node.declaration) && isAtom(t, node.declaration.callee, options?.customAtomNames)) {
-          const filename = (state.filename ?? 'unknown').replace(/\.\w+$/, '');
+          const filename = (state.filename?.replace(options?.projectRoot ?? '', '') ?? 'unknown').replace(/\.\w+$/, '');
 
           let displayName = filename.split('/').pop() ?? 'unknown';
 

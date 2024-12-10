@@ -2,12 +2,12 @@ import { transformSync } from '@babel/core';
 import { expect, it } from 'vitest';
 import plugin from '../plugin-debug-label';
 
-const transform = (code: string, filename?: string, customAtomNames?: string[]) =>
+const transform = (code: string, filename?: string, customAtomNames?: string[], projectRoot?: string) =>
   transformSync(code, {
     babelrc: false,
     configFile: false,
     filename,
-    plugins: [[plugin, { customAtomNames }]],
+    plugins: [[plugin, { customAtomNames, projectRoot }]],
   })?.code;
 
 it('Should add a debugLabel to an atom', () => {
@@ -53,6 +53,22 @@ it('Should handle a atom being exported', () => {
 
 it('Should handle a default exported atom', () => {
   expect(transform(`export default $value(0);`, 'countAtom.ts')).toMatchInlineSnapshot(`
+      "const countAtom = $value(0, {
+        debugLabel: "countAtom"
+      });
+      export default countAtom;"
+    `);
+});
+
+it('Should filter out projectRoot from the debugLabel', () => {
+  expect(
+    transform(
+      `export default $value(0);`,
+      '/users/username/project/src/atoms/countAtom.ts',
+      [],
+      '/users/username/project/src/atoms/',
+    ),
+  ).toMatchInlineSnapshot(`
       "const countAtom = $value(0, {
         debugLabel: "countAtom"
       });

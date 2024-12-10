@@ -2,13 +2,13 @@ import { transformSync } from '@babel/core';
 import { expect, it } from 'vitest';
 import plugin from '../plugin-react-refresh';
 
-const transform = (code: string, filename?: string, customAtomNames?: string[]) =>
+const transform = (code: string, filename?: string, customAtomNames?: string[], projectRoot?: string) =>
   transformSync(code, {
     babelrc: false,
     configFile: false,
     filename,
     root: '.',
-    plugins: [[plugin, { customAtomNames }]],
+    plugins: [[plugin, { customAtomNames, projectRoot }]],
   })?.code;
 
 it('Should add a cache for a single atom', () => {
@@ -173,4 +173,20 @@ it('Should handle custom atom names', () => {
     };
     const mySpecialThing = globalThis.ripplingAtomCache.get("/src/atoms/index.ts/mySpecialThing", myCustomAtom(0));"
   `);
+});
+
+it('Will strip out the projectRoot from the atom key', () => {
+  expect(transform(`const count$ = $value(0);`, '/src/atoms/index.ts', [], '/src/atoms/')).toMatchInlineSnapshot(`
+      "globalThis.ripplingAtomCache = globalThis.ripplingAtomCache || {
+        cache: new Map(),
+        get(name, inst) {
+          if (this.cache.has(name)) {
+            return this.cache.get(name);
+          }
+          this.cache.set(name, inst);
+          return inst;
+        }
+      };
+      const count$ = globalThis.ripplingAtomCache.get("index.ts/count$", $value(0));"
+    `);
 });

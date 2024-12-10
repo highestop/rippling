@@ -3,6 +3,7 @@ import { types } from '@babel/core';
 
 export interface PluginOptions {
   customAtomNames?: string[];
+  projectRoot?: string;
 }
 
 export function isAtom(

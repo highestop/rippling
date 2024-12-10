@@ -1,10 +1,10 @@
 import babel from '@babel/core';
 import type { PluginObj } from '@babel/core';
-import template from '@babel/template';
 import { isAtom } from './utils';
 import type { PluginOptions } from './utils';
+import { templateBuilder } from './template';
 
-const buildGlobalAtomCache = template(`
+const buildGlobalAtomCache = templateBuilder(`
   globalThis.ripplingAtomCache = globalThis.ripplingAtomCache || {
     cache: new Map(),
     get(name, inst) { 
@@ -16,8 +16,8 @@ const buildGlobalAtomCache = template(`
     },
   }
 `);
-const buildExport = template(`export default globalThis.ripplingAtomCache.get(%%atomKey%%, %%atom%%)`);
-const buildAtomDeclaration = template(
+const buildExport = templateBuilder(`export default globalThis.ripplingAtomCache.get(%%atomKey%%, %%atom%%)`);
+const buildAtomDeclaration = templateBuilder(
   `const %%atomIdentifier%% = globalThis.ripplingAtomCache.get(%%atomKey%%, %%atom%%)`,
 );
 
@@ -43,7 +43,7 @@ export default function reactRefreshPlugin({ types: t }: typeof babel, options?:
         if (t.isCallExpression(node.declaration) && isAtom(t, node.declaration.callee, options?.customAtomNames)) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const filename = state.filename!;
-          const atomKey = `${filename}/defaultExport`;
+          const atomKey = `${filename.replace(options?.projectRoot ?? '', '')}/defaultExport`;
 
           const ast = buildExport({
             atomKey: t.stringLiteral(atomKey),
@@ -62,7 +62,7 @@ export default function reactRefreshPlugin({ types: t }: typeof babel, options?:
         ) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const filename = state.filename!;
-          const atomKey = `${filename}/${nodePath.node.id.name}`;
+          const atomKey = `${filename.replace(options?.projectRoot ?? '', '')}/${nodePath.node.id.name}`;
 
           const ast = buildAtomDeclaration({
             atomIdentifier: t.identifier(nodePath.node.id.name),
