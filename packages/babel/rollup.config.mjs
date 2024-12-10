@@ -5,7 +5,7 @@ import { babel } from '@rollup/plugin-babel';
 import { dts } from 'rollup-plugin-dts';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import { ModuleKind, ModuleResolutionKind } from 'typescript';
+import { ModuleKind } from 'typescript';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const projectRootDir = path.resolve(__dirname);
