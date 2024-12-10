@@ -1,9 +1,36 @@
+import type { CallbackFunc, StoreInspector } from '../../types/core/store';
 import type { DebugStore } from '../../types/debug/debug-store';
 import type { NestedAtom } from '../../types/debug/util';
-import type { Computed, Func, Subscribe, Value } from '../core';
+import type { Computed, Func, Subscribe, Updater, Value } from '../core';
 import { AtomManager, ListenerManager } from '../core/atom-manager';
 import type { ComputedState } from '../core/atom-manager';
 import { StoreImpl } from '../core/store';
+
+const ConsoleLoggingInterceptor: StoreInspector = {
+  get: <T>(atom$: Value<T> | Computed<T>, fn: () => T) => {
+    console.log('GET', '[' + atom$.toString() + ']', fn());
+  },
+  set: <T, Args extends unknown[]>(atom$: Value<T> | Func<T, Args>, fn: () => T, ...args: Args | [T | Updater<T>]) => {
+    console.log('SET', '[' + atom$.toString() + ']', args, fn());
+  },
+  sub: <T>(atom$: Value<T> | Computed<T>, callback$: CallbackFunc<T>, fn: () => void) => {
+    fn();
+    console.log('SUB', '[' + atom$.toString() + ']', callback$);
+  },
+  unsub: <T>(atom$: Value<T> | Computed<T>, callback$: CallbackFunc<T>, fn: () => void) => {
+    fn();
+    console.log('UNSUB', '[' + atom$.toString() + ']', callback$);
+  },
+  mount: <T>(atom$: Value<T> | Computed<T>) => {
+    console.log('MOUNT', '[' + atom$.toString() + ']');
+  },
+  unmount: <T>(atom$: Value<T> | Computed<T>) => {
+    console.log('UNMOUNT', '[' + atom$.toString() + ']');
+  },
+  notify: <T>(callback$: CallbackFunc<T>, fn: () => T) => {
+    console.log('NOTIFY', '[' + callback$.toString() + ']', fn());
+  },
+};
 
 class DebugStoreImpl extends StoreImpl implements DebugStore {
   private readonly mountedAtomListenersCount = new Map<Value<unknown> | Computed<unknown>, number>();
@@ -69,9 +96,18 @@ class DebugStoreImpl extends StoreImpl implements DebugStore {
   };
 }
 
-export function createDebugStore(): DebugStore {
-  const atomManager = new AtomManager();
+interface DebugStoreOptions {
+  enableConsoleLogging?: boolean;
+}
+
+export function createDebugStore(options?: DebugStoreOptions): DebugStore {
+  const inspector = options?.enableConsoleLogging ? ConsoleLoggingInterceptor : undefined;
+  const atomManager = new AtomManager({
+    inspector,
+  });
   const listenerManager = new ListenerManager();
 
-  return new DebugStoreImpl(atomManager, listenerManager);
+  return new DebugStoreImpl(atomManager, listenerManager, {
+    inspector,
+  });
 }

@@ -640,3 +640,44 @@ it('call unsub for multiple atoms will unsub all listeners', () => {
   store.set(base2$, 2);
   expect(trace).not.toBeCalled();
 });
+
+it('should unmount base automatically when unmount listener', () => {
+  const store = createStore();
+  const base$ = $value(0, {
+    debugLabel: 'base$',
+  });
+  const trace = vi.fn();
+  const computed$ = $computed(
+    (get) => {
+      trace();
+      return get(base$);
+    },
+    {
+      debugLabel: 'computed$',
+    },
+  );
+
+  const derived$ = $computed(
+    (get) => {
+      return get(computed$);
+    },
+    {
+      debugLabel: 'derived$',
+    },
+  );
+
+  const unsub = store.sub(
+    derived$,
+    $func(() => void 0, {
+      debugLabel: 'callback$',
+    }),
+  );
+  trace.mockClear();
+  store.set(base$, 1);
+  expect(trace).toHaveBeenCalledTimes(1);
+
+  unsub();
+  trace.mockClear();
+  store.set(base$, 2);
+  expect(trace).not.toHaveBeenCalled();
+});

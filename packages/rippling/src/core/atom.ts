@@ -8,7 +8,7 @@ let globalId = 0;
 
 const generateToString = (debugLabel?: string) => {
   const id = globalId++;
-  const label = `${String(id)}:${debugLabel ?? ''}`;
+  const label = `${String(id)}${debugLabel ? ':' + debugLabel : ''}`;
   return () => label;
 };
 
