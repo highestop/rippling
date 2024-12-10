@@ -49,7 +49,8 @@ export default function debugLabelPlugin({ types: t }: typeof babel, options?: P
             const existingOptions = path.node.init.arguments[1];
             if (t.isObjectExpression(existingOptions)) {
               const hasDebugLabel = existingOptions.properties.some(
-                (prop) => t.isObjectProperty(prop) && t.isIdentifier(prop.key) && prop.key.name === 'debugLabel',
+                (prop: babel.types.ObjectMethod | babel.types.ObjectProperty | babel.types.SpreadElement) =>
+                  t.isObjectProperty(prop) && t.isIdentifier(prop.key) && prop.key.name === 'debugLabel',
               );
               if (hasDebugLabel) return;
               existingOptions.properties.push(debugLabel);
