@@ -2,8 +2,14 @@ export { $value, $computed, $func, createStore } from './core';
 
 export type { Value, Computed, Func, Getter, Setter, Updater, Subscribe, Store, Read, Write } from './core';
 
-export { nestedAtomToString, createDebugStore } from './debug';
-export type { DebugStore } from './debug';
+export {
+  nestedAtomToString,
+  createDebugStore,
+  setupDevtoolsInterceptor,
+  GLOBAL_RIPPLING_INTERCEPED_KEY,
+  EventInterceptor,
+} from './debug';
+export type { DebugStore, PackedEventMessage, DevToolsHookMessage } from './debug';
 
 export { useGet, useSet, useResolved, useLoadable, StoreProvider } from './react';
 
@@ -16,4 +22,13 @@ export type {
   UnmountEventData,
   UnsubEventData,
 } from '../types/debug/event';
-export { GetEvent, SetEvent, SubEvent, UnsubEvent, type EventMap, MountEvent, UnmountEvent } from './debug/event';
+export {
+  GetEvent,
+  SetEvent,
+  SubEvent,
+  UnsubEvent,
+  type EventMap,
+  MountEvent,
+  UnmountEvent,
+  StoreEvent,
+} from './debug/event';

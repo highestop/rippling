@@ -1,15 +1,24 @@
-import './style.css';
-import { createRoot } from 'react-dom/client';
 import { Inspector } from './components/Inspector';
-import { createStore, StoreProvider } from 'rippling';
+import { StoreProvider, type DevToolsHookMessage, type Store } from 'rippling';
+import type { ReactNode } from 'react';
+import { onEvent$ } from './atoms/events';
 
-const main = document.createElement('div');
-main.id = 'main';
-document.body.appendChild(main);
-const store = createStore();
-const root = createRoot(main);
-root.render(
-  <StoreProvider value={store}>
-    <Inspector />
-  </StoreProvider>,
-);
+export function setupUI(render: (children: ReactNode) => void, store: Store) {
+  render(
+    <>
+      <StoreProvider value={store}>
+        <Inspector />
+      </StoreProvider>
+    </>,
+  );
+}
+
+export function setupStore(store: Store, window: Window) {
+  window.addEventListener('message', ({ data }: { data: DevToolsHookMessage | undefined }) => {
+    if (!data || !('source' in data) || (data as unknown as { source: string }).source !== 'rippling-store-inspector') {
+      return;
+    }
+
+    store.set(onEvent$, data.payload);
+  });
+}

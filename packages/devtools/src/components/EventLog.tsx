@@ -1,25 +1,19 @@
-import { useGet } from 'rippling';
-import { generateMockEvents } from '../mocks/mockEvents';
-import { selectedStoreIndex } from '../atoms/selectedStore';
+import {
+  useGet,
+  type EventMap,
+  type GetEventData,
+  type MountEventData,
+  type PackedEventMessage,
+  type SetEventData,
+  type SubEventData,
+  type UnmountEventData,
+  type UnsubEventData,
+  type Value,
+} from 'rippling';
+import { storeEvents$ } from '../atoms/events';
 
-const events = generateMockEvents();
 export function EventLog() {
-  const index = useGet(selectedStoreIndex);
-  if (index === undefined) return null;
-
-  const formatTimestamp = (timestamp: number) => {
-    const date = new Date(timestamp);
-    return (
-      date.toLocaleTimeString('zh-CN', {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      }) +
-      '.' +
-      date.getMilliseconds().toString().padStart(3, '0')
-    );
-  };
+  const event$s = useGet(storeEvents$);
 
   return (
     <div className="h-full flex flex-col bg-white">
@@ -50,7 +44,7 @@ export function EventLog() {
         <table className="w-full border-collapse text-[11px] leading-[14px]">
           <thead>
             <tr className="bg-[#f3f3f3] text-[#5f6368]">
-              <th className="text-left py-[3px] px-[6px] font-normal border-b border-[#e0e0e0]">Time</th>
+              <th className="text-left py-[3px] px-[6px] font-normal border-b border-[#e0e0e0]">ID</th>
               <th className="text-left py-[3px] px-[6px] font-normal border-b border-[#e0e0e0]">Op</th>
               <th className="text-left py-[3px] px-[6px] font-normal border-b border-[#e0e0e0]">Atom</th>
               <th className="text-left py-[3px] px-[6px] font-normal border-b border-[#e0e0e0]">Atom Type</th>
@@ -59,24 +53,132 @@ export function EventLog() {
             </tr>
           </thead>
           <tbody className="text-[#333]">
-            {events.map((event, index) => (
-              <tr
-                key={index}
-                className={`border-b border-[#e0e0e0] hover:bg-[#f5f5f5] ${
-                  index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'
-                }`}
-              >
-                <td className="py-[1px] px-[6px] font-mono">{formatTimestamp(event.timestamp)}</td>
-                <td className="py-[1px] px-[6px]">{event.type.toUpperCase()}</td>
-                <td className="py-[1px] px-[6px]">{event.target}</td>
-                <td className="py-[1px] px-[6px]">{event.targetType}</td>
-                <td className="py-[1px] px-[6px]">{event.argsType ?? '-'}</td>
-                <td className="py-[1px] px-[6px]">{event.returnType ?? '-'}</td>
-              </tr>
+            {event$s.map((event$) => (
+              <EventRow key={event$.toString()} event$={event$} />
             ))}
           </tbody>
         </table>
       </div>
     </div>
+  );
+}
+
+function EventRow<T extends keyof EventMap>({ event$ }: { event$: Value<PackedEventMessage<T>> }) {
+  const event: PackedEventMessage<T> = useGet(event$);
+
+  if (event.type === 'mount') {
+    return <MountEventRow event={event as PackedEventMessage<'mount'>} />;
+  }
+
+  if (event.type === 'unmount') {
+    return <UnmountEventRow event={event as PackedEventMessage<'unmount'>} />;
+  }
+
+  if (event.type === 'get') {
+    return <GetEventRow event={event as PackedEventMessage<'get'>} />;
+  }
+
+  if (event.type === 'set') {
+    return <SetEventRow event={event as PackedEventMessage<'set'>} />;
+  }
+
+  if (event.type === 'sub') {
+    return <SubEventRow event={event as PackedEventMessage<'sub'>} />;
+  }
+
+  if (event.type === 'unsub') {
+    return <UnsubEventRow event={event as PackedEventMessage<'unsub'>} />;
+  }
+
+  return null;
+}
+
+function MountEventRow({ event }: { event: PackedEventMessage<'mount'> }) {
+  const data: MountEventData = event.data;
+
+  return (
+    <tr data-testid="event-row">
+      <td>{event.eventId}</td>
+      <td>{event.type.toUpperCase()}</td>
+      <td>{event.targetAtom}</td>
+      <td>{data.time}</td>
+      <td></td>
+      <td></td>
+    </tr>
+  );
+}
+
+function UnmountEventRow({ event }: { event: PackedEventMessage<'unmount'> }) {
+  const data: UnmountEventData = event.data;
+
+  return (
+    <tr data-testid="event-row">
+      <td>{event.eventId}</td>
+      <td>{event.type.toUpperCase()}</td>
+      <td>{event.targetAtom}</td>
+      <td>{data.time}</td>
+      <td></td>
+      <td></td>
+    </tr>
+  );
+}
+
+function SubEventRow({ event }: { event: PackedEventMessage<'sub'> }) {
+  const data: SubEventData = event.data;
+
+  return (
+    <tr data-testid="event-row">
+      <td>{event.eventId}</td>
+      <td>{event.type.toUpperCase()}</td>
+      <td>{event.targetAtom}</td>
+      <td>{data.beginTime}</td>
+      <td>{data.state === 'end' ? data.endTime : ''}</td>
+      <td>{data.callback}</td>
+    </tr>
+  );
+}
+
+function UnsubEventRow({ event }: { event: PackedEventMessage<'unsub'> }) {
+  const data: UnsubEventData = event.data;
+
+  return (
+    <tr data-testid="event-row">
+      <td>{event.eventId}</td>
+      <td>{event.type.toUpperCase()}</td>
+      <td>{event.targetAtom}</td>
+      <td>{data.beginTime}</td>
+      <td>{data.state === 'end' ? data.endTime : ''}</td>
+      <td>{data.callback}</td>
+    </tr>
+  );
+}
+
+function GetEventRow({ event }: { event: PackedEventMessage<'get'> }) {
+  const data: GetEventData = event.data;
+
+  return (
+    <tr data-testid="event-row">
+      <td>{event.eventId}</td>
+      <td>{event.type.toUpperCase()}</td>
+      <td>{event.targetAtom}</td>
+      <td>{data.beginTime}</td>
+      <td>{data.state !== 'begin' ? data.endTime : ''}</td>
+      <td>{data.state === 'hasData' ? String(data.data) : data.state === 'hasError' ? String(data.error) : ''}</td>
+    </tr>
+  );
+}
+
+function SetEventRow({ event }: { event: PackedEventMessage<'set'> }) {
+  const data: SetEventData = event.data;
+
+  return (
+    <tr data-testid="event-row">
+      <td>{event.eventId}</td>
+      <td>{event.type.toUpperCase()}</td>
+      <td>{event.targetAtom}</td>
+      <td>{data.beginTime}</td>
+      <td>{data.state !== 'begin' ? data.endTime : ''}</td>
+      <td>{data.state === 'hasData' ? String(data.data) : data.state === 'hasError' ? String(data.error) : ''}</td>
+    </tr>
   );
 }
