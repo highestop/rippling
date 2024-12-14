@@ -44,12 +44,8 @@ describe('forwarder', () => {
       source: 'rippling-store-inspector',
       payload: {
         eventId: expect.any(Number) as number,
-        data: {
-          args: [1],
-          beginTime: expect.any(Number) as number,
-          endTime: expect.any(Number) as number,
-          state: 'hasData',
-        },
+        time: expect.any(Number) as number,
+        state: 'success',
         targetAtom: expect.any(String) as string,
         type: 'set',
       },
@@ -70,12 +66,8 @@ describe('forwarder', () => {
       source: 'rippling-store-inspector',
       payload: {
         eventId: expect.any(Number) as number,
-        data: {
-          args: [1],
-          beginTime: expect.any(Number) as number,
-          endTime: expect.any(Number) as number,
-          state: 'hasData',
-        },
+        time: expect.any(Number) as number,
+        state: 'success',
         targetAtom: expect.any(String) as string,
         type: 'set',
       },
