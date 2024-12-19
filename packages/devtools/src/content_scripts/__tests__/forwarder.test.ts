@@ -1,7 +1,7 @@
 import { beforeEach, expect, it, vi, type Mock, afterEach, describe } from 'vitest';
 import { setupDevtoolsMessageListener } from '../forwarder';
 import { delay } from 'signal-timers';
-import { $value, createDebugStore, setupDevtoolsInterceptor } from 'rippling';
+import { state, createDebugStore, setupDevtoolsInterceptor } from 'ccstate';
 
 describe('forwarder', () => {
   let controller: AbortController;
@@ -37,11 +37,11 @@ describe('forwarder', () => {
     connect();
 
     const store = createDebugStore(setupDevtoolsInterceptor(window));
-    store.set($value(0), 1);
+    store.set(state(0), 1);
 
     await delay(0);
     expect(trace).toHaveBeenCalledWith({
-      source: 'rippling-store',
+      source: 'ccstate-store',
       payload: {
         eventId: expect.any(Number) as number,
         time: expect.any(Number) as number,
@@ -55,7 +55,7 @@ describe('forwarder', () => {
   it('will forward history messages before connect', async () => {
     const store = createDebugStore(setupDevtoolsInterceptor(window));
 
-    store.set($value(0), 1);
+    store.set(state(0), 1);
     await delay(0);
 
     connect();
@@ -63,7 +63,7 @@ describe('forwarder', () => {
     await delay(0);
 
     expect(trace).toHaveBeenCalledWith({
-      source: 'rippling-store',
+      source: 'ccstate-store',
       payload: {
         eventId: expect.any(Number) as number,
         time: expect.any(Number) as number,
@@ -79,7 +79,7 @@ describe('forwarder', () => {
 
     controller.abort();
     const store = createDebugStore(setupDevtoolsInterceptor(window));
-    store.set($value(0), 1);
+    store.set(state(0), 1);
 
     await delay(0);
     expect(trace).not.toHaveBeenCalled();

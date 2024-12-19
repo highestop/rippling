@@ -1,7 +1,7 @@
-import { $func, createStore } from 'rippling';
+import { command, createStore } from 'ccstate';
 import { initialize$ as initializeInspectPanel$ } from './atoms/chrome/inspect-panel';
 
-const createDevtoolsRootSignal$ = $func(() => {
+const createDevtoolsRootSignal$ = command(() => {
   const controller = new AbortController();
   window.addEventListener(
     'beforeunload',
@@ -37,4 +37,4 @@ const init = () => {
 
 chrome.devtools.network.onNavigated.addListener(init);
 init();
-console.warn('[Rippling] Devtools initialized');
+console.warn('[CCState] Devtools initialized');
