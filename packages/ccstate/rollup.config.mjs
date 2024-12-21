@@ -8,10 +8,19 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const projectRootDir = path.resolve(__dirname);
 
-/** @type {import('./package.json')} */
-const pkg = JSON.parse(fs.readFileSync('./package.json', { encoding: 'utf-8' }));
+/**
+ * @param {string} id
+ * @returns {boolean}
+ */
+function external(id) {
+  return !id.startsWith('.') && !id.startsWith(projectRootDir);
+}
 
-function generateTarget({ input, targetCJS, targetES, external }) {
+/**
+ * @param {{input:string, targetCJS:string, targetES:string}} param0
+ * @returns {ReadonlyArray<import('rollup').RollupOptions>}
+ */
+function generateTarget({ input, targetCJS, targetES }) {
   return [
     {
       input,
@@ -51,6 +60,8 @@ function generateTarget({ input, targetCJS, targetES, external }) {
         dts({
           respectExternal: true,
           tsconfig: path.resolve(projectRootDir, './tsconfig.json'),
+          // https://github.com/Swatinem/rollup-plugin-dts/issues/143
+          compilerOptions: { preserveSymlinks: false },
         }),
       ],
       output: [
@@ -71,27 +82,29 @@ export default [
     input: './src/index.ts',
     targetCJS: './dist/index.cjs',
     targetES: './dist/index.js',
-    external: ['react'],
   }),
 
   ...generateTarget({
     input: './src/core/index.ts',
     targetCJS: './dist/core/index.cjs',
     targetES: './dist/core/index.js',
-    external: [],
   }),
 
   ...generateTarget({
     input: './src/react/index.ts',
     targetCJS: './dist/react/index.cjs',
     targetES: './dist/react/index.js',
-    external: [...Object.keys(pkg.peerDependencies)],
   }),
 
   ...generateTarget({
     input: './src/debug/index.ts',
     targetCJS: './dist/debug/index.cjs',
     targetES: './dist/debug/index.js',
-    external: [],
+  }),
+
+  ...generateTarget({
+    input: './src/vue/index.ts',
+    targetCJS: './dist/vue/index.cjs',
+    targetES: './dist/vue/index.js',
   }),
 ];
