@@ -19,7 +19,7 @@ The name of CCState comes from three basic data types: computed, command, and st
 - 💯 Simple & Intuitive: Crystal-clear API design with just 3 data types and 2 operations
 - ✅ Rock-solid Reliability: Comprehensive test coverage reaching 100% branch coverage
 - 🪶 Ultra-lightweight: Zero dependencies, only 500 lines of core code
-- 💡 Framework Agnostic: Seamlessly works with [React](docs/react.md), [Vue](docs/vue.md), [Vanilla](docs/vanilla.md), or any UI framework
+- 💡 Framework Agnostic: Seamlessly works with [React](docs/react.md), [Vue](docs/vue.md), [Solid.js](docs/solid.md), [Vanilla](docs/vanilla.md), or any UI framework
 - 🚀 Blazing Fast: Optimized performance from day one, 2x-7x faster than Jotai across scenarios
 
 ## Getting Started
@@ -275,6 +275,10 @@ That's it! Next, you can learn how to use CCState in React.
 ## Using in Vue
 
 [Using in Vue](docs/vue.md)
+
+## Using in Solid.js
+
+[Using in Solid.js](docs/solid.md)
 
 ## Using in Vanilla
 
@@ -813,10 +817,9 @@ So, I think the only way to implement `Computed`'s effect-less is to separate th
 
 Here are some new ideas:
 
-- Integration with svelte / solid.js
-- Enhance devtools
+- Integration with svelte
+- Enhance debug ability
   - Support viewing current subscription graph and related atom values
-  - Enable logging and breakpoints for specific atoms in devtools
 - Performance improvements
   - Mount atomState directly on atoms when there's only one store in the application to reduce WeakMap lookup overhead
   - Support static declaration of upstream dependencies for Computed to improve performance by disabling runtime dependency analysis
