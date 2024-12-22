@@ -6,6 +6,8 @@ import { state, createStore } from '../../core';
 import type { State } from '../../core';
 import { useGet, StoreProvider, useLastResolved } from '../';
 import { cleanup, render } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
+import { delay } from 'signal-timers';
 
 it('should release memory after component unmount', async () => {
   const store = createStore();
@@ -32,7 +34,7 @@ it('should release memory after component unmount', async () => {
   expect(await detector.isLeaking()).toBe(false);
 });
 
-it.skip('should release memory for promise & loadable', async () => {
+it('should release memory for promise & loadable', async () => {
   const store = createStore();
   let base$: State<Promise<string>> | undefined = state(Promise.resolve('bar'));
 
@@ -54,6 +56,7 @@ it.skip('should release memory for promise & loadable', async () => {
 
   base$ = undefined;
   cleanup();
+  await delay(0); // wait promise reject to free promise callback
 
   expect(await detector.isLeaking()).toBe(false);
 });
