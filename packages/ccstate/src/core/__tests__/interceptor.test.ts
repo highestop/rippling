@@ -1,15 +1,12 @@
 import { expect, it, vi } from 'vitest';
-import { computed, command, state } from '../atom';
+import { computed, command, state } from '../signal';
 import type { CallbackFunc, Store, StoreInterceptor, StoreOptions } from '../../../types/core/store';
-import { AtomManager, ListenerManager } from '../atom-manager';
 import { StoreImpl } from '../store';
-import type { Command, ReadableAtom, Updater, State } from '../../../types/core/atom';
+import type { Command, Signal, Updater, State } from '../../../types/core/signal';
+import { delay } from 'signal-timers';
 
 function createStoreForTest(options: StoreOptions): Store {
-  const atomManager = new AtomManager(options);
-  const listenerManager = new ListenerManager();
-
-  return new StoreImpl(atomManager, listenerManager, options);
+  return new StoreImpl(options);
 }
 
 it('should intercept get', () => {
@@ -59,6 +56,19 @@ it('interceptor must call fn sync', () => {
 
   const base$ = state(0);
   expect(() => store.get(base$)).toThrow();
+});
+
+it('interceptor must call fn sync for set', () => {
+  const store = createStoreForTest({
+    interceptor: {
+      set: () => void 0,
+    },
+  });
+
+  const base$ = state(0);
+  expect(() => {
+    store.set(base$, 1);
+  }).toThrow();
 });
 
 it('interceptor must call fn sync for derived', () => {
@@ -150,7 +160,7 @@ it('should intercept sub', () => {
   const trace = vi.fn();
   const store = createStoreForTest({
     interceptor: {
-      sub: <T>(atom$: ReadableAtom<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
+      sub: <T>(atom$: Signal<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
         fn();
         trace(atom$, callback$);
       },
@@ -170,7 +180,7 @@ it('should intercept multiple sub', () => {
   const trace = vi.fn();
   const store = createStoreForTest({
     interceptor: {
-      sub: <T>(atom$: ReadableAtom<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
+      sub: <T>(atom$: Signal<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
         fn();
         trace(atom$, callback$);
       },
@@ -189,7 +199,7 @@ it('intercept sub must call fn sync', () => {
   const trace = vi.fn();
   const store = createStoreForTest({
     interceptor: {
-      sub: <T>(atom$: ReadableAtom<unknown>, callback$: CallbackFunc<T>) => {
+      sub: <T>(atom$: Signal<unknown>, callback$: CallbackFunc<T>) => {
         trace(atom$, callback$);
       },
     },
@@ -257,7 +267,7 @@ it('should intercept unsub', () => {
   const trace = vi.fn();
   const store = createStoreForTest({
     interceptor: {
-      unsub: <T>(atom$: ReadableAtom<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
+      unsub: <T>(atom$: Signal<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
         fn();
         trace(atom$, callback$);
       },
@@ -270,20 +280,24 @@ it('should intercept unsub', () => {
   expect(trace).toBeCalledWith(base$, callback$);
 });
 
-it('intercept unsub fn must be called sync', () => {
+it('intercept unsub fn must be called sync', async () => {
+  const traceUncaughtException = vi.fn();
+  process.on('uncaughtException', traceUncaughtException);
+
   const base$ = state(0);
   const trace = vi.fn();
   const store = createStoreForTest({
     interceptor: {
-      unsub: <T>(atom$: ReadableAtom<unknown>, callback$: CallbackFunc<T>) => {
+      unsub: <T>(atom$: Signal<unknown>, callback$: CallbackFunc<T>) => {
         trace(atom$, callback$);
       },
     },
   });
   const callback$ = command(() => 'foo');
-  expect(() => {
-    store.sub(base$, callback$)();
-  }).toThrow();
+  store.sub(base$, callback$)();
+  await delay(0);
+  expect(traceUncaughtException).toBeCalled();
+  process.off('uncaughtException', traceUncaughtException);
 });
 
 it('should intercept multiple unsub', () => {
@@ -293,7 +307,7 @@ it('should intercept multiple unsub', () => {
   const trace = vi.fn();
   const store = createStoreForTest({
     interceptor: {
-      unsub: <T>(atom$: ReadableAtom<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
+      unsub: <T>(atom$: Signal<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
         fn();
         trace(atom$, callback$);
       },
@@ -314,7 +328,7 @@ it('should intercept signal triggered unsub', () => {
   const trace = vi.fn();
   const store = createStoreForTest({
     interceptor: {
-      unsub: <T>(atom$: ReadableAtom<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
+      unsub: <T>(atom$: Signal<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
         fn();
         trace(atom$, callback$);
       },
@@ -339,7 +353,7 @@ it('intercept unsub should not called if already unsub', () => {
   const trace = vi.fn();
   const store = createStoreForTest({
     interceptor: {
-      unsub: <T>(atom$: ReadableAtom<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
+      unsub: <T>(atom$: Signal<unknown>, callback$: CallbackFunc<T>, fn: () => void) => {
         fn();
         trace(atom$, callback$);
       },
@@ -366,11 +380,7 @@ it('intercept unmount', () => {
     },
   };
 
-  const atomManager = new AtomManager({
-    interceptor: interceptor,
-  });
-  const listenerManager = new ListenerManager();
-  const store = new StoreImpl(atomManager, listenerManager, {
+  const store = new StoreImpl({
     interceptor: interceptor,
   });
 
@@ -467,7 +477,7 @@ it('should intercept computed', () => {
   );
   expect(traceRead).not.toBeCalled();
 
-  store.set(base$, 1);
+  store.set(base$, 2);
   expect(traceRead).toBeCalled();
 });
 
